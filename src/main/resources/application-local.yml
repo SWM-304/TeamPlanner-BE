@@ -18,3 +18,8 @@ spring:
 logging.level:
   org.hibernate.SQL: debug
   org.hibernate.type: trace
+
+
+springdoc:
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json

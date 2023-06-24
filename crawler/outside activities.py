@@ -10,11 +10,11 @@ import re
 from datetime import datetime, timedelta, date
 
 chrome_options = webdriver.ChromeOptions()
-# chrome_options.add_argument('--headless')               # headless
-# chrome_options.add_argument('--no-sandbox')
-# chrome_options.add_argument('--disable-dev-shm-usage')
-# chrome_options.add_argument('--disable-gpu')
-# chrome_options.add_argument('--window-size=1920x1080')
+chrome_options.add_argument('--headless')               # headless
+chrome_options.add_argument('--no-sandbox')
+chrome_options.add_argument('--disable-dev-shm-usage')
+chrome_options.add_argument('--disable-gpu')
+chrome_options.add_argument('--window-size=1920x1080')
 chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
 driver = webdriver.Chrome('chromedriver', chrome_options=chrome_options)
@@ -70,7 +70,7 @@ urls = re.findall(r"https://[^\s]+", sitemap.text)
 
 totalsite=len(urls)-4 #  쓸때없는 coverletter 4개 값 빼야함
 
-for i in range(totalsite-1,78,-1): ## 80부터가 최신이므로 80번 부터 탐색
+for i in range(totalsite-1,77,-1): ## 80부터가 최신이므로 80번 부터 탐색
     data=1
     driver2 = webdriver.Chrome('chromedriver', chrome_options=chrome_options)
     driver2.implicitly_wait(1)
@@ -152,7 +152,7 @@ for i in range(totalsite-1,78,-1): ## 80부터가 최신이므로 80번 부터 �
             
         except:
             pass
-        data+=300 # 원래는 폴더가 3씩 늘어나서 +=3으로해야함.
+        data+=3 # 원래는 폴더가 3씩 늘어나서 +=3으로해야함.
             
 
 # json 파일로 변환하는 작업

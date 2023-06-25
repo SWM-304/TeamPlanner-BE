@@ -18,7 +18,7 @@ chrome_options.add_argument('--disable-gpu')
 chrome_options.add_argument('--window-size=1920x1080')
 chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
-driver = webdriver.Chrome('chromedriver', chrome_options=chrome_options)
+driver = webdriver.Chrome('chromedriver', options=chrome_options)
 driver.implicitly_wait(3)
 driver.get('https://linkareer.com/robots.txt')
 

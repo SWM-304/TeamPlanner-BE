@@ -3,6 +3,7 @@ package com.tbfp.teamplannerbe.domain.common.querydsl.support;
 import com.querydsl.core.types.EntityPath;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.jpa.impl.JPAInsertClause;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +72,7 @@ public abstract class Querydsl4RepositorySupport {
     protected <T> JPAQuery<T> select(Expression<T> expr) {
         return getQueryFactory().select(expr);
     }
+
 
     protected <T> JPAQuery<T> selectFrom(EntityPath<T> from) {
         return getQueryFactory().selectFrom(from);

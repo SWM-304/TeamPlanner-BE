@@ -2,6 +2,7 @@ from time import sleep
 from selenium import webdriver
 from io import BytesIO
 from bs4 import BeautifulSoup
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 import json
@@ -9,7 +10,7 @@ import os
 import re
 from datetime import datetime, timedelta, date
 
-chrome_options = webdriver.ChromeOptions()
+chrome_options = Options()
 chrome_options.add_argument('--headless')               # headless
 chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument('--disable-dev-shm-usage')

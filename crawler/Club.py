@@ -10,15 +10,15 @@ import os
 import re
 from datetime import datetime, timedelta, date
 
-chrome_options = Options()
-chrome_options.add_argument('--headless')               # headless
-chrome_options.add_argument('--no-sandbox')
-chrome_options.add_argument('--disable-dev-shm-usage')
-chrome_options.add_argument('--disable-gpu')
-chrome_options.add_argument('--window-size=1920x1080')
-chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+options = Options()
+options.add_argument('--headless')               # headless
+options.add_argument('--no-sandbox')
+options.add_argument('--disable-dev-shm-usage')
+options.add_argument('--disable-gpu')
+options.add_argument('--window-size=1920x1080')
+options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
-driver = webdriver.Chrome('chromedriver', options=chrome_options)
+driver = webdriver.Chrome(options=options)
 driver.implicitly_wait(3)
 driver.get('https://linkareer.com/robots.txt')
 

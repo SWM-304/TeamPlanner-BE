@@ -60,6 +60,10 @@ jobs:
       run: |
         cd crawler
         python Club.py
+    - name: Use output value
+      run: |
+        source .env
+        echo $DATE
     - name: Set date in environment variable
       run: echo "DATE=$(date +'%Y년 %m월 %d일 %H시 %M분')" >> $GITHUB_ENV
     - name: Add & Commit # Add Commit
@@ -69,6 +73,8 @@ jobs:
         author_name: 'GitHub-Actions-Bot'
         add: '*.json'
         push: false
+      env:
+        Date: ${{ env.DATE }}
     - name: Push
       uses: ad-m/github-push-action@master
       with:

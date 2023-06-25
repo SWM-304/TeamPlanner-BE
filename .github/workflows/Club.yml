@@ -22,7 +22,7 @@ jobs:
     - uses: actions/checkout@v2
       with:
         token: ${{ secrets.TOKEN }}
-        persist-credentials: false
+        persist-credentials: true
         fetch-depth: 0
       
       # 한국 시간으로 변경

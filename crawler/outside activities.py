@@ -32,10 +32,6 @@ def parse_simple_content(text):
         value = lines[i+1]
         parsed_data[key] = value
         
-    for i in range(0, len(lines), 2):
-        key = lines[i]
-        value = lines[i+1]
-        parsed_data[key] = value
         
 def parse_recruitment_info(text):
     recruitment_info = {}
@@ -70,7 +66,7 @@ urls = re.findall(r"https://[^\s]+", sitemap.text)
 
 totalsite=len(urls)-4 #  쓸때없는 coverletter 4개 값 빼야함
 
-for i in range(totalsite-1,77,-1): ## 80부터가 최신이므로 80번 부터 탐색
+for i in range(totalsite-1,totalsite-6,-1): ## 80부터가 최신이므로 80번 부터 탐색
     data=1
     driver2 = webdriver.Chrome('chromedriver', chrome_options=chrome_options)
     driver2.implicitly_wait(1)
@@ -135,7 +131,7 @@ for i in range(totalsite-1,77,-1): ## 80부터가 최신이므로 80번 부터 �
                     # 상세내용 데이터 result에 할당
                     result["상세내용"]=parsed_info
                         # print(title,content)
-                    
+                    result['Category']="outside activities"
                     # primary key로 잡을 데이터를 linkareer_site domain 번호로 잡았음.
                     parsing_data[linkareer_site.text]=result
    

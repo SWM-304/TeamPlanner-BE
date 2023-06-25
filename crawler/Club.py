@@ -65,7 +65,7 @@ urls = re.findall(r"https://[^\s]+", sitemap.text)
 
 totalsite=len(urls)-4 #  쓸때없는 coverletter 4개 값 빼야함
 
-for i in range(totalsite-1,totalsite-6,-1): ## 80부터가 최신이므로 80번 부터 탐색
+for i in range(totalsite-1,78,-1): ## 80부터가 최신이므로 80번 부터 탐색
     data=1
     driver2 = webdriver.Chrome('chromedriver', chrome_options=chrome_options)
     driver2.implicitly_wait(1)
@@ -91,35 +91,34 @@ for i in range(totalsite-1,totalsite-6,-1): ## 80부터가 최신이므로 80번
             
                 ## 공모전인지 대외활동인지 동아리인지 채용 인턴인지 확인
             
-                header=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.internal-nav-bar.InternalNavBar__StyledWrapper-sc-3b9fd182-0.jxFbnW > div > div.menu-list > button:nth-child(3) > div.second-depth-nav > div > div > div > button:nth-child(4)')
+                header=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.internal-nav-bar.InternalNavBar__StyledWrapper-sc-3b9fd182-0.jxFbnW > div > div.menu-list > button:nth-child(3) > div.second-depth-nav > div > div > div > button:nth-child(5)')
 
             
                 if header.get_attribute("data-active")=="true": 
-                    print("공모전에 대한 정보에 들어왔습니다")
+                    print("동아리에 대한 정보에 들어왔습니다")
+                    
                     img=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.MuiContainer-root.jss10.jss1.MuiContainer-maxWidthLg > div > div.jss3 > div.jss4.jss5 > div:nth-child(1) > div.jss49 > div.jss50.jss51 > div > div > figure > img')
                     title=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.MuiContainer-root.jss10.jss1.MuiContainer-maxWidthLg > div > div.jss3 > div.jss4.jss5 > div:nth-child(1) > h1')
                     content=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.MuiContainer-root.jss10.jss1.MuiContainer-maxWidthLg > div > div.jss3 > div.jss4.jss5 > div:nth-child(1) > div.jss49 > div:nth-child(2) > div.jss68')
-                    detail_content=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.MuiContainer-root.jss10.jss1.MuiContainer-maxWidthLg > div > div.jss3 > div.jss4.jss5 > div:nth-child(4) > div:nth-child(1) > div.jss143 > div:nth-child(2)')
+                    detail_content=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.MuiContainer-root.jss10.jss1.MuiContainer-maxWidthLg > div > div.jss3 > div.jss4.jss5 > div:nth-child(4) > div:nth-child(1) > div.jss147 > div:nth-child(2)')
                     result["이미지"]=img.get_attribute('src')
                     result['제목 ']=title.text
                     
-                    parsed_data = {}
+                    parsed_data={}
+
                     lines = content.text.split('\n')
-                    
+
                     
                     summary_information={}
                     
                     # 모집내용 파싱
-                    parse_simple_content(content.text)
- 
                     # 파싱된 데이터 result에 할당
                     for key, value in parsed_data.items():
 
                         # print(key + ': ' + value)
                         summary_information[key]=value
                     
-                    
-                    
+
                         
                     # 상세내용은 inner html코드로 가져오기
                     parsed_info = detail_content.get_attribute('innerHTML')
@@ -128,8 +127,8 @@ for i in range(totalsite-1,totalsite-6,-1): ## 80부터가 최신이므로 80번
                     result["요약정보"]=summary_information
                     # 상세내용 데이터 result에 할당
                     result["상세내용"]=parsed_info
+                    result['Category']="동아리"
                         # print(title,content)
-                    result['Category']="공모전"
 
                     # primary key로 잡을 데이터를 linkareer_site domain 번호로 잡았음.
                     parsing_data[linkareer_site.text]=result
@@ -147,11 +146,11 @@ for i in range(totalsite-1,totalsite-6,-1): ## 80부터가 최신이므로 80번
             
         except:
             pass
-        data+=3 # 원래는 폴더가 3씩 늘어나서 +=3으로해야함.
+        data+=1389 # 원래는 폴더가 3씩 늘어나서 +=3으로해야함.
             
 
 # json 파일로 변환하는 작업
-with open(os.path.join(BASE_DIR, 'Contest.json'), 'w+',encoding='utf-8') as json_file:
+with open(os.path.join(BASE_DIR, 'Club.json'), 'w+',encoding='utf-8') as json_file:
     json.dump(parsing_data, json_file, ensure_ascii = False, indent='\t')
 
 print("완료!")

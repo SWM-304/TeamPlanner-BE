@@ -148,7 +148,7 @@ for i in range(totalsite-1,totalsite-6,-1): ## 80부터가 최신이므로 80번
             
         except:
             pass
-        data+=816 # 원래는 폴더가 3씩 늘어나서 +=3으로해야함.
+        data+=3 # 원래는 폴더가 3씩 늘어나서 +=3으로해야함.
             
 
 # json 파일로 변환하는 작업

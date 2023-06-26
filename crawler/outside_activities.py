@@ -71,7 +71,7 @@ urls = re.findall(r"https://[^\s]+", sitemap.text)
 
 totalsite=len(urls)-4 #  쓸때없는 coverletter 4개 값 빼야함
 
-for i in range(totalsite-1,77,-1): ## 80부터가 최신이므로 80번 부터 탐색
+for i in range(totalsite-1,totalsite-6,-1): ## 80부터가 최신이므로 80번 부터 탐색
     data=1
     driver2 = webdriver.Chrome(options=options)
     driver2.implicitly_wait(1)

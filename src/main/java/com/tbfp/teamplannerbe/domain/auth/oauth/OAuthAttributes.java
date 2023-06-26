@@ -5,11 +5,13 @@ import com.tbfp.teamplannerbe.domain.auth.ProviderType;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 import java.util.UUID;
 
 @Getter
+@Slf4j
 public class OAuthAttributes {
     private String nameAttributeKey; // OAuth2 로그인 진행 시 키가 되는 필드 값, PK와 같은 의미
     private OAuth2MemberInfo oauth2MemberInfo; // 소셜 타입별 로그인 유저 정보(닉네임, 이메일, 프로필 사진 등등)
@@ -56,6 +58,7 @@ public class OAuthAttributes {
      * role은 GUEST로 설정
      */
     public Member toEntity(ProviderType providerType, OAuth2MemberInfo oauth2MemberInfo) {
+        log.info("providerType.name() + \"-\" + UUID.randomUUID() = " + providerType.name() + "-" + UUID.randomUUID());
         return Member.builder()
                 .providerType(providerType)
                 .providerId(oauth2MemberInfo.getId())

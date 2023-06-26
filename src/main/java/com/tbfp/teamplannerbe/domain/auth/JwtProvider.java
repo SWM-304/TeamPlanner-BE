@@ -16,8 +16,8 @@ public class JwtProvider {
     @Value("${jwt.secret_key}")
     private String SECRET_KEY;
 
-    private final long ACCESS_TOKEN_EXPIRATION_TIME = 1000L * 60 * 30; // 30 min
-    private final long REFRESH_TOKEN_EXPIRATION_TIME = 1000L * 60 * 60 * 24 * 14; // 14 week
+    public final long ACCESS_TOKEN_EXPIRATION_TIME = 1000L * 60 * 30; // 30 min
+    public final long REFRESH_TOKEN_EXPIRATION_TIME = 1000L * 60 * 60 * 24 * 14; // 14 week
 
     private final String HEADER_NAME = "Authorization";
     private final String TOKEN_PREFIX = "Bearer ";

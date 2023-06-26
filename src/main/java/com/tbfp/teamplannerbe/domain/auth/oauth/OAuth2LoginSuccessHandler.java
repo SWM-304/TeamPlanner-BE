@@ -1,12 +1,11 @@
 package com.tbfp.teamplannerbe.domain.auth.oauth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tbfp.teamplannerbe.domain.auth.JwtProvider;
 import com.tbfp.teamplannerbe.domain.auth.MemberRole;
+import com.tbfp.teamplannerbe.domain.auth.cookie.CookieUtil;
 import com.tbfp.teamplannerbe.domain.auth.service.RefreshTokenService;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -48,14 +47,18 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_OK);
-        response.getWriter().write(
-                new ObjectMapper().writeValueAsString(
-                        MemberResponseDto.MemberLoginResponseDto.builder()
-                                .accessToken(accessToken)
-                                .refreshToken(refreshToken)
-                                .build()
-                )
-        );
+        CookieUtil.addCookie(response, "accessToken", accessToken, jwtProvider.ACCESS_TOKEN_EXPIRATION_TIME);
+        CookieUtil.addCookie(response, "refreshToken", refreshToken, jwtProvider.REFRESH_TOKEN_EXPIRATION_TIME);
+
+        // token body comment
+//        response.getWriter().write(
+//                new ObjectMapper().writeValueAsString(
+//                        MemberResponseDto.MemberLoginResponseDto.builder()
+//                                .accessToken(accessToken)
+//                                .refreshToken(refreshToken)
+//                                .build()
+//                )
+//        );
 
     }
 }

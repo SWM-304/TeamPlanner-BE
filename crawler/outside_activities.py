@@ -80,16 +80,17 @@ for i in range(totalsite-1,totalsite-6,-1): ## 80부터가 최신이므로 80번
     ## 1 4 7 순으로 폴더가 늘어남
     while True:
         result={}
+        folder_div=""
         try:
-            if data>3000: # 파일 최대갯수 3천개이므 3천개 넘어가면 break
-                break
+            # 다음폴더가 있는지 확인
+            folder_div = driver2.find_element(By.CSS_SELECTOR, '#folder{}'.format(data))
             
             linkareer_site=driver2.find_element(By.CSS_SELECTOR,'#folder{} > div.opened > div:nth-child(2) > span:nth-child(2)'.format(data))
             linkarrer_date=driver2.find_element(By.CSS_SELECTOR,'#folder{} > div.opened > div:nth-child(8) > span:nth-child(2)'.format(data))
              
             # 공고올린 날짜를 날짜데이터로 변환 
             target_date = datetime.strptime(linkarrer_date.text, '%Y-%m-%dT%H:%M:%S.%fZ').date()
-            print(target_date,current_date)
+            print("site",linkareer_site.text,"공고올린 날짜 : ", target_date,"현재날짜 : ",current_date)
             if linkareer_site.text!="" and target_date >= one_month_ago and target_date <= current_date: ## 1달내로 올린 글이고, folder가 비지않았으면 계속 탐색
                 driver3 = webdriver.Chrome(options=options)
                 driver3.implicitly_wait(1)
@@ -155,7 +156,9 @@ for i in range(totalsite-1,totalsite-6,-1): ## 80부터가 최신이므로 80번
         except:
             pass
         data+=3 # 원래는 폴더가 3씩 늘어나서 +=3으로해야함.
-            
+        # 다음 폴더 없으면 break하고 다음꺼 탐색
+        if folder_div=="":
+            break    
 
 # json 파일로 변환하는 작업
 with open(os.path.join(BASE_DIR, 'outside_activities.json'), 'w+',encoding='utf-8') as json_file:

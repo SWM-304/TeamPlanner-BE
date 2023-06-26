@@ -1,8 +1,8 @@
 name: linkareer crawler for outside activities # 워크플로우 이름 지정
 
 on:
-  schedule:
-    - cron: '0 5 * * 1' # 주기적으로 실행하기 위한 스케줄링 - cron 설정
+#   schedule:
+#     - cron: '0 5 * * 1' # 주기적으로 실행하기 위한 스케줄링 - cron 설정
   workflow_dispatch:
     inputs:
       name:

@@ -2,6 +2,7 @@ from time import sleep
 from selenium import webdriver
 from io import BytesIO
 from bs4 import BeautifulSoup
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 import json
@@ -9,15 +10,15 @@ import os
 import re
 from datetime import datetime, timedelta, date
 
-chrome_options = webdriver.ChromeOptions()
-# chrome_options.add_argument('--headless')               # headless
-# chrome_options.add_argument('--no-sandbox')
-# chrome_options.add_argument('--disable-dev-shm-usage')
-# chrome_options.add_argument('--disable-gpu')
-# chrome_options.add_argument('--window-size=1920x1080')
-chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+options = Options()
+options.add_argument('--headless')               # headless
+options.add_argument('--no-sandbox')
+options.add_argument('--disable-dev-shm-usage')
+options.add_argument('--disable-gpu')
+options.add_argument('--window-size=1920x1080')
+options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
-driver = webdriver.Chrome('chromedriver', chrome_options=chrome_options)
+driver = webdriver.Chrome(options=options)
 driver.implicitly_wait(3)
 driver.get('https://linkareer.com/robots.txt')
 
@@ -65,9 +66,9 @@ urls = re.findall(r"https://[^\s]+", sitemap.text)
 
 totalsite=len(urls)-4 #  쓸때없는 coverletter 4개 값 빼야함
 
-for i in range(totalsite-1,78,-1): ## 80부터가 최신이므로 80번 부터 탐색
+for i in range(totalsite-1,totalsite-6,-1): ## 80부터가 최신이므로 80번 부터 탐색
     data=1
-    driver2 = webdriver.Chrome('chromedriver', chrome_options=chrome_options)
+    driver2 = webdriver.Chrome(options=options)
     driver2.implicitly_wait(1)
     driver2.get(urls[i])  
     
@@ -85,7 +86,7 @@ for i in range(totalsite-1,78,-1): ## 80부터가 최신이므로 80번 부터 �
             target_date = datetime.strptime(linkarrer_date.text, '%Y-%m-%dT%H:%M:%S.%fZ').date()
             print("공고올린 날짜 : ", target_date,"현재날짜 : ",current_date)
             if linkareer_site.text!="" and target_date >= one_month_ago and target_date <= current_date: ## 1달내로 올린 글이고, folder가 비지않았으면 계속 탐색
-                driver3 = webdriver.Chrome('chromedriver', chrome_options=chrome_options)
+                driver3 = webdriver.Chrome(options=options)
                 driver3.implicitly_wait(2)
                 driver3.get(linkareer_site.text) # 링커리어 대외활동페이지 오픈
             
@@ -110,7 +111,7 @@ for i in range(totalsite-1,78,-1): ## 80부터가 최신이므로 80번 부터 �
 
                     
                     summary_information={}
-                    
+                    parse_simple_content(content.text)
                     # 모집내용 파싱
                     # 파싱된 데이터 result에 할당
                     for key, value in parsed_data.items():
@@ -146,7 +147,7 @@ for i in range(totalsite-1,78,-1): ## 80부터가 최신이므로 80번 부터 �
             
         except:
             pass
-        data+=1389 # 원래는 폴더가 3씩 늘어나서 +=3으로해야함.
+        data+=3 # 원래는 폴더가 3씩 늘어나서 +=3으로해야함.
             
 
 # json 파일로 변환하는 작업

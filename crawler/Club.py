@@ -111,7 +111,7 @@ for i in range(totalsite-1,78,-1): ## 80부터가 최신이므로 80번 부터 �
 
                     
                     summary_information={}
-                    
+                    parse_simple_content(content.text)
                     # 모집내용 파싱
                     # 파싱된 데이터 result에 할당
                     for key, value in parsed_data.items():

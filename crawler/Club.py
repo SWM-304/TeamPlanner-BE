@@ -71,7 +71,7 @@ totalsite=len(urls)-4 #  쓸때없는 coverletter 4개 값 빼야함
 for i in range(totalsite-1,totalsite-6,-1): ## 80부터가 최신이므로 80번 부터 탐색
     data=1
     driver2 = webdriver.Chrome(options=options)
-    driver2.implicitly_wait(1)
+    driver2.implicitly_wait(3)
     driver2.get(urls[i])  
     
     
@@ -100,7 +100,7 @@ for i in range(totalsite-1,totalsite-6,-1): ## 80부터가 최신이므로 80번
             print("site",linkareer_site.text,"공고올린 날짜 : ", target_date,"현재날짜 : ",current_date)
             if linkareer_site.text!="" and target_date >= one_month_ago and target_date <= current_date: ## 1달내로 올린 글이고, folder가 비지않았으면 계속 탐색
                 driver3 = webdriver.Chrome(options=options)
-                driver3.implicitly_wait(2)
+                driver3.implicitly_wait(3)
                 driver3.get(linkareer_site.text) # 링커리어 대외활동페이지 오픈
             
                 ## 공모전인지 대외활동인지 동아리인지 채용 인턴인지 확인

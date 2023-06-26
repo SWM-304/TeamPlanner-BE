@@ -1,0 +1,58 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/testdb
+    username: root
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        use_sql_comments: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ENC(thvvcLV+DnQ58aRRXC7hYqhSDR7+itO9duMQq84+FbmMyoPBjZRdpnzNhpQ6PkRZiPYsPldPlhpxBkblYqVu3tDIw10+qgRqGTC58Wh1Ym7VJW0JkwPHwQ==)
+            client-secret: ENC(8jxilkxKqm9WG5rHfTZCLnCe2wNlNKQTOgqU+AWLxBJ/VIX39PGXYuIupL+YmKrD)
+            scope:
+              - profile
+              - email
+            authorization-grant-type: authorization_code
+          kakao:
+            client-id: ENC(tIqDwGm2/0M+d9q+cJ90pfEZqcninNW6XS5DM/E3OFlsr2rXOGApp5Ydopezh/TH)
+            client-secret: ENC(Fvhw9WH3FB30IohjJ+hrfbLT+7FfZGXjnma0jgO0BNeuXVDQrAGMiiY7V11P0IzU)
+            scope: profile_nickname, profile_image
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            client-authentication-method: POST
+            client-name: kakao
+
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+logging.level:
+  #  org.hibernate.SQL: debug
+  org.hibernate.type: trace
+
+jwt:
+  secret_key: ENC(mmf+mUwEemm7lqzn7MyjYaYVlRpGN25Xpvmo4jQ4ctx7tNdCrjBXR2JdWIZjh6LAupCdrOSI44WtK+dUp4tym1fIiEfdYbNpNudokWdOtKf1JnRMMB8PasGfLDAPofA0uNViAU3SZeK0hd9oeTBo3P+LawaOOimGe4G7FZqQIA0x4B0IIkJx9WGN+O3zam1UZdtcTd4WA0Ojnal1JcjcwDRJ1XcmsDyGHVQ5LSWMN0PydTg0hCd4COYUz5ORRKAE2ytwgmhPF0A=)
+
+
+springdoc:
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+
+github:
+  access_token: github access code

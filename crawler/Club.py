@@ -33,7 +33,6 @@ def parse_simple_content(text):
         value = lines[i+1]
         parsed_data[key] = value
         
-        
 def parse_recruitment_info(text):
     recruitment_info = {}
 
@@ -93,36 +92,35 @@ for i in range(totalsite-1,totalsite-6,-1): ## 80부터가 최신이므로 80번
             
                 ## 공모전인지 대외활동인지 동아리인지 채용 인턴인지 확인
             
-                header=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.internal-nav-bar.InternalNavBar__StyledWrapper-sc-3b9fd182-0.jxFbnW > div > div.menu-list > button:nth-child(3) > div.second-depth-nav > div > div > div > button:nth-child(4)')
+                header=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.internal-nav-bar.InternalNavBar__StyledWrapper-sc-3b9fd182-0.jxFbnW > div > div.menu-list > button:nth-child(3) > div.second-depth-nav > div > div > div > button:nth-child(5)')
 
             
                 if header.get_attribute("data-active")=="true": 
-                    print("공모전에 대한 정보에 들어왔습니다")
+                    print("동아리에 대한 정보에 들어왔습니다")
                     print(linkareer_site.text)
+                    
                     img=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.MuiContainer-root.jss10.jss1.MuiContainer-maxWidthLg > div > div.jss3 > div.jss4.jss5 > div:nth-child(1) > div.jss49 > div.jss50.jss51 > div > div > figure > img')
                     title=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.MuiContainer-root.jss10.jss1.MuiContainer-maxWidthLg > div > div.jss3 > div.jss4.jss5 > div:nth-child(1) > h1')
                     content=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.MuiContainer-root.jss10.jss1.MuiContainer-maxWidthLg > div > div.jss3 > div.jss4.jss5 > div:nth-child(1) > div.jss49 > div:nth-child(2) > div.jss68')
-                    detail_content=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.MuiContainer-root.jss10.jss1.MuiContainer-maxWidthLg > div > div.jss3 > div.jss4.jss5 > div:nth-child(4) > div:nth-child(1) > div.jss143 > div:nth-child(2)')
+                    detail_content=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.MuiContainer-root.jss10.jss1.MuiContainer-maxWidthLg > div > div.jss3 > div.jss4.jss5 > div:nth-child(4) > div:nth-child(1) > div.jss147 > div:nth-child(2)')
                     result["이미지"]=img.get_attribute('src')
                     result['제목 ']=title.text
                     
-                    parsed_data = {}
+                    parsed_data={}
+
                     lines = content.text.split('\n')
-                    
+
                     
                     summary_information={}
-                    
-                    # 모집내용 파싱
                     parse_simple_content(content.text)
- 
+                    # 모집내용 파싱
                     # 파싱된 데이터 result에 할당
                     for key, value in parsed_data.items():
 
                         # print(key + ': ' + value)
                         summary_information[key]=value
                     
-                    
-                    
+
                         
                     # 상세내용은 inner html코드로 가져오기
                     parsed_info = detail_content.get_attribute('innerHTML')
@@ -131,6 +129,7 @@ for i in range(totalsite-1,totalsite-6,-1): ## 80부터가 최신이므로 80번
                     result["요약정보"]=summary_information
                     # 상세내용 데이터 result에 할당
                     result["상세내용"]=parsed_info
+                    result['Category']="동아리"
                         # print(title,content)
 
                     # primary key로 잡을 데이터를 linkareer_site domain 번호로 잡았음.
@@ -140,7 +139,7 @@ for i in range(totalsite-1,totalsite-6,-1): ## 80부터가 최신이므로 80번
 
                 
                 else:
-                    print("공모전에 대한 정보가 아닙니다 재탐색 합니다.")
+                    print("동아리에 대한 정보가 아닙니다 재탐색 합니다.")
                 
             
             else: # ## 1달내로 올린 글이 아니고, folder가 비어 있음
@@ -153,7 +152,7 @@ for i in range(totalsite-1,totalsite-6,-1): ## 80부터가 최신이므로 80번
             
 
 # json 파일로 변환하는 작업
-with open(os.path.join(BASE_DIR, 'Contest.json'), 'w+',encoding='utf-8') as json_file:
+with open(os.path.join(BASE_DIR, 'Club.json'), 'w+',encoding='utf-8') as json_file:
     json.dump(parsing_data, json_file, ensure_ascii = False, indent='\t')
 
 print("완료!")

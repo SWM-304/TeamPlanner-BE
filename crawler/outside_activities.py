@@ -3,21 +3,22 @@ from selenium import webdriver
 from io import BytesIO
 from bs4 import BeautifulSoup
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 import json
 import os
 import re
 from datetime import datetime, timedelta, date
 
-chrome_options = webdriver.ChromeOptions()
-chrome_options.add_argument('--headless')               # headless
-chrome_options.add_argument('--no-sandbox')
-chrome_options.add_argument('--disable-dev-shm-usage')
-chrome_options.add_argument('--disable-gpu')
-chrome_options.add_argument('--window-size=1920x1080')
-chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+options = Options()
+options.add_argument('--headless')               # headless
+options.add_argument('--no-sandbox')
+options.add_argument('--disable-dev-shm-usage')
+options.add_argument('--disable-gpu')
+options.add_argument('--window-size=1920x1080')
+options.add_experimental_option('excludeSwitches', ['enable-logging'])
 
-driver = webdriver.Chrome('chromedriver', chrome_options=chrome_options)
+driver = webdriver.Chrome(options=options)
 driver.implicitly_wait(3)
 driver.get('https://linkareer.com/robots.txt')
 
@@ -70,9 +71,9 @@ urls = re.findall(r"https://[^\s]+", sitemap.text)
 
 totalsite=len(urls)-4 #  쓸때없는 coverletter 4개 값 빼야함
 
-for i in range(totalsite-1,77,-1): ## 80부터가 최신이므로 80번 부터 탐색
+for i in range(totalsite-1,totalsite-6,-1): ## 80부터가 최신이므로 80번 부터 탐색
     data=1
-    driver2 = webdriver.Chrome('chromedriver', chrome_options=chrome_options)
+    driver2 = webdriver.Chrome(options=options)
     driver2.implicitly_wait(1)
     driver2.get(urls[i])  
     
@@ -90,7 +91,7 @@ for i in range(totalsite-1,77,-1): ## 80부터가 최신이므로 80번 부터 �
             target_date = datetime.strptime(linkarrer_date.text, '%Y-%m-%dT%H:%M:%S.%fZ').date()
             print(target_date,current_date)
             if linkareer_site.text!="" and target_date >= one_month_ago and target_date <= current_date: ## 1달내로 올린 글이고, folder가 비지않았으면 계속 탐색
-                driver3 = webdriver.Chrome('chromedriver', chrome_options=chrome_options)
+                driver3 = webdriver.Chrome(options=options)
                 driver3.implicitly_wait(1)
                 driver3.get(linkareer_site.text) # 링커리어 대외활동페이지 오픈
             
@@ -101,6 +102,7 @@ for i in range(totalsite-1,77,-1): ## 80부터가 최신이므로 80번 부터 �
             
                 if header.get_attribute("data-active")=="true":
                     print("대외활동에 대한 정보에 들어왔습니다")
+                    print(linkareer_site.text)
                     img=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.MuiContainer-root.jss10.jss1.MuiContainer-maxWidthLg > div > div.jss3 > div.jss4.jss5 > div:nth-child(1) > div.jss49 > div.jss50.jss51 > div > div > figure > img')
                     title=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.MuiContainer-root.jss10.jss1.MuiContainer-maxWidthLg > div > div.jss3 > div.jss4.jss5 > div:nth-child(1) > h1')
                     content=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.MuiContainer-root.jss10.jss1.MuiContainer-maxWidthLg > div > div.jss3 > div.jss4.jss5 > div:nth-child(1) > div.jss49 > div:nth-child(2) > div.jss68')
@@ -156,7 +158,7 @@ for i in range(totalsite-1,77,-1): ## 80부터가 최신이므로 80번 부터 �
             
 
 # json 파일로 변환하는 작업
-with open(os.path.join(BASE_DIR, 'outside activities.json'), 'w+',encoding='utf-8') as json_file:
+with open(os.path.join(BASE_DIR, 'outside_activities.json'), 'w+',encoding='utf-8') as json_file:
     json.dump(parsing_data, json_file, ensure_ascii = False, indent='\t')
 
 print("완료!")

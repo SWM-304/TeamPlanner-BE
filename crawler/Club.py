@@ -66,7 +66,7 @@ urls = re.findall(r"https://[^\s]+", sitemap.text)
 
 totalsite=len(urls)-4 #  쓸때없는 coverletter 4개 값 빼야함
 
-for i in range(totalsite-1,totalsite-6,-1): ## 80부터가 최신이므로 80번 부터 탐색
+for i in range(78,77,-1): ## 80부터가 최신이므로 80번 부터 탐색
     data=1
     driver2 = webdriver.Chrome(options=options)
     driver2.implicitly_wait(1)
@@ -97,6 +97,7 @@ for i in range(totalsite-1,totalsite-6,-1): ## 80부터가 최신이므로 80번
             
                 if header.get_attribute("data-active")=="true": 
                     print("동아리에 대한 정보에 들어왔습니다")
+                    print(linkareer_site.text)
                     
                     img=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.MuiContainer-root.jss10.jss1.MuiContainer-maxWidthLg > div > div.jss3 > div.jss4.jss5 > div:nth-child(1) > div.jss49 > div.jss50.jss51 > div > div > figure > img')
                     title=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.MuiContainer-root.jss10.jss1.MuiContainer-maxWidthLg > div > div.jss3 > div.jss4.jss5 > div:nth-child(1) > h1')
@@ -138,7 +139,7 @@ for i in range(totalsite-1,totalsite-6,-1): ## 80부터가 최신이므로 80번
 
                 
                 else:
-                    print("공모전에 대한 정보가 아닙니다 재탐색 합니다.")
+                    print("동아리에 대한 정보가 아닙니다 재탐색 합니다.")
                 
             
             else: # ## 1달내로 올린 글이 아니고, folder가 비어 있음
@@ -147,7 +148,7 @@ for i in range(totalsite-1,totalsite-6,-1): ## 80부터가 최신이므로 80번
             
         except:
             pass
-        data+=3 # 원래는 폴더가 3씩 늘어나서 +=3으로해야함.
+        data+=816 # 원래는 폴더가 3씩 늘어나서 +=3으로해야함.
             
 
 # json 파일로 변환하는 작업

@@ -98,6 +98,7 @@ for i in range(totalsite-1,77,-1): ## 80부터가 최신이므로 80번 부터 �
             
                 if header.get_attribute("data-active")=="true": 
                     print("공모전에 대한 정보에 들어왔습니다")
+                    print(linkareer_site.text)
                     img=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.MuiContainer-root.jss10.jss1.MuiContainer-maxWidthLg > div > div.jss3 > div.jss4.jss5 > div:nth-child(1) > div.jss49 > div.jss50.jss51 > div > div > figure > img')
                     title=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.MuiContainer-root.jss10.jss1.MuiContainer-maxWidthLg > div > div.jss3 > div.jss4.jss5 > div:nth-child(1) > h1')
                     content=driver3.find_element(By.CSS_SELECTOR,'#__next > div.jss2.PageLayout__StyledWrapper-sc-8e20e380-0.hyrgHR > div.MuiContainer-root.jss10.jss1.MuiContainer-maxWidthLg > div > div.jss3 > div.jss4.jss5 > div:nth-child(1) > div.jss49 > div:nth-child(2) > div.jss68')

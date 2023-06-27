@@ -74,10 +74,7 @@ public abstract class Querydsl4RepositorySupport {
         return getQueryFactory().select(expr);
     }
 
-<<<<<<< HEAD
-=======
 
->>>>>>> bd5328b2e80d02b1cf4e1f010f02da6719f7142e
     protected <T> JPAQuery<T> selectFrom(EntityPath<T> from) {
         return getQueryFactory().selectFrom(from);
     }

@@ -30,9 +30,15 @@ public class QMember extends EntityPathBase<Member> {
 
     public final StringPath loginId = createString("loginId");
 
+    public final EnumPath<com.tbfp.teamplannerbe.domain.auth.MemberRole> memberRole = createEnum("memberRole", com.tbfp.teamplannerbe.domain.auth.MemberRole.class);
+
     public final StringPath password = createString("password");
 
     public final StringPath phone = createString("phone");
+
+    public final StringPath providerId = createString("providerId");
+
+    public final EnumPath<com.tbfp.teamplannerbe.domain.auth.ProviderType> providerType = createEnum("providerType", com.tbfp.teamplannerbe.domain.auth.ProviderType.class);
 
     public final BooleanPath state = createBoolean("state");
 

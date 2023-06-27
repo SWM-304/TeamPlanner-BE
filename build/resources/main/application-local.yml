@@ -9,7 +9,8 @@ spring:
     password:
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
+
     properties:
       hibernate:
         show_sql: true
@@ -39,12 +40,13 @@ spring:
         provider:
           kakao:
             authorization-uri: https://kauth.kakao.com/oauth/authorize
-
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
 logging.level:
+
   #  org.hibernate.SQL: debug
+
   org.hibernate.type: trace
 
 jwt:

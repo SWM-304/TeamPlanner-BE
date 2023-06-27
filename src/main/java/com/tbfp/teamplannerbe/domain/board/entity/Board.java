@@ -22,15 +22,15 @@ public class Board extends BaseTimeEntity {
     private Long id;
 
 
-    private String activity_key;
+    private String activity_Key;
 
-    private String activitiy_name; // 공고 제목
-
-    private String activity_url; //주최 url
-
-    private String activity_img; //이미지
+    private String activitiy_Name; // 공고 제목
     @Column(columnDefinition = "TEXT")
-    private String activitiy_detail; // 상세내용
+    private String activity_Url; //주최 url
+
+    private String activity_Img; //이미지
+    @Column(columnDefinition = "MEDIUMTEXT")
+    private String activitiy_Detail; // 상세내용
 
     private String category; //카테고리
 
@@ -38,77 +38,77 @@ public class Board extends BaseTimeEntity {
 
     private String target; // 참여대상
 
-    private String activity_area; //활동지역
+    private String activity_Area; //활동지역
 
-    private String recruitment_period; // 접수기간
+    private String recruitment_Period; // 접수기간
 
-    private String recruitment_count; //모집인원
+    private String recruitment_Count; //모집인원
 
-    private String meetingTime; // 모임시간
+    private String meeting_Time; // 모임시간
 
     private String homepage; // 주최 url 주소
 
-    private String activity_benefits; // 활동혜택
+    private String activity_Benefits; // 활동혜택
 
-    private String interest_area; //관심분야
+    private String interest_Area; //관심분야
 
-    private String activity_field; //활동분야
+    private String activity_Field; //활동분야
 
-    private String prize_scale; // 시상규모
+    private String prize_Scale; // 시상규모
 
-    private String competition_category; // 공모분야
+    private String competition_Category; // 공모분야
 
-    private String preferred_skills; //우대역량
+    private String preferred_Skills; //우대역량
 
-    private String activity_period; //활동기간
+    private String activity_Period; //활동기간
 
 
 
 
     public void overwrite(Board board) {
         this.id = board.id;
-        this.activitiy_name = board.activitiy_name;
-        this.activity_url = board.activity_url;
-        this.activity_img = board.activity_img;
-        this.activitiy_detail =board.activitiy_detail;
+        this.activitiy_Name = board.activitiy_Name;
+        this.activity_Url = board.activity_Url;
+        this.activity_Img = board.activity_Img;
+        this.activitiy_Detail =board.activitiy_Detail;
         this.category = board.category;
         this.company_Type = board.company_Type;
         this.target = board.target;
-        this.activity_area = board.activity_area;
-        this.recruitment_period = board.recruitment_period;
-        this.recruitment_count = board.recruitment_count;
-        this.meetingTime = board.meetingTime;
+        this.activity_Area = board.activity_Area;
+        this.recruitment_Period = board.recruitment_Period;
+        this.recruitment_Count = board.recruitment_Count;
+        this.meeting_Time = board.meeting_Time;
         this.homepage = board.homepage;
-        this.activity_benefits = board.activity_benefits;
-        this.interest_area = board.interest_area;
-        this.activity_field = board.activity_field;
-        this.prize_scale = board.prize_scale;
-        this.competition_category = board.competition_category;
-        this.preferred_skills = board.preferred_skills;
-        this.activity_period = board.activity_period;
-        this.activity_key=board.getActivity_key();
+        this.activity_Benefits = board.activity_Benefits;
+        this.interest_Area = board.interest_Area;
+        this.activity_Field = board.activity_Field;
+        this.prize_Scale = board.prize_Scale;
+        this.competition_Category = board.competition_Category;
+        this.preferred_Skills = board.preferred_Skills;
+        this.activity_Period = board.activity_Period;
+        this.activity_Key=board.getActivity_Key();
     }
 
     public BoardResponseDto.BoardDetailResponseDto toDTO() {
         return BoardResponseDto.BoardDetailResponseDto.builder()
-                .activitiy_name(activitiy_name)
-                .activity_field(activity_field)
-                .activitiy_detail(activitiy_detail)
-                .activity_area(activity_area)
-                .activity_benefits(activity_benefits)
-                .activity_img(activity_img)
-                .activity_period(activity_period)
-                .activity_url(activity_url)
+                .activitiy_name(activitiy_Name)
+                .activity_field(activity_Field)
+                .activitiy_detail(activitiy_Detail)
+                .activity_area(activity_Area)
+                .activity_benefits(activity_Benefits)
+                .activity_img(activity_Img)
+                .activity_period(activity_Period)
+                .activity_url(activity_Url)
                 .category(category)
                 .target(target)
                 .company_Type(company_Type)
-                .recruitment_count(recruitment_count)
-                .recruitment_period(recruitment_period)
-                .interest_area(interest_area)
-                .preferred_skills(preferred_skills)
-                .prize_scale(prize_scale)
-                .competition_category(competition_category)
-                .meetingTime(meetingTime)
+                .recruitment_count(recruitment_Count)
+                .recruitment_period(recruitment_Period)
+                .interest_area(interest_Area)
+                .preferred_skills(preferred_Skills)
+                .prize_scale(prize_Scale)
+                .competition_category(competition_Category)
+                .meetingTime(meeting_Time)
                 .homepage(homepage)
                 .build();
 

@@ -68,8 +68,8 @@ public class BoardResponseDto {
         private String category; //카테고리
 
         public BoardSimpleListResponseDto(Board board) {
-            this.activitiy_name = board.getActivitiy_name();
-            this.activity_img = board.getActivity_img();
+            this.activitiy_name = board.getActivitiy_Name();
+            this.activity_img = board.getActivity_Img();
             this.category = board.getCategory();
         }
     }

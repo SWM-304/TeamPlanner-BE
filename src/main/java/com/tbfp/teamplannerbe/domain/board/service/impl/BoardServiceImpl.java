@@ -33,7 +33,7 @@ public class BoardServiceImpl implements BoardService {
     @Transactional
     public Long upsert(Board board) {
         // Check if the board already exists
-        Board findBoard = Optional.ofNullable(boardRepository.findByactivitykey(board.getActivity_key())).orElse(new Board());
+        Board findBoard = Optional.ofNullable(boardRepository.findByactivitykey(board.getActivity_Key())).orElse(new Board());
         findBoard.overwrite(board);
         if (findBoard.getId() == null) {
             log.info("\tinsert board");
@@ -82,8 +82,8 @@ public class BoardServiceImpl implements BoardService {
         Page<Board> getBoardList = boardRepository.applyPagination(condition, pageable);
 
         Page<BoardResponseDto.BoardSimpleListResponseDto> boardSimpleListResponseDtoPage = getBoardList.map(board -> new BoardResponseDto.BoardSimpleListResponseDto(
-                board.getActivitiy_name(),
-                board.getActivity_img(),
+                board.getActivitiy_Name(),
+                board.getActivity_Img(),
                 board.getCategory()
         ));
         return boardSimpleListResponseDtoPage;

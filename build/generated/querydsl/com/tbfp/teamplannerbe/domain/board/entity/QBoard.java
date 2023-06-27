@@ -21,29 +21,29 @@ public class QBoard extends EntityPathBase<Board> {
 
     public final com.tbfp.teamplannerbe.domain.common.base.QBaseTimeEntity _super = new com.tbfp.teamplannerbe.domain.common.base.QBaseTimeEntity(this);
 
-    public final StringPath activitiy_detail = createString("activitiy_detail");
+    public final StringPath activitiy_Detail = createString("activitiy_Detail");
 
-    public final StringPath activitiy_name = createString("activitiy_name");
+    public final StringPath activitiy_Name = createString("activitiy_Name");
 
-    public final StringPath activity_area = createString("activity_area");
+    public final StringPath activity_Area = createString("activity_Area");
 
-    public final StringPath activity_benefits = createString("activity_benefits");
+    public final StringPath activity_Benefits = createString("activity_Benefits");
 
-    public final StringPath activity_field = createString("activity_field");
+    public final StringPath activity_Field = createString("activity_Field");
 
-    public final StringPath activity_img = createString("activity_img");
+    public final StringPath activity_Img = createString("activity_Img");
 
-    public final StringPath activity_key = createString("activity_key");
+    public final StringPath activity_Key = createString("activity_Key");
 
-    public final StringPath activity_period = createString("activity_period");
+    public final StringPath activity_Period = createString("activity_Period");
 
-    public final StringPath activity_url = createString("activity_url");
+    public final StringPath activity_Url = createString("activity_Url");
 
     public final StringPath category = createString("category");
 
     public final StringPath company_Type = createString("company_Type");
 
-    public final StringPath competition_category = createString("competition_category");
+    public final StringPath competition_Category = createString("competition_Category");
 
     //inherited
     public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
@@ -52,17 +52,17 @@ public class QBoard extends EntityPathBase<Board> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final StringPath interest_area = createString("interest_area");
+    public final StringPath interest_Area = createString("interest_Area");
 
-    public final StringPath meetingTime = createString("meetingTime");
+    public final StringPath meeting_Time = createString("meeting_Time");
 
-    public final StringPath preferred_skills = createString("preferred_skills");
+    public final StringPath preferred_Skills = createString("preferred_Skills");
 
-    public final StringPath prize_scale = createString("prize_scale");
+    public final StringPath prize_Scale = createString("prize_Scale");
 
-    public final StringPath recruitment_count = createString("recruitment_count");
+    public final StringPath recruitment_Count = createString("recruitment_Count");
 
-    public final StringPath recruitment_period = createString("recruitment_period");
+    public final StringPath recruitment_Period = createString("recruitment_Period");
 
     public final StringPath target = createString("target");
 

@@ -57,7 +57,7 @@ public class BoardRepository extends Querydsl4RepositorySupport{
     public Board findByactivitykey(String activity_key) {
         return select(board)
                 .from(board)
-                .where(activity_key!=null ? board.activity_key.eq(activity_key) : board.id.isNull())
+                .where(activity_key!=null ? board.activity_Key.eq(activity_key) : board.id.isNull())
                 .fetchOne();
     }
     public Board save(Board board) {

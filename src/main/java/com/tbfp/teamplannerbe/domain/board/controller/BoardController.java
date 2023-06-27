@@ -62,7 +62,7 @@ public class BoardController {
      * 예) localhost:8080/api/v1/board/list2?category=공모전&page=0&size=2&sortBy=boardId
      * @return
      */
-    @GetMapping("/list2")
+    @GetMapping("/list")
     public Page<BoardResponseDto.BoardSimpleListResponseDto> boardList(BoardSearchCondition boardSearchCondition,
                                  Pageable pageable){
 

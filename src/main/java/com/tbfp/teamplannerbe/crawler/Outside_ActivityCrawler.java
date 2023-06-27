@@ -23,18 +23,15 @@ public class Outside_ActivityCrawler {
     /**
      * 대외활동에 관련된 json 파일을 읽어오는 코드
      */
-    @Value("${github.access_token}")
-    private String token;
 
     //    @Scheduled(fixedDelay = 10 * 60 * 1000) // 10min
     public void runCrawler_with_outsideActivity() {
-        String url = "https://raw.githubusercontent.com/SWM-304/TeamPlanner-BE/develop/crawler/outside_activities.json?token=GHSAT0AAAAAACD6DGX7BW4ZLZMJDRTUGL5EZEZJ62A";
+        String url = "https://raw.githubusercontent.com/SWM-304/TeamPlanner-Crawler/main/crawler/outside_activities.json";
 
         try {
             URL urlObj = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) urlObj.openConnection();
             connection.setRequestMethod("GET");
-            connection.setRequestProperty("Authorization", "token " + token);
 
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
@@ -88,6 +85,7 @@ public class Outside_ActivityCrawler {
                             .interest_area(interest_area)
                             .activity_field(activity_field)
                             .prize_scale("")
+                            .homepage("")
                             .competition_category("")
                             .preferred_skills(preferred_skills)
                             .activity_period(activity_period)

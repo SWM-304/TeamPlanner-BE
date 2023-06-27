@@ -23,17 +23,14 @@ public class ContestCrawler {
     /**
      * 공모전에 관련된 json 파일을 읽어오는 코드
      */
-    @Value("${github.access_token}")
-    private String token;
+
     //    @Scheduled(fixedDelay = 10 * 60 * 1000) // 10min
     public void runCrawler_with_Contest() {
-        String url = "https://raw.githubusercontent.com/SWM-304/TeamPlanner-BE/develop/crawler/Contest.json?token=GHSAT0AAAAAACD6DGX7ZGJDZDBQYJGE5YBAZEZJ6LA";
+        String url = "https://raw.githubusercontent.com/SWM-304/TeamPlanner-Crawler/main/crawler/Contest.json";
 
         try {
             URL urlObj = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) urlObj.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setRequestProperty("Authorization", "token " + token);
 
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
@@ -82,6 +79,7 @@ public class ContestCrawler {
                             .meetingTime(meetingTime)
                             .activity_benefits(activity_benefits)
                             .interest_area("")
+                            .homepage("")
                             .activity_field(activity_field)
                             .prize_scale(prize_scale)
                             .competition_category("")

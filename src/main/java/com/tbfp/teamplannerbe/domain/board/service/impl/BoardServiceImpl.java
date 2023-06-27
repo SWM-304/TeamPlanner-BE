@@ -1,6 +1,7 @@
 package com.tbfp.teamplannerbe.domain.board.service.impl;
 
 import com.google.gson.Gson;
+import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.board.repository.BoardRepository;
 import com.tbfp.teamplannerbe.domain.board.service.BoardService;
@@ -44,6 +45,13 @@ public class BoardServiceImpl implements BoardService {
 
         }
         return findBoard.getId();
+    }
+
+    @Override
+    public BoardResponseDto.BoardDetailResponseDto getBoardDetail(Long boardId) {
+        Board board = boardRepository.findById(boardId);
+        BoardResponseDto.BoardDetailResponseDto boardDetailDto = board.toDTO();
+        return boardDetailDto;
     }
 
 

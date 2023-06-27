@@ -26,17 +26,15 @@ public class ClubCrawler {
     /**
      * 동아리에 관련된 json 파일을 읽어오는 코드
      */
-    @Value("${github.access_token}")
-    private String token;
+
 //    @Scheduled(fixedDelay = 10 * 60 * 1000) // 10min
     public void runCrawler_with_Club() {
-        String url = "https://raw.githubusercontent.com/SWM-304/TeamPlanner-BE/develop/crawler/Club.json?token=GHSAT0AAAAAACD6DGX6SFB5YV5ISPAFHEZMZEZFH7Q";
+        String url = "https://raw.githubusercontent.com/SWM-304/TeamPlanner-Crawler/main/crawler/Club.json";
 
         try {
             URL urlObj = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) urlObj.openConnection();
             connection.setRequestMethod("GET");
-            connection.setRequestProperty("Authorization", "token " + token);
 
             int responseCode = connection.getResponseCode();
             if (responseCode == HttpURLConnection.HTTP_OK) {
@@ -90,6 +88,7 @@ public class ClubCrawler {
                             .interest_area(interest_area)
                             .activity_field(activity_field)
                             .prize_scale("")
+                            .homepage("")
                             .competition_category("")
                             .preferred_skills("")
                             .activity_period("")

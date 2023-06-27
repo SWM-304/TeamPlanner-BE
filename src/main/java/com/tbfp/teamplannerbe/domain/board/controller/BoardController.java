@@ -10,8 +10,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,9 +28,14 @@ public class BoardController {
 
     private final Outside_ActivityCrawler outsideActivityCrawler;
     @GetMapping("")
-    public void test(){
+    public void healthCheck(){
         outsideActivityCrawler.runCrawler_with_outsideActivity();
     }
 
+    @GetMapping("/{boardId}")
+    public ResponseEntity<?> boardDetail(@PathVariable Long boardId){
+
+        return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoardDetail(boardId));
+    }
 
 }

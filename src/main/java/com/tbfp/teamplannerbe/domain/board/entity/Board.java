@@ -1,6 +1,7 @@
 package com.tbfp.teamplannerbe.domain.board.entity;
 
 
+import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
 import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
 import lombok.*;
 
@@ -86,5 +87,30 @@ public class Board extends BaseTimeEntity {
         this.preferred_skills = board.preferred_skills;
         this.activity_period = board.activity_period;
         this.activity_key=board.getActivity_key();
+    }
+
+    public BoardResponseDto.BoardDetailResponseDto toDTO() {
+        return BoardResponseDto.BoardDetailResponseDto.builder()
+                .activitiy_name(activitiy_name)
+                .activity_field(activity_field)
+                .activitiy_detail(activitiy_detail)
+                .activity_area(activity_area)
+                .activity_benefits(activity_benefits)
+                .activity_img(activity_img)
+                .activity_period(activity_period)
+                .activity_url(activity_url)
+                .category(category)
+                .target(target)
+                .company_Type(company_Type)
+                .recruitment_count(recruitment_count)
+                .recruitment_period(recruitment_period)
+                .interest_area(interest_area)
+                .preferred_skills(preferred_skills)
+                .prize_scale(prize_scale)
+                .competition_category(competition_category)
+                .meetingTime(meetingTime)
+                .homepage(homepage)
+                .build();
+
     }
 }

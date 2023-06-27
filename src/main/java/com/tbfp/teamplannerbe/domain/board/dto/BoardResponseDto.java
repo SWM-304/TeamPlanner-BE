@@ -1,5 +1,6 @@
 package com.tbfp.teamplannerbe.domain.board.dto;
 
+import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import lombok.*;
 
 import javax.persistence.Column;
@@ -50,5 +51,26 @@ public class BoardResponseDto {
         private String preferred_skills; //우대역량
 
         private String activity_period; //활동기간
+    }
+
+
+    @Setter
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class BoardSimpleListResponseDto {
+
+        private String activitiy_name; // 공고 제목
+
+        private String activity_img; //이미지
+
+        private String category; //카테고리
+
+        public BoardSimpleListResponseDto(Board board) {
+            this.activitiy_name = board.getActivitiy_name();
+            this.activity_img = board.getActivity_img();
+            this.category = board.getCategory();
+        }
     }
 }

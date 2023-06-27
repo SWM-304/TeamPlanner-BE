@@ -1,22 +1,20 @@
 package com.tbfp.teamplannerbe.domain.board.service.impl;
 
-import com.google.gson.Gson;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
+import com.tbfp.teamplannerbe.domain.board.dto.BoardSearchCondition;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.board.repository.BoardRepository;
 import com.tbfp.teamplannerbe.domain.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,11 +45,48 @@ public class BoardServiceImpl implements BoardService {
         return findBoard.getId();
     }
 
-    @Override
+    /**
+     *
+     * 공모전 대외활동에 대한 상세정보조회
+     */
+
+    @Transactional(readOnly = true)
     public BoardResponseDto.BoardDetailResponseDto getBoardDetail(Long boardId) {
         Board board = boardRepository.findById(boardId);
         BoardResponseDto.BoardDetailResponseDto boardDetailDto = board.toDTO();
         return boardDetailDto;
+    }
+
+
+//    @Transactional(readOnly = true)
+//    public List<BoardResponseDto.BoardSimpleListResponseDto> getBoardList(String category) {
+//        List<Board> getBoardList = boardRepository.getBoardListbyCategory(category);
+//
+//        List<BoardResponseDto.BoardSimpleListResponseDto> boardList = getBoardList.stream().
+//                map(i -> new BoardResponseDto.BoardSimpleListResponseDto(i)).
+//                collect(Collectors.toList());
+//
+//        return boardList;
+//
+//    }
+
+    /**
+     *
+     * 공모전 대외활동 category 별 List 페이지
+     * 동적쿼리를 통한 pagination
+     */
+
+    @Override
+    @Transactional
+    public Page<BoardResponseDto.BoardSimpleListResponseDto> searchPageSimple(BoardSearchCondition condition, Pageable pageable) {
+        Page<Board> getBoardList = boardRepository.applyPagination(condition, pageable);
+
+        Page<BoardResponseDto.BoardSimpleListResponseDto> boardSimpleListResponseDtoPage = getBoardList.map(board -> new BoardResponseDto.BoardSimpleListResponseDto(
+                board.getActivitiy_name(),
+                board.getActivity_img(),
+                board.getCategory()
+        ));
+        return boardSimpleListResponseDtoPage;
     }
 
 

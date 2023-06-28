@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -21,12 +20,7 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     public void setRefreshToken(String loginId, String refreshToken) {
-        Optional<RefreshToken> refreshTokenByMemberLoginId = refreshTokenRepository.findRefreshTokenByMember_LoginId(loginId);
-        if (refreshTokenByMemberLoginId.isPresent()) {
-            refreshTokenByMemberLoginId.get().updateToken(refreshToken);
-        } else {
-            Member member = memberRepository.findMemberByLoginId(loginId).orElseThrow(() -> new RuntimeException("no member by loginid"));
-            refreshTokenRepository.save(RefreshToken.builder().token(refreshToken).member(member).build());
-        }
+        Member member = memberRepository.findMemberByLoginId(loginId).orElseThrow(() -> new RuntimeException("no member by loginid"));
+        refreshTokenRepository.save(RefreshToken.builder().token(refreshToken).id(member.getLoginId()).build());
     }
 }

@@ -4,6 +4,7 @@ package com.tbfp.teamplannerbe.domain.board.entity;
 import com.tbfp.teamplannerbe.domain.Comment.entity.Comment;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
 import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
+import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import lombok.*;
 
 import javax.persistence.*;
@@ -15,7 +16,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
 public class Board extends BaseTimeEntity {
 
     @Id
@@ -67,9 +67,12 @@ public class Board extends BaseTimeEntity {
     @OneToMany(mappedBy="board",cascade = CascadeType.ALL)
     private List<Comment> comments=new ArrayList<>();
 
+    @JoinColumn(name="MEMBER_ID")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Member member;
+
 
     public void overwrite(Board board) {
-        this.id = board.id;
         this.activitiyName = board.activitiyName;
         this.activityUrl = board.activityUrl;
         this.activityImg = board.activityImg;

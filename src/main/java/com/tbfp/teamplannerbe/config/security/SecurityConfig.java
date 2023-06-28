@@ -56,6 +56,7 @@ public class SecurityConfig {
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(), memberService, jwtProvider))
                 .authorizeRequests()
                 .antMatchers(
+                        "/api/v1/**",
                         "/", "/api/v1/member/login", "/api/v1/member/renew-access-token"
                         , "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**" // swagger
                 ).permitAll()

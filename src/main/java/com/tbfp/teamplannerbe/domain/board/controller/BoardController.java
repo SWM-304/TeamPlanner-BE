@@ -9,6 +9,9 @@ import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardSearchCondition;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.board.service.BoardService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +39,15 @@ public class BoardController {
     /**
      * 임시로 healthcheck 를 통해서 크롤링한데이터를 읽어오고 db에 넣는작업
      */
+
     @GetMapping("/healthcheck")
+    @Operation(summary = "크롤링데이터 삽입 API", description = "스케줄러 대신 임시로 수동으로 크롤링데이터 DB삽입")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
+    })
     public void healthCheck(){
-        outsideActivityCrawler.runCrawler_with_outsideActivity();
         contestCrawler.runCrawler_with_Contest();
     }
 
@@ -49,6 +58,12 @@ public class BoardController {
      */
 
     @GetMapping("/{boardId}")
+    @Operation(summary = "공고 세부페이지 API", description = "boardId를 통해 공고에 대한 세부사항을 확인할 수 있다")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
+    })
     public ResponseEntity<?> boardDetail(@PathVariable Long boardId){
 
         return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoardDetail(boardId));
@@ -59,10 +74,16 @@ public class BoardController {
      *
      *
      * 동적쿼리를 이용하여 pagination 및 search 기능 구현
-     * 예) localhost:8080/api/v1/board/list2?category=공모전&page=0&size=2&sortBy=boardId
+     * 예) localhost:8080/api/v1/board/list
      * @return
      */
     @GetMapping("/list")
+    @Operation(summary = "공고리스트 출력 및 페이징 and 동적검색기능", description = "localhost:8080/api/v1/board/list2?category=공모전&page=0&size=2&sortBy=boardId")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
+    })
     public Page<BoardResponseDto.BoardSimpleListResponseDto> boardList(BoardSearchCondition boardSearchCondition,
                                  Pageable pageable){
 

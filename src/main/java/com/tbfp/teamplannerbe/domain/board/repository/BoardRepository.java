@@ -2,9 +2,11 @@ package com.tbfp.teamplannerbe.domain.board.repository;
 
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.tbfp.teamplannerbe.domain.Comment.entity.Comment;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardSearchCondition;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.common.querydsl.support.Querydsl4RepositorySupport;
+import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,8 +16,11 @@ import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.Optional;
 
+import static com.tbfp.teamplannerbe.domain.Comment.entity.QComment.comment;
 import static com.tbfp.teamplannerbe.domain.board.entity.QBoard.board;
+import static com.tbfp.teamplannerbe.domain.member.entity.QMember.member;
 import static org.springframework.util.StringUtils.hasText;
 
 
@@ -36,10 +41,10 @@ public class BoardRepository extends Querydsl4RepositorySupport{
                 .fetch();
     }
 
-    public List<Board> getBoardListbyCategory(String Category){
+    public List<Board> getBoardListbyCategory(String category){
         return select(board)
                 .from(board)
-                .where(Category!=null ? board.category.eq(Category) : board.category.isNull())
+                .where(category!=null ? board.category.eq(category) : board.category.isNull())
                 .fetch();
     }
 
@@ -54,10 +59,16 @@ public class BoardRepository extends Querydsl4RepositorySupport{
                 .fetchOne();
     }
 
+    public Optional<Board> findByBoardId(Long id){
+        return Optional.ofNullable(select(board)
+                .from(board)
+                .where(board.id.eq(id)).fetchOne());
+    }
+
     public Board findByactivitykey(String activity_key) {
         return select(board)
                 .from(board)
-                .where(activity_key!=null ? board.activity_Key.eq(activity_key) : board.id.isNull())
+                .where(activity_key!=null ? board.activityKey.eq(activity_key) : board.id.isNull())
                 .fetchOne();
     }
     public Board save(Board board) {
@@ -67,11 +78,16 @@ public class BoardRepository extends Querydsl4RepositorySupport{
 
 
     public Page<Board> applyPagination(BoardSearchCondition condition, Pageable pageable){
-        Page<Board> result = applyPagination(pageable, contentQuery -> contentQuery.selectFrom(board)
-                .where(categoryEq(condition.getCategory())),countQuery->countQuery
-                .select(board.id)
-                .from(board)
-                .where(categoryEq(condition.getCategory()))
+        Page<Board> result = applyPagination(pageable,
+                query -> query
+                        .selectFrom(board)
+                        .where(categoryEq(
+                                condition.getCategory())
+                        ),
+                countQuery->countQuery
+                        .select(board.id)
+                        .from(board)
+                        .where(categoryEq(condition.getCategory()))
         );
         return result;
     }

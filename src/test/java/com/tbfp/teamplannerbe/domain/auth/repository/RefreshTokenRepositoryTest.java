@@ -21,7 +21,7 @@ class RefreshTokenRepositoryTest {
 
     @AfterEach
     void tearDown() {
-        refreshTokenRedisRepository.deleteAll();
+//        refreshTokenRedisRepository.deleteAll();
     }
 
     @Test

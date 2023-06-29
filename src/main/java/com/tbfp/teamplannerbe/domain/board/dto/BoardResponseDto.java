@@ -1,9 +1,12 @@
 package com.tbfp.teamplannerbe.domain.board.dto;
 
+import com.tbfp.teamplannerbe.domain.Comment.dto.CommentResponseDto;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import lombok.*;
 
 import javax.persistence.Column;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class BoardResponseDto {
 
@@ -61,16 +64,23 @@ public class BoardResponseDto {
     @AllArgsConstructor
     public static class BoardSimpleListResponseDto {
 
-        private String activitiy_name; // 공고 제목
+        private String activitiyName; // 공고 제목
 
-        private String activity_img; //이미지
+        private String activityImg; //이미지
 
         private String category; //카테고리
 
+        List<CommentResponseDto.boardWithCommentListResponseDto> comments; // 댓글정보 List 형태로 가져오기
+
+
+
         public BoardSimpleListResponseDto(Board board) {
-            this.activitiy_name = board.getActivitiy_Name();
-            this.activity_img = board.getActivity_Img();
+            this.activitiyName = board.getActivitiyName();
+            this.activityImg = board.getActivityImg();
             this.category = board.getCategory();
+            this.comments=board.getComments().stream().
+                    map(i-> new CommentResponseDto.boardWithCommentListResponseDto(i))
+                    .collect(Collectors.toList());
         }
     }
 }

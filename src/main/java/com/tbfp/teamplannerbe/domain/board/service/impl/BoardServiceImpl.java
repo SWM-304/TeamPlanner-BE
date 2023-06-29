@@ -1,5 +1,6 @@
 package com.tbfp.teamplannerbe.domain.board.service.impl;
 
+import com.tbfp.teamplannerbe.domain.Comment.dto.CommentResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardSearchCondition;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
@@ -33,7 +34,7 @@ public class BoardServiceImpl implements BoardService {
     @Transactional
     public Long upsert(Board board) {
         // Check if the board already exists
-        Board findBoard = Optional.ofNullable(boardRepository.findByactivitykey(board.getActivity_Key())).orElse(new Board());
+        Board findBoard = Optional.ofNullable(boardRepository.findByactivitykey(board.getActivityKey())).orElse(new Board());
         findBoard.overwrite(board);
         if (findBoard.getId() == null) {
             log.info("\tinsert board");
@@ -77,14 +78,20 @@ public class BoardServiceImpl implements BoardService {
      */
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public Page<BoardResponseDto.BoardSimpleListResponseDto> searchPageSimple(BoardSearchCondition condition, Pageable pageable) {
         Page<Board> getBoardList = boardRepository.applyPagination(condition, pageable);
 
-        Page<BoardResponseDto.BoardSimpleListResponseDto> boardSimpleListResponseDtoPage = getBoardList.map(board -> new BoardResponseDto.BoardSimpleListResponseDto(
-                board.getActivitiy_Name(),
-                board.getActivity_Img(),
-                board.getCategory()
+        // 게시글 및 댓글 , 대댓글 같이나오게
+        Page<BoardResponseDto.BoardSimpleListResponseDto> boardSimpleListResponseDtoPage = getBoardList.
+                map(board -> new BoardResponseDto.BoardSimpleListResponseDto(
+                board.getActivitiyName(),
+                board.getActivityImg(),
+                board.getCategory(),
+                board.getComments().stream().
+                        filter(comment -> comment.isState()).
+                        map(comment->new CommentResponseDto.boardWithCommentListResponseDto(comment)).
+                        collect(Collectors.toList())
         ));
         return boardSimpleListResponseDtoPage;
     }

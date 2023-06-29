@@ -24,6 +24,8 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
 
+import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType.REFRESH_TOKEN_FOR_USER_NOT_FOUND;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -62,7 +64,7 @@ public class MemberServiceImpl implements MemberService {
 
         // get user
         String loginId = jwtProvider.getLoginIdFromToken(refreshToken);
-        RefreshToken refreshTokenFound = refreshTokenRepository.findRefreshTokenByMember_LoginId(loginId).orElseThrow(() -> new RuntimeException("no refresh token"));
+        RefreshToken refreshTokenFound = refreshTokenRepository.findById(loginId).orElseThrow(() -> new ApplicationException(REFRESH_TOKEN_FOR_USER_NOT_FOUND));
         if (!refreshTokenFound.getToken().equals(refreshToken)) {
             throw new RuntimeException("not matching refreshToken");
         }

@@ -62,14 +62,14 @@ public class OAuthAttributes {
         return Member.builder()
                 .providerType(providerType)
                 .providerId(oauth2MemberInfo.getId())
-                .email(UUID.randomUUID() + "@socialMember.com")
+                .email(oauth2MemberInfo.getEmail()) //
                 .loginId(providerType.name() + "-" + UUID.randomUUID())
                 .state(true)
                 .password("" + UUID.randomUUID())
                 .phone("")
 //                .nickname(oauth2MemberInfo.getNickname())
 //                .imageUrl(oauth2MemberInfo.getImageUrl())
-                .memberRole(MemberRole.GUEST)
+                .memberRole(MemberRole.MEMBER)
                 .build();
     }
 }

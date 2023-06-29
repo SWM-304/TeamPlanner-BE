@@ -1,2 +1,2 @@
 # TeamPlanner-BE
-team planner project backend repositoryd
+team planner project backend repository

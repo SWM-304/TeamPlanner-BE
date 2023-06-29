@@ -1,13 +1,9 @@
 package com.tbfp.teamplannerbe.domain.Comment.dto;
 
 import com.tbfp.teamplannerbe.domain.Comment.entity.Comment;
-import com.tbfp.teamplannerbe.domain.board.entity.Board;
-import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
-import java.util.ArrayList;
-import java.util.List;
 
 public class CommentResponseDto {
 
@@ -22,7 +18,7 @@ public class CommentResponseDto {
         private Long parentId;
         private String content;
         private String updatedAt;
-        private boolean Serect;
+        private boolean isConfidential;
 
 
         /**
@@ -34,7 +30,7 @@ public class CommentResponseDto {
             this.loginId = comment.getMember().getLoginId();
             this.content = comment.getContent();
             this.updatedAt = String.valueOf(comment.getUpdatedAt());
-            this.Serect=comment.isConfidential();
+            this.isConfidential=comment.isConfidential();
             this.parentId=comment.getParentComment().getId();
         }
     }

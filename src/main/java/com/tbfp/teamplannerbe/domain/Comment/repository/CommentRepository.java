@@ -41,17 +41,18 @@ public class CommentRepository extends Querydsl4RepositorySupport {
      * jpaqueryfactory를 사용해서 delete update 처리
      */
 
-    public Long deleteComment(Long commentId) {
-        return jpaQueryFactory
-                .delete(comment)
-                .where(commentId!=null ? comment.id.eq(commentId) : comment.id.isNull())
-                .execute();
-    }
-    public Long stateFalseComment(Long commentId){
-        return jpaQueryFactory
-                .update(comment)
-                .set(comment.state,false)
-                .where(commentId!=null ? comment.parentComment.id.eq(commentId) : comment.id.isNull())
-                .execute();
-    }
+//    public Long deleteComment(Long commentId) {
+//        return jpaQueryFactory
+//                .delete(comment)
+//                .where(commentId!=null ? comment.id.eq(commentId) : comment.id.isNull())
+//                .execute();
+//    }
+//    public Long stateFalseComment(Long commentId){
+//        return jpaQueryFactory
+//                .update(comment)
+//                .set(comment.state,false)
+//                .where(commentId!=null ? comment.parentComment.id.eq(commentId) : comment.id.isNull())
+//                .execute();
+//
+//    }
 }

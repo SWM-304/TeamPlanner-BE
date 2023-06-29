@@ -2,15 +2,12 @@ package com.tbfp.teamplannerbe.domain.Comment.entity;
 
 
 import com.tbfp.teamplannerbe.domain.Comment.dto.CommentRequestDto;
-import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -22,7 +19,7 @@ public class Comment extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="COMMENTID")
+    @Column(name="COMMENT_ID")
     private Long id;
 
     @Column(nullable = false)

@@ -1,11 +1,7 @@
 package com.tbfp.teamplannerbe.domain.Comment.dto;
-
-import com.nimbusds.oauth2.sdk.auth.Secret;
-import com.tbfp.teamplannerbe.domain.Comment.entity.Comment;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 public class CommentRequestDto {
 
@@ -41,10 +37,10 @@ public class CommentRequestDto {
         @NotBlank
         private String memberId;
 
-        private boolean Secret;
+        private boolean isConfidential;
 
-        public boolean isSecret() {
-            return Secret;
+        public boolean isConfidential() {
+            return isConfidential;
         }
     }
     @Getter

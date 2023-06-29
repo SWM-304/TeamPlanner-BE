@@ -7,22 +7,15 @@ import com.tbfp.teamplannerbe.domain.Comment.entity.Comment;
 import com.tbfp.teamplannerbe.domain.Comment.repository.CommentJpaRepository;
 import com.tbfp.teamplannerbe.domain.Comment.repository.CommentRepository;
 import com.tbfp.teamplannerbe.domain.Comment.service.CommentService;
-import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.board.repository.BoardRepository;
-import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
-import com.tbfp.teamplannerbe.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import java.util.List;
 import java.util.Optional;
 
 import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType.*;
@@ -39,9 +32,9 @@ public class CommentServiceImpl implements CommentService {
     private final BoardRepository boardRepository;
 
     private final CommentJpaRepository commentJpaRepository;
-
-    @PersistenceContext
-    private EntityManager em;
+//
+//    @PersistenceContext
+//    private EntityManager em;
 
     /**
      *
@@ -67,6 +60,7 @@ public class CommentServiceImpl implements CommentService {
                 .content(commentSendRequestDto.getContent())
                 .state(true)  // 막 생성 된거니 state true
                 .board(board)
+                .depth(1)
                 .member(member)
                 .isConfidential(false)
                 .build();
@@ -90,23 +84,23 @@ public class CommentServiceImpl implements CommentService {
                         orElseThrow(()->new RuntimeException("댓글을 찾을 수 없습니다")));
 
 
-        // 공고글 하고 Comment 둘다 있고 부모댓글이라면 삭제가능
-        if (findComment.get().getDepth()==1 && findBoard!=null && findComment!=null){
-//            deleteId = commentRepository.deleteComment(commentId);
-
-            // 부모댓글 state 값 false
-            findComment.get().setState(false);
-            // 자식댓글은 queryDsl bulkUpdate를 통해 한꺼번에 처리
-            //주의사항 ** 데이터베이스에 직접 쿼리를 날리기때문에 영속성컨텍스트와 값이 달라질 수 있음 flush 및 clear 필수
-            commentRepository.stateFalseComment(findComment.get().getId());
-
-            commentJpaRepository.save(findComment.get());
-
-            em.flush();
-            em.clear();
-        }
+//        // 공고글 하고 Comment 둘다 있고 부모댓글이라면 삭제가능
+//        if (findComment.get().getDepth()==1 && findBoard!=null && findComment!=null){
+////            deleteId = commentRepository.deleteComment(commentId);
+//
+//            // 부모댓글 state 값 false
+//            findComment.get().setState(false);
+//            // 자식댓글은 queryDsl bulkUpdate를 통해 한꺼번에 처리
+//            //주의사항 ** 데이터베이스에 직접 쿼리를 날리기때문에 영속성컨텍스트와 값이 달라질 수 있음 flush 및 clear 필수
+//            commentRepository.stateFalseComment(findComment.get().getId());
+//
+//            commentJpaRepository.save(findComment.get());
+//
+//            em.flush();
+//            em.clear();
+//        }
         // 자식댓글일 경우 해결 댓글만 state 값 false
-        if(findBoard!=null && findComment!=null){
+        if(findBoard.isPresent() && findComment.isPresent()){
             findComment.get().setState(false);
             commentJpaRepository.save(findComment.get());
         }
@@ -159,9 +153,9 @@ public class CommentServiceImpl implements CommentService {
      *     "boardId":"1",
      *     "content":"나는 자식댓글4",
      *     "memberId":"test2",
-     *     "isSecret": true
+     *     "isConfidential": true
      * }
-     * @return
+     *
      *
      */
     @Transactional
@@ -178,7 +172,7 @@ public class CommentServiceImpl implements CommentService {
             Comment parentComment = commentJpaRepository.findById(bigCommentSendRequestDto.getParentCommentId())
                     .orElseThrow(() -> new RuntimeException("부모 댓글을 찾을 수 없습니다"));
 
-            log.info(String.valueOf(bigCommentSendRequestDto.isSecret()));
+            log.info(String.valueOf(bigCommentSendRequestDto.isConfidential()));
             childComment = Comment.builder()
                     .content(bigCommentSendRequestDto.getContent())
                     .state(true)

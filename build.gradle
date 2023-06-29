@@ -62,6 +62,11 @@ dependencies {
     //    jasypt
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3'
 
+
+    //javamail
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework:spring-context:5.3.19'
+
     // json-simple
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
     //gson
@@ -72,6 +77,7 @@ dependencies {
 
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 
 
     compileOnly 'org.projectlombok:lombok'

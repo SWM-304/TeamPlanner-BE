@@ -35,4 +35,10 @@ public class KakaoOAuth2MemberInfo extends OAuth2MemberInfo {
 
         return (String) profile.get("thumbnail_image_url");
     }
+
+    @Override
+    public String getEmail() {
+        Map<String, Object> account = (Map<String, Object>) attributes.get("kakao_account");
+        return (String) account.get("email");
+    }
 }

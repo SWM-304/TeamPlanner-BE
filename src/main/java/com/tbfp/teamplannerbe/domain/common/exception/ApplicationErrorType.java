@@ -19,9 +19,15 @@ public enum ApplicationErrorType {
 
     INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, -4, "유효하지 않은 리프레시 토큰"),
 
+
     BOARD_NOT_FIND(HttpStatus.NO_CONTENT,-5,"공고글을 찾을 수 없습니다"),
 
-    COMMNET_NOT_FINE(HttpStatus.NO_CONTENT,-6,"댓글을 찾을 수 없습니다");
+    COMMNET_NOT_FINE(HttpStatus.NO_CONTENT,-6,"댓글을 찾을 수 없습니다"),
+
+    REFRESH_TOKEN_FOR_USER_NOT_FOUND(HttpStatus.NO_CONTENT, -7, "리프레시 토큰을 찾을 수 없습니다.")
+
+    ;
+
 
     private HttpStatus httpStatus;
     private Integer code;

@@ -70,6 +70,8 @@ dependencies {
     //json object 를 사용하기 위해
     implementation 'org.json:json:20210307'
 
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 
     compileOnly 'org.projectlombok:lombok'

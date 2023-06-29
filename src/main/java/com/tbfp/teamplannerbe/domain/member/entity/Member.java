@@ -37,5 +37,7 @@ public class Member extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private ProviderType providerType;
+
     private String providerId;
+
 }

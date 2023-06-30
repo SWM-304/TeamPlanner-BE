@@ -47,10 +47,13 @@ public class Member extends BaseTimeEntity {
 
     private String providerId;
 
+<<<<<<< HEAD
     @OneToMany(mappedBy="member",cascade = CascadeType.ALL)
     private List<Comment> applies=new ArrayList<>();
 
     @OneToMany(mappedBy="member",cascade = CascadeType.ALL)
     private List<Board> boardList=new ArrayList<>();
 
+=======
+>>>>>>> 4a8cd70 (:sparkles: 회원가입구현)
 }

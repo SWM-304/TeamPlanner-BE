@@ -12,7 +12,7 @@ public class CrawController {
 
     private final CrawlingTest crawlingTest;
 
-    @GetMapping("/")
+    @GetMapping("/crawling")
     public void testCrawling() throws IOException {
         crawlingTest.searchXml();
     }

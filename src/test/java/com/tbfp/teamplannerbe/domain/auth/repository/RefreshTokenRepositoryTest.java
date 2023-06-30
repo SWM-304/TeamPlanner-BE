@@ -49,7 +49,6 @@ class RefreshTokenRepositoryTest {
 
         RefreshToken foundToken = refreshTokenRedisRepository.findById(loginId).get();
 
-
         assertThat(foundToken.getToken()).isEqualTo(tokenValue2);
     }
 

@@ -2,7 +2,6 @@ package com.tbfp.teamplannerbe.crawler;
 
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.board.service.BoardService;
-import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -14,7 +13,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -45,24 +43,30 @@ public class CrawlingTest {
     // 날짜 형식 변환
     String currentDate = now.format(formatter);
 
-    @Scheduled(fixedDelay = 7 * 24 * 60 * 60 * 1000) // 1 week
+    public static final String WEB_DRIVER_ID = "webdriver.chrome.driver"; //드라이버 ID
+    public static final String WEB_DRIVER_PATH = "/Users/minwookim/Downloads/chromedriver_mac_arm64/chromedriver"; //드라이버 경로
+
     public void searchXml() throws IOException {
-        WebDriverManager.chromedriver().setup();
         int maxNumber = maxNumberXml();
         String baseUrl = "https://linkareer.com/sitemap/activities/%s.xml";
 
 
 
-        for(int i=maxNumber;i>maxNumber-5;i--){  //이거 나중에 75정도까지만 탐색하기
+        for(int i=maxNumber;i>75;i--){  //이거 나중에 75정도까지만 탐색하기
 
             String url = String.format(baseUrl, maxNumber);
             Document doc = Jsoup.connect(url).get();
             Elements locElements = doc.select("loc");
+            int count=0;
             for (Element locElement : locElements) {
+                if (count==200){
+                    break;
+                }
                 String link = locElement.text();
                 if (link.startsWith("https")) {
                     searchActivity(link); // 해당하는 활동을 탐색
                 }
+                count+=1;
             }
         }
 
@@ -70,6 +74,13 @@ public class CrawlingTest {
 
     private void searchActivity(String link) throws IOException {
 
+
+            //드라이버 설정
+            try {
+                System.setProperty(WEB_DRIVER_ID, WEB_DRIVER_PATH);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             //크롬 설정을 담은 객체 생성
             ChromeOptions options = new ChromeOptions();
@@ -86,7 +97,6 @@ public class CrawlingTest {
             //위에서 설정한 옵션은 담은 드라이버 객체 생성
             //옵션을 설정하지 않았을 때에는 생략 가능하다.
             //WebDriver객체가 곧 하나의 브라우저 창이라 생각한다.
-
             WebDriver driver = new ChromeDriver(options);
 
             //이동을 원하는 url

@@ -1,13 +1,19 @@
 package com.tbfp.teamplannerbe.domain.board.controller;
 
 
+import com.tbfp.teamplannerbe.crawler.ClubCrawler;
+import com.tbfp.teamplannerbe.crawler.ContestCrawler;
+import com.tbfp.teamplannerbe.crawler.Outside_ActivityCrawler;
+
 import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardSearchCondition;
+import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.board.service.BoardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -15,6 +21,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/board")
@@ -24,6 +32,24 @@ import org.springframework.web.bind.annotation.*;
 public class BoardController {
 
     private final BoardService boardService;
+
+    private final Outside_ActivityCrawler outsideActivityCrawler;
+    private final ContestCrawler contestCrawler;
+
+    /**
+     * 임시로 healthcheck 를 통해서 크롤링한데이터를 읽어오고 db에 넣는작업
+     */
+
+    @GetMapping("/healthcheck")
+    @Operation(summary = "크롤링데이터 삽입 API", description = "스케줄러 대신 임시로 수동으로 크롤링데이터 DB삽입")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
+    })
+    public void healthCheck(){
+        contestCrawler.runCrawler_with_Contest();
+    }
 
     /**
      *

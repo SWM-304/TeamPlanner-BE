@@ -8,7 +8,7 @@ import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
-public class CrawController {
+public class CrawlingController {
 
     private final CrawlingTest crawlingTest;
 

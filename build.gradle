@@ -62,10 +62,19 @@ dependencies {
     //    jasypt
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3'
 
+    // Selenium WebDriver
+    implementation 'org.seleniumhq.selenium:selenium-java:3.141.59'
+
+    // ChromeDriver
+    implementation 'io.github.bonigarcia:webdrivermanager:5.1.1'
+
 
     //javamail
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework:spring-context:5.3.19'
+
+    //jsoup
+    implementation 'org.jsoup:jsoup:1.14.3'
 
     // json-simple
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'

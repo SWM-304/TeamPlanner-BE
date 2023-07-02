@@ -34,6 +34,10 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+//    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+//    implementation 'org.springframework.boot:spring-boot-starter-security'
+
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
@@ -42,6 +46,7 @@ dependencies {
 //    implementation 'org.flywaydb:flyway-core'
 //    implementation 'org.flywaydb:flyway-mysql'
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
+
 
     // jwt
     implementation 'com.auth0:java-jwt:4.4.0'
@@ -58,12 +63,27 @@ dependencies {
     //    jasypt
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3'
 
+
     //javamail
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework:spring-context:5.3.19'
 
     //validation
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '2.7.13'
+    
+    // json-simple
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    
+    //gson
+    implementation 'com.google.code.gson:gson:2.8.9'
+
+    //json object 를 사용하기 위해
+    implementation 'org.json:json:20210307'
+
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'

@@ -13,7 +13,7 @@ import static com.tbfp.teamplannerbe.domain.member.entity.QMember.member;
 
 
 @Repository
-public class MemberRepository extends Querydsl4RepositorySupport {
+public class MemberRepository extends Querydsl4RepositorySupport{
 
     public MemberRepository() {
         super(Member.class);
@@ -25,6 +25,11 @@ public class MemberRepository extends Querydsl4RepositorySupport {
                 .fetch();
     }
 
+    /**
+     *
+     * loginId loginId가 null값이 들어오면 오류뜸 예외처리 필요
+     *
+     */
 
     public Optional<Member> findMemberByLoginId(String loginId) {
         return Optional.ofNullable(select(member)

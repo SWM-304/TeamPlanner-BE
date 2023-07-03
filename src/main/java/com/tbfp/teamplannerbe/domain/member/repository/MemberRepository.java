@@ -57,4 +57,11 @@ public class MemberRepository extends Querydsl4RepositorySupport{
                 .where(member.username.eq(username))
                 .execute();
     }
+
+    public Optional<List<String>> findUsernamesByEmail(String email) {
+        return Optional.ofNullable(select(member.username)
+                .from(member)
+                .where(member.email.eq(email).and(member.state.eq(true))).
+                fetch());
+    }
 }

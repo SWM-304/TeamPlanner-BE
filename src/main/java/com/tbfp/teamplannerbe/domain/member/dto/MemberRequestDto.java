@@ -4,6 +4,7 @@ import com.tbfp.teamplannerbe.domain.auth.MemberRole;
 import com.tbfp.teamplannerbe.domain.member.Education;
 import com.tbfp.teamplannerbe.domain.member.Gender;
 import com.tbfp.teamplannerbe.domain.member.Job;
+import com.tbfp.teamplannerbe.domain.member.VerifyPurpose;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.entity.Profile;
 import lombok.*;
@@ -142,6 +143,8 @@ public class MemberRequestDto {
     public static class EmailAddressRequestDto {
         @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$", message = "이메일 형식이 맞지 않습니다.")
         private String emailAddress;
+
+        private VerifyPurpose verifyPurpose;
     }
 
     @Getter
@@ -154,6 +157,20 @@ public class MemberRequestDto {
         private String emailAddress;
 
         private String code;
+
+        private VerifyPurpose verifyPurpose;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ForgotUsernameRequestDto {
+        @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$", message = "이메일 형식이 맞지 않습니다.")
+        private String emailAddress;
+
+        private Boolean emailChecked;
     }
 
 }

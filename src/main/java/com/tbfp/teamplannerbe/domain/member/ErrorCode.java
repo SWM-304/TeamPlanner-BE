@@ -2,11 +2,12 @@ package com.tbfp.teamplannerbe.domain.member;
 
 public enum ErrorCode {
     INVALID_USERNAME,
-    DUPLICATE_USERNAME,
     INVALID_PASSWORD,
     INVALID_EMAIL,
     INVALID_PHONE,
     INVALID_CONTACTEMAIL,
+    DUPLICATE_USERNAME,
+    USERNAME_ABSENT,
     INVALID_DEFAULT;
 
     public static ErrorCode mapToErrorCode(String fieldName) {

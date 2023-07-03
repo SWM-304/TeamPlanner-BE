@@ -35,4 +35,28 @@ public class MemberResponseDto {
         private List<String> messages;
         private List<ErrorCode> errorCodes;
     }
+
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class EmailAddressResponseDto{
+        private boolean success;
+        private List<String> messages;
+        private List<ErrorCode> errorCodes;
+    }
+
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ForgotUsernameResponseDto {
+        private boolean success;
+        private List<String> usernames;
+        private List<String> messages;
+        private List<ErrorCode> errorCodes;
+    }
+
 }

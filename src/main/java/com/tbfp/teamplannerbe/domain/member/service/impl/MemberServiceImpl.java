@@ -7,7 +7,10 @@ import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.ErrorCode;
 import com.tbfp.teamplannerbe.domain.member.VerificationStatus;
+import com.tbfp.teamplannerbe.domain.member.VerifyPurpose;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.SignUpRequestDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.EmailAddressResponseDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.ForgotUsernameResponseDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.SignUpResponseDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.entity.Profile;
@@ -25,6 +28,7 @@ import org.springframework.validation.FieldError;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType.REFRESH_TOKEN_FOR_USER_NOT_FOUND;
 
@@ -139,45 +143,86 @@ public class MemberServiceImpl implements MemberService {
                 build();
     }
 
-    private Hashtable<String, Hashtable<String,Object>> authenticateTable = new Hashtable<>();
+    private ConcurrentHashMap<String, Map<String,Object>> authenticateMap = new ConcurrentHashMap<>();
+
     @Override
     @Transactional
-    public void sendVerificationEmail(String emailAddress) {//인증번호 발급, 재발급
+    public EmailAddressResponseDto sendVerificationEmail(String emailAddress, VerifyPurpose verifyPurpose, Errors errors) {//인증번호 발급, 재발급
+
+        List<String> errorMessages = new ArrayList<>();
+        List<ErrorCode> errorCodes = new ArrayList<>();
+
+        //Validation error
+        if (errors.hasErrors()) {
+            List<FieldError> fieldErrors = errors.getFieldErrors();
+
+            for(FieldError fieldError : fieldErrors){
+                errorMessages.add(fieldError.getDefaultMessage());
+                ErrorCode errorCode = ErrorCode.mapToErrorCode(fieldError.getField());
+                errorCodes.add(errorCode);
+            }
+
+            return EmailAddressResponseDto.builder().
+                    success(false).
+                    messages(errorMessages).
+                    errorCodes(errorCodes).
+                    build();
+        }
+
         try {
-            if (authenticateTable.containsKey(emailAddress)) authenticateTable.remove(emailAddress);
+            if (authenticateMap.containsKey(emailAddress)) authenticateMap.remove(emailAddress);
 
             Integer verificationCode = mailSenderService.getVerificationNumber();
-            String mailBody = "TeamPlanner 회원가입 인증번호입니다.\n" + verificationCode.toString();
-            mailSenderService.sendEmail(emailAddress, "TeamPlanner 회원가입 인증번호입니다.", mailBody);
+            String mailSubject = "TeamPlanner " + verifyPurpose.getDisplayName() + " 인증번호입니다.";
+            String mailBody = mailSubject + "\n" + verificationCode.toString();
+            mailSenderService.sendEmail(emailAddress, mailSubject, mailBody);
 
-            //hashtable에 이메일주소, 인증번호, 만료시간 저장
+            //Concurrent에 이메일주소, 인증번호, 만료시간 저장
             LocalDateTime expireDateTime = LocalDateTime.now().plusSeconds(180);
-            Hashtable<String,Object> innerHashTable = new Hashtable<>();
-            innerHashTable.put("verificationCode",verificationCode);
-            innerHashTable.put("expireDateTime",expireDateTime);
-            authenticateTable.put(emailAddress,innerHashTable);
+            Map<String,Object> innerMap = new ConcurrentHashMap<>();
+            innerMap.put("verificationCode",verificationCode);
+            innerMap.put("expireDateTime",expireDateTime);
+            innerMap.put("verifyPurpose",verifyPurpose);
+            authenticateMap.put(emailAddress,innerMap);
+
+            return EmailAddressResponseDto.builder().
+                    success(true).
+                    messages(null).
+                    errorCodes(null).
+                    build();
         } catch (Exception e) {
-            throw new IllegalArgumentException("이메일 전송 중 오류가 발생했습니다.", e);
+            return EmailAddressResponseDto.builder().
+                    success(false).
+                    messages(Collections.singletonList("전송 중 오류가 발생했습니다.")).
+                    errorCodes(Collections.singletonList(ErrorCode.INVALID_DEFAULT))
+                    .build();
         }
     }
 
     @Override
     @Transactional
-    public VerificationStatus verifyCode(String emailAddress, String userInputCode){
+    public VerificationStatus verifyCode(String emailAddress, String userInputCode, VerifyPurpose verifyPurpose){
         try{
-            authenticateTable.containsKey(emailAddress);
+            authenticateMap.containsKey(emailAddress);
         } catch (NullPointerException e){
             return VerificationStatus.UNPROVIDED;
         }
 
-        String verificationCode = authenticateTable.get(emailAddress).get("verificationCode").toString();
-        LocalDateTime expireDateTime = (LocalDateTime) authenticateTable.get(emailAddress).get("expireDateTime");
+        Map<String,Object> mapInfo = authenticateMap.get(emailAddress);
 
+        String verificationCode = mapInfo.get("verificationCode").toString();
+        LocalDateTime expireDateTime = (LocalDateTime) mapInfo.get("expireDateTime");
+        VerifyPurpose verifyPurposeInMap = (VerifyPurpose) mapInfo.get("verifyPurpose");
+
+        //다른 타입의 인증번호
+        if(!verifyPurposeInMap.equals(verifyPurpose)){
+            return VerificationStatus.UNPROVIDED;
+        }
         //인증번호 기한 만료
         if (expireDateTime.isBefore(LocalDateTime.now())){//인증번호 만료시
-            authenticateTable.remove(emailAddress);
+            authenticateMap.remove(emailAddress);
             //인증번호 재발급
-            sendVerificationEmail(emailAddress);
+            sendVerificationEmail(emailAddress,verifyPurpose,null);
             return VerificationStatus.EXPIRED;
         }
         //인증번호 일치
@@ -195,5 +240,26 @@ public class MemberServiceImpl implements MemberService {
             return true;
         }
         return false;
+    }
+
+    @Override
+    @Transactional
+    public ForgotUsernameResponseDto findForgotUsername(String emailAddress){
+        List<String> optionalUsername = memberRepository.findUsernamesByEmail(emailAddress).orElse(Collections.emptyList());
+        if(optionalUsername.isEmpty()){
+            //그 멤버에 대해 id 주기
+            return ForgotUsernameResponseDto.builder().
+                    success(false).
+                    usernames(null).
+                    messages(Collections.singletonList("가입된 아이디가 없습니다.")).
+                    errorCodes(Collections.singletonList(ErrorCode.USERNAME_ABSENT)).
+                    build();
+        }
+        return ForgotUsernameResponseDto.builder().
+                        success(true).
+                        usernames(optionalUsername).
+                        messages(Collections.singletonList("아이디 조회에 성공했습니다.")).
+                        errorCodes(null).
+                        build();
     }
 }

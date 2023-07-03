@@ -3,11 +3,15 @@ package com.tbfp.teamplannerbe.domain.member.controller;
 import com.tbfp.teamplannerbe.domain.auth.JwtProvider;
 import com.tbfp.teamplannerbe.domain.auth.cookie.CookieUtil;
 import com.tbfp.teamplannerbe.domain.member.*;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.ForgotPasswordRequestDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.ForgotPasswordResponseDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.ForgotUsernameRequestDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.EmailAddressRequestDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.CheckDuplicateRequestDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.VerificationRequestDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.SignUpRequestDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.MemberRenewAccessTokenRequestDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.EmailAddressResponseDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.ForgotUsernameResponseDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.SignUpResponseDto;
 import com.tbfp.teamplannerbe.domain.member.service.MemberService;
@@ -19,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -113,13 +118,12 @@ public class MemberController {
     }
 
     @PostMapping("/signup/send-verification")
-    public ResponseEntity<String> sendVerificationEmail(@RequestBody EmailAddressRequestDto emailAddressRequestDto) {
-        try {
-            memberService.sendVerificationEmail(emailAddressRequestDto.getEmailAddress());
-            return ResponseEntity.ok("이메일 전송에 성공했습니다.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("이메일 전송 실패");
+    public ResponseEntity<EmailAddressResponseDto> sendVerificationEmail(@Validated @RequestBody EmailAddressRequestDto emailAddressRequestDto, Errors errors) {
+        EmailAddressResponseDto emailAddressResponseDto = memberService.sendVerificationEmail(emailAddressRequestDto.getEmailAddress(), emailAddressRequestDto.getVerifyPurpose(), errors);
+        if(!emailAddressResponseDto.isSuccess()){
+            ResponseEntity.badRequest().body(emailAddressResponseDto);
         }
+        return ResponseEntity.ok().body(emailAddressResponseDto);
     }
 
     @PostMapping("/signup/verify")
@@ -128,7 +132,9 @@ public class MemberController {
             // 인증번호 검증 로직 수행
             String emailAddress = verificationRequestDto.getEmailAddress();
             String code = verificationRequestDto.getCode().toString();
-            VerificationStatus verificationStatus = memberService.verifyCode(emailAddress,code);
+            VerifyPurpose verifyPurpose = verificationRequestDto.getVerifyPurpose();
+
+            VerificationStatus verificationStatus = memberService.verifyCode(emailAddress,code,verifyPurpose);
 
             switch (verificationStatus) {
                 case MATCHED:
@@ -136,7 +142,7 @@ public class MemberController {
                 case UNMATCHED:
                     return ResponseEntity.status(400).body("이메일 인증에 실패했습니다 : Verification code is unmatched");
                 case EXPIRED:
-                    return ResponseEntity.status(400).body("이메일 인증에 실패했습니다 : Verification code is expired");
+                    return ResponseEntity.status(400).body("이메일 인증에 실패했습니다. 인증번호를 재발송했습니다. : Verification code is expired");
                 case UNPROVIDED:
                     return ResponseEntity.status(400).body("이메일 인증에 실패했습니다 : Verification code is unprovided");
                 default:
@@ -153,4 +159,16 @@ public class MemberController {
         if(memberService.deleteMember(username)) return ResponseEntity.ok().body("회원 삭제가 완료되었습니다.");
         return ResponseEntity.badRequest().body("존재하지 않는 회원입니다.");
     }
+
+    @PostMapping("/forgot-username")
+    public ResponseEntity<ForgotUsernameResponseDto> giveUsername(@RequestBody ForgotUsernameRequestDto forgotUsernameRequestDto){
+        String emailAddress = forgotUsernameRequestDto.getEmailAddress();
+        Boolean emailChecked = forgotUsernameRequestDto.getEmailChecked();
+        ForgotUsernameResponseDto forgotUsernameResponseDto = memberService.findForgotUsername(emailAddress);
+        if(!forgotUsernameResponseDto.isSuccess()){
+            return ResponseEntity.badRequest().body(forgotUsernameResponseDto);
+        }
+        return ResponseEntity.ok().body(forgotUsernameResponseDto);
+    }
+
 }

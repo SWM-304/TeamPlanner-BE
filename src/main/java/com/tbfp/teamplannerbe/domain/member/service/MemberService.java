@@ -1,7 +1,10 @@
 package com.tbfp.teamplannerbe.domain.member.service;
 
 import com.tbfp.teamplannerbe.domain.member.VerificationStatus;
+import com.tbfp.teamplannerbe.domain.member.VerifyPurpose;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.SignUpRequestDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.EmailAddressResponseDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.ForgotUsernameResponseDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.SignUpResponseDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import org.springframework.validation.Errors;
@@ -22,9 +25,11 @@ public interface MemberService {
 
     SignUpResponseDto buildSignUpResponse(String username, Errors errors);
 
-    void sendVerificationEmail(String emailAddress);
+    EmailAddressResponseDto sendVerificationEmail(String emailAddress, VerifyPurpose verifyPurpose, Errors errors);
 
-    VerificationStatus verifyCode(String emailAddress, String userInputCode);
+    VerificationStatus verifyCode(String emailAddress, String userInputCode, VerifyPurpose verifyPurpose);
 
     boolean deleteMember(String username);
+
+    ForgotUsernameResponseDto findForgotUsername(String emailAddress);
 }

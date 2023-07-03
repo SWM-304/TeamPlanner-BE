@@ -143,7 +143,6 @@ public class MemberRequestDto {
     public static class EmailAddressRequestDto {
         @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$", message = "이메일 형식이 맞지 않습니다.")
         private String emailAddress;
-
         private VerifyPurpose verifyPurpose;
     }
 
@@ -153,11 +152,10 @@ public class MemberRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class VerificationRequestDto {
+
         @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$", message = "이메일 형식이 맞지 않습니다.")
         private String emailAddress;
-
         private String code;
-
         private VerifyPurpose verifyPurpose;
     }
 
@@ -167,9 +165,18 @@ public class MemberRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ForgotUsernameRequestDto {
-        @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$", message = "이메일 형식이 맞지 않습니다.")
         private String emailAddress;
+        private Boolean emailChecked;
+    }
 
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ForgotPasswordRequestDto {
+        private String username;
+        private String emailAddress;
         private Boolean emailChecked;
     }
 

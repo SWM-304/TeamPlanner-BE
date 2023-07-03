@@ -63,7 +63,7 @@ public class OAuthAttributes {
                 .providerType(providerType)
                 .providerId(oauth2MemberInfo.getId())
                 .email(oauth2MemberInfo.getEmail()) //
-                .loginId(providerType.name() + "-" + UUID.randomUUID())
+                .username(providerType.name() + "-" + UUID.randomUUID())
                 .state(true)
                 .password("" + UUID.randomUUID())
                 .phone("")

@@ -3,11 +3,12 @@ package com.tbfp.teamplannerbe.domain.member.controller;
 import com.tbfp.teamplannerbe.domain.auth.JwtProvider;
 import com.tbfp.teamplannerbe.domain.auth.cookie.CookieUtil;
 import com.tbfp.teamplannerbe.domain.member.*;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.EmailAddresRequestsDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.EmailAddressRequestDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.CheckDuplicateRequestDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.VerificationRequestDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.SignUpRequestDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.MemberRenewAccessTokenRequestDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.ForgotUsernameResponseDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.SignUpResponseDto;
 import com.tbfp.teamplannerbe.domain.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -68,8 +69,8 @@ public class MemberController {
     @PostMapping("/signup")
     public ResponseEntity<SignUpResponseDto> registerMember(@Validated @RequestBody SignUpRequestDto signUpRequestDto, Errors errors) {
         // 회원 가입 서비스 호출
-        String loginId = signUpRequestDto.getLoginId();
-        SignUpResponseDto signUpResponseDto = memberService.buildSignUpResponse(loginId, errors);
+        String username = signUpRequestDto.getUsername();
+        SignUpResponseDto signUpResponseDto = memberService.buildSignUpResponse(username, errors);
 
         if(!signUpResponseDto.isSuccess()){
             return ResponseEntity.badRequest().body(signUpResponseDto);
@@ -104,15 +105,15 @@ public class MemberController {
 
     @PostMapping("/signup/is-duplicate")
     public ResponseEntity<String> checkDuplicate(@RequestBody CheckDuplicateRequestDto checkDuplicateRequestDto){
-        String loginId = checkDuplicateRequestDto.getLoginId();
-        if(memberService.isDuplicate(loginId)){
+        String username = checkDuplicateRequestDto.getUsername();
+        if(memberService.isDuplicate(username)){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 존재하는 아이디입니다.");
         }
         return ResponseEntity.ok("생성 가능한 아이디입니다.");
     }
 
     @PostMapping("/signup/send-verification")
-    public ResponseEntity<String> sendVerificationEmail(@RequestBody EmailAddresRequestsDto emailAddressRequestDto) {
+    public ResponseEntity<String> sendVerificationEmail(@RequestBody EmailAddressRequestDto emailAddressRequestDto) {
         try {
             memberService.sendVerificationEmail(emailAddressRequestDto.getEmailAddress());
             return ResponseEntity.ok("이메일 전송에 성공했습니다.");
@@ -147,9 +148,9 @@ public class MemberController {
         }
     }
 
-    @DeleteMapping("/{loginId}")
-    public ResponseEntity<String> deleteMember(@PathVariable("loginId") String loginId){
-        if(memberService.deleteMember(loginId)) return ResponseEntity.ok().body("회원 삭제가 완료되었습니다.");
+    @DeleteMapping("/{username}")
+    public ResponseEntity<String> deleteMember(@PathVariable("username") String username){
+        if(memberService.deleteMember(username)) return ResponseEntity.ok().body("회원 삭제가 완료되었습니다.");
         return ResponseEntity.badRequest().body("존재하지 않는 회원입니다.");
     }
 }

@@ -27,14 +27,14 @@ public class MemberRepository extends Querydsl4RepositorySupport{
 
     /**
      *
-     * loginId loginId가 null값이 들어오면 오류뜸 예외처리 필요
+     * username username가 null값이 들어오면 오류뜸 예외처리 필요
      *
      */
 
-    public Optional<Member> findMemberByLoginId(String loginId) {
+    public Optional<Member> findMemberByUsername(String username) {
         return Optional.ofNullable(select(member)
                 .from(member)
-                .where(member.loginId.eq(loginId).and(member.state.eq(true))).
+                .where(member.username.eq(username).and(member.state.eq(true))).
                 fetchOne());
     }
 
@@ -51,10 +51,10 @@ public class MemberRepository extends Querydsl4RepositorySupport{
         return member;
     }
 
-    public void updateMemberStateFalseByLoginId(String loginId){
+    public void updateMemberStateFalseByUsername(String username){
         update(member)
                 .set(member.state, false)
-                .where(member.loginId.eq(loginId))
+                .where(member.username.eq(username))
                 .execute();
     }
 }

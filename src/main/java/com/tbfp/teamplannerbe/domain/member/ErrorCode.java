@@ -1,8 +1,8 @@
 package com.tbfp.teamplannerbe.domain.member;
 
 public enum ErrorCode {
-    INVALID_LOGINID,
-    DUPLICATE_LOGINID,
+    INVALID_USERNAME,
+    DUPLICATE_USERNAME,
     INVALID_PASSWORD,
     INVALID_EMAIL,
     INVALID_PHONE,

@@ -50,7 +50,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public Long sendComment(CommentRequestDto.CommentSendRequestDto commentSendRequestDto) {
-        Member member = memberRepository.findMemberByLoginId(commentSendRequestDto.getMemberId())
+        Member member = memberRepository.findMemberByUsername(commentSendRequestDto.getMemberId())
                 .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
 
         Board board = boardRepository.findByBoardId(commentSendRequestDto.getBoardId())
@@ -137,7 +137,7 @@ public class CommentServiceImpl implements CommentService {
         CommentResponseDto.updatedCommentResponseDto commentResponseDto = CommentResponseDto.updatedCommentResponseDto.builder()
                 .content(savedComment.getContent())
                 .boardId(savedComment.getBoard().getId())
-                .memberId(savedComment.getMember().getLoginId())
+                .memberId(savedComment.getMember().getUsername())
                 .build();
 
         return commentResponseDto;
@@ -162,7 +162,7 @@ public class CommentServiceImpl implements CommentService {
     public Long sendBigComment(CommentRequestDto.bigCommentSendRequestDto bigCommentSendRequestDto) {
 
         Comment childComment=null;
-        Member member = memberRepository.findMemberByLoginId(bigCommentSendRequestDto.getMemberId())
+        Member member = memberRepository.findMemberByUsername(bigCommentSendRequestDto.getMemberId())
                 .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
 
         Board board = boardRepository.findByBoardId(bigCommentSendRequestDto.getBoardId())

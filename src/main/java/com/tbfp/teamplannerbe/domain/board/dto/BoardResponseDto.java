@@ -4,7 +4,6 @@ import com.tbfp.teamplannerbe.domain.Comment.dto.CommentResponseDto;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import lombok.*;
 
-import javax.persistence.Column;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -75,7 +74,7 @@ public class BoardResponseDto {
 
 
         public BoardSimpleListResponseDto(Board board) {
-            this.activitiyName = board.getActivitiyName();
+            this.activitiyName = board.getActivityName();
             this.activityImg = board.getActivityImg();
             this.category = board.getCategory();
             this.comments=board.getComments().stream().

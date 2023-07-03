@@ -13,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -85,7 +84,7 @@ public class BoardServiceImpl implements BoardService {
         // 게시글 및 댓글 , 대댓글 같이나오게
         Page<BoardResponseDto.BoardSimpleListResponseDto> boardSimpleListResponseDtoPage = getBoardList.
                 map(board -> new BoardResponseDto.BoardSimpleListResponseDto(
-                board.getActivitiyName(),
+                board.getActivityName(),
                 board.getActivityImg(),
                 board.getCategory(),
                 board.getComments().stream().

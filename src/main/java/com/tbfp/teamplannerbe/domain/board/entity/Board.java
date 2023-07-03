@@ -26,13 +26,13 @@ public class Board extends BaseTimeEntity {
 
     private String activityKey;
 
-    private String activitiyName; // 공고 제목
+    private String activityName; // 공고 제목
     @Column(columnDefinition = "TEXT")
     private String activityUrl; //주최 url
 
     private String activityImg; //이미지
     @Column(columnDefinition = "MEDIUMTEXT")
-    private String activitiyDetail; // 상세내용
+    private String activityDetail; // 상세내용
 
     private String category; //카테고리
 
@@ -73,10 +73,10 @@ public class Board extends BaseTimeEntity {
 
 
     public void overwrite(Board board) {
-        this.activitiyName = board.activitiyName;
+        this.activityName = board.activityName;
         this.activityUrl = board.activityUrl;
         this.activityImg = board.activityImg;
-        this.activitiyDetail =board.activitiyDetail;
+        this.activityDetail =board.activityDetail;
         this.category = board.category;
         this.companyType = board.companyType;
         this.target = board.target;
@@ -97,9 +97,9 @@ public class Board extends BaseTimeEntity {
 
     public BoardResponseDto.BoardDetailResponseDto toDTO() {
         return BoardResponseDto.BoardDetailResponseDto.builder()
-                .activitiy_name(activitiyName)
+                .activitiy_name(activityName)
                 .activity_field(activityField)
-                .activitiy_detail(activitiyDetail)
+                .activitiy_detail(activityDetail)
                 .activity_area(activityArea)
                 .activity_benefits(activityBenefits)
                 .activity_img(activityImg)

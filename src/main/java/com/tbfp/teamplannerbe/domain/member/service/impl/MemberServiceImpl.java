@@ -9,6 +9,7 @@ import com.tbfp.teamplannerbe.domain.member.ErrorCode;
 import com.tbfp.teamplannerbe.domain.member.VerificationStatus;
 import com.tbfp.teamplannerbe.domain.member.VerifyPurpose;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.SignUpRequestDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.ForgotPasswordResponseDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.EmailAddressResponseDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.ForgotUsernameResponseDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.SignUpResponseDto;
@@ -244,9 +245,18 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public ForgotUsernameResponseDto findForgotUsername(String emailAddress){
-        List<String> optionalUsername = memberRepository.findUsernamesByEmail(emailAddress).orElse(Collections.emptyList());
-        if(optionalUsername.isEmpty()){
+    public ForgotUsernameResponseDto findForgotUsername(String emailAddress, Boolean emailChecked){
+        if(!emailChecked){
+            return ForgotUsernameResponseDto.builder().
+                    success(false).
+                    usernames(null).
+                    messages(Collections.singletonList("이메일 인증이 완료되지 않았습니다.")).
+                    errorCodes(Collections.singletonList(ErrorCode.UNVERIFIED)).
+                    build();
+        }
+
+        List<String> usernameList = memberRepository.findUsernamesByEmail(emailAddress).orElse(Collections.emptyList());
+        if(usernameList.isEmpty()){
             //그 멤버에 대해 id 주기
             return ForgotUsernameResponseDto.builder().
                     success(false).
@@ -257,9 +267,64 @@ public class MemberServiceImpl implements MemberService {
         }
         return ForgotUsernameResponseDto.builder().
                         success(true).
-                        usernames(optionalUsername).
+                        usernames(usernameList).
                         messages(Collections.singletonList("아이디 조회에 성공했습니다.")).
                         errorCodes(null).
                         build();
+    }
+
+    @Override
+    @Transactional
+    public ForgotPasswordResponseDto findForgotPassword(String username, String emailAddress, Boolean emailChecked) {
+        if (!emailChecked) {
+            return ForgotPasswordResponseDto.builder().
+                    success(false).
+                    messages(Collections.singletonList("이메일 인증이 완료되지 않았습니다.")).
+                    errorCodes(Collections.singletonList(ErrorCode.UNVERIFIED)).
+                    build();
+        }
+
+        if(!memberRepository.findUsernamesByEmail(emailAddress).orElse(Collections.emptyList()).contains(username)){
+            return ForgotPasswordResponseDto.builder().
+                    success(false).
+                    messages(Collections.singletonList("입력하신 아이디에 등록된 이메일이 아닙니다.")).
+                    errorCodes(Collections.singletonList(ErrorCode.INVALID_CONTACTEMAIL)).
+                    build();
+        }
+
+        Optional<Member> optionalMember = memberRepository.findMemberByUsername(username);
+        if(!optionalMember.isPresent()){
+            return ForgotPasswordResponseDto.builder().
+                    success(false).
+                    messages(Collections.singletonList("가입된 아이디가 없습니다.")).
+                    errorCodes(Collections.singletonList(ErrorCode.USERNAME_ABSENT)).
+                    build();
+        }
+        Member member = optionalMember.get();
+
+
+        //임시 비밀번호 전송
+        try {
+            String newPassword = mailSenderService.getRandomPassword();
+            String mailSubject = "TeamPlanner 임시 발급된 비밀번호입니다.";
+            String mailBody = mailSubject + "\n반드시 접속 후 비밀번호를 재설정 하시길 바랍니다.\n" + newPassword.toString();
+            mailSenderService.sendEmail(emailAddress, mailSubject, mailBody);
+
+            String encodedPassword = bCryptPasswordEncoder.encode(newPassword);
+            memberRepository.updateMemberPassword(member, encodedPassword);
+
+            return ForgotPasswordResponseDto.builder().
+                    success(true).
+                    messages(Collections.singletonList("임시 비밀번호를 이메일로 보냈습니다. 반드시 접속 후 재설정해주세요")).
+                    errorCodes(null).
+                    build();
+
+        } catch (Exception e) {
+            return ForgotPasswordResponseDto.builder().
+                    success(false).
+                    messages(Collections.singletonList("임시 비밀번호 전송 중 오류가 발생했습니다.")).
+                    errorCodes(Collections.singletonList(ErrorCode.INVALID_DEFAULT))
+                    .build();
+        }
     }
 }

@@ -8,6 +8,7 @@ public enum ErrorCode {
     INVALID_CONTACTEMAIL,
     DUPLICATE_USERNAME,
     USERNAME_ABSENT,
+    UNVERIFIED,
     INVALID_DEFAULT;
 
     public static ErrorCode mapToErrorCode(String fieldName) {

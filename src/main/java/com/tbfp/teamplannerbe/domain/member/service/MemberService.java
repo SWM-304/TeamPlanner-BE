@@ -3,6 +3,7 @@ package com.tbfp.teamplannerbe.domain.member.service;
 import com.tbfp.teamplannerbe.domain.member.VerificationStatus;
 import com.tbfp.teamplannerbe.domain.member.VerifyPurpose;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.SignUpRequestDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.ForgotPasswordResponseDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.EmailAddressResponseDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.ForgotUsernameResponseDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.SignUpResponseDto;
@@ -31,5 +32,8 @@ public interface MemberService {
 
     boolean deleteMember(String username);
 
-    ForgotUsernameResponseDto findForgotUsername(String emailAddress);
+    ForgotUsernameResponseDto findForgotUsername(String emailAddress, Boolean emailChecked);
+
+    ForgotPasswordResponseDto findForgotPassword(String username, String emailAddress, Boolean emailChecked);
+
 }

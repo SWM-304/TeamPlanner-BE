@@ -59,4 +59,15 @@ public class MemberResponseDto {
         private List<ErrorCode> errorCodes;
     }
 
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ForgotPasswordResponseDto {
+        private boolean success;
+        private List<String> messages;
+        private List<ErrorCode> errorCodes;
+    }
+
 }

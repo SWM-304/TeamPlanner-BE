@@ -3,12 +3,14 @@ package com.tbfp.teamplannerbe.domain.member.controller;
 import com.tbfp.teamplannerbe.domain.auth.JwtProvider;
 import com.tbfp.teamplannerbe.domain.auth.cookie.CookieUtil;
 import com.tbfp.teamplannerbe.domain.member.*;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.ForgotPasswordRequestDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.ForgotUsernameRequestDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.EmailAddressRequestDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.CheckDuplicateRequestDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.VerificationRequestDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.SignUpRequestDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.MemberRenewAccessTokenRequestDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.ForgotPasswordResponseDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.EmailAddressResponseDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.ForgotUsernameResponseDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.SignUpResponseDto;
@@ -161,11 +163,25 @@ public class MemberController {
     public ResponseEntity<ForgotUsernameResponseDto> giveUsername(@RequestBody ForgotUsernameRequestDto forgotUsernameRequestDto){
         String emailAddress = forgotUsernameRequestDto.getEmailAddress();
         Boolean emailChecked = forgotUsernameRequestDto.getEmailChecked();
-        ForgotUsernameResponseDto forgotUsernameResponseDto = memberService.findForgotUsername(emailAddress);
+        ForgotUsernameResponseDto forgotUsernameResponseDto = memberService.findForgotUsername(emailAddress,emailChecked);
         if(!forgotUsernameResponseDto.isSuccess()){
             return ResponseEntity.badRequest().body(forgotUsernameResponseDto);
         }
         return ResponseEntity.ok().body(forgotUsernameResponseDto);
     }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ForgotPasswordResponseDto> givePassword(@RequestBody ForgotPasswordRequestDto forgotPasswordRequestDto){
+        String username = forgotPasswordRequestDto.getUsername();
+        String emailAddress = forgotPasswordRequestDto.getEmailAddress();
+        Boolean emailChecked = forgotPasswordRequestDto.getEmailChecked();
+        ForgotPasswordResponseDto forgotPasswordResponseDto = memberService.findForgotPassword(username, emailAddress,emailChecked);
+
+        if(!forgotPasswordResponseDto.isSuccess()){
+            return ResponseEntity.badRequest().body(forgotPasswordResponseDto);
+        }
+        return ResponseEntity.ok().body(forgotPasswordResponseDto);
+    }
+
 
 }

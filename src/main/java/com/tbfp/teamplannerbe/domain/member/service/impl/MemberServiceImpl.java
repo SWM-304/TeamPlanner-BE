@@ -41,8 +41,8 @@ public class MemberServiceImpl implements MemberService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
-    public Optional<Member> findMemberByLoginId(String loginId) {
-        return memberRepository.findMemberByLoginId(loginId);
+    public Optional<Member> findMemberByUsername(String username) {
+        return memberRepository.findMemberByUsername(username);
     }
 
     @Override
@@ -65,13 +65,13 @@ public class MemberServiceImpl implements MemberService {
         }
 
         // get user
-        String loginId = jwtProvider.getLoginIdFromToken(refreshToken);
-        RefreshToken refreshTokenFound = refreshTokenRepository.findById(loginId).orElseThrow(() -> new ApplicationException(REFRESH_TOKEN_FOR_USER_NOT_FOUND));
+        String username = jwtProvider.getUsernameFromToken(refreshToken);
+        RefreshToken refreshTokenFound = refreshTokenRepository.findById(username).orElseThrow(() -> new ApplicationException(REFRESH_TOKEN_FOR_USER_NOT_FOUND));
         if (!refreshTokenFound.getToken().equals(refreshToken)) {
             throw new RuntimeException("not matching refreshToken");
         }
 
-        return jwtProvider.generateAccessToken(loginId);
+        return jwtProvider.generateAccessToken(username);
     }
 
     @Override
@@ -90,8 +90,8 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public boolean isDuplicate(String loginId){
-        if(findMemberByLoginId(loginId).isPresent()) return true;
+    public boolean isDuplicate(String username){
+        if(findMemberByUsername(username).isPresent()) return true;
         return false;
     }
 
@@ -100,14 +100,14 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public SignUpResponseDto buildSignUpResponse(String loginId, Errors errors) {
+    public SignUpResponseDto buildSignUpResponse(String username, Errors errors) {
 
         List<String> errorMessages = new ArrayList<>();
         List<ErrorCode> errorCodes = new ArrayList<>();
 
         //Id 중복
-        if(isDuplicate(loginId)){
-            errorCodes.add(ErrorCode.DUPLICATE_LOGINID);
+        if(isDuplicate(username)){
+            errorCodes.add(ErrorCode.DUPLICATE_USERNAME);
             return SignUpResponseDto.builder().
                     success(false).
                     messages(Collections.singletonList("이미 존재하는 아이디입니다.")).
@@ -189,9 +189,9 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public boolean deleteMember(String loginId){
-        if(isDuplicate(loginId)){
-            memberRepository.updateMemberStateFalseByLoginId(loginId);
+    public boolean deleteMember(String username){
+        if(isDuplicate(username)){
+            memberRepository.updateMemberStateFalseByUsername(username);
             return true;
         }
         return false;

@@ -12,19 +12,19 @@ import java.util.Optional;
 public interface MemberService {
     List<Member> members();
 
-    Optional<Member> findMemberByLoginId(String loginId);
+    Optional<Member> findMemberByUsername(String username);
 
     String renewAccessToken(String refreshToken);
 
     void registerMember(SignUpRequestDto signUpRequestDto);
 
-    boolean isDuplicate(String loginId);
+    boolean isDuplicate(String username);
 
-    SignUpResponseDto buildSignUpResponse(String loginId, Errors errors);
+    SignUpResponseDto buildSignUpResponse(String username, Errors errors);
 
     void sendVerificationEmail(String emailAddress);
 
     VerificationStatus verifyCode(String emailAddress, String userInputCode);
 
-    boolean deleteMember(String loginId);
+    boolean deleteMember(String username);
 }

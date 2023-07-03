@@ -8,6 +8,7 @@ import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.entity.Profile;
 import lombok.*;
 
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 
 public class MemberRequestDto {
@@ -39,12 +40,20 @@ public class MemberRequestDto {
     @AllArgsConstructor
     public static class SignUpRequestDto {
 
+        @NotEmpty(message = "아이디 설정은 필수입니다.")
+        @Size(min = 4, max = 32, message = "아이디를 4~32글자로 설정해주세요.")
         private String loginId;
 
+        @NotEmpty(message = "비밀번호 설정은 필수입니다.")
+        @Size(min = 8, max = 64, message = "비밀번호를 8~64글자의 영문+숫자 조합으로 설정해주세요.")
+        @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]+$", message = "비밀번호는 영문과 숫자의 조합이어야 합니다.")
         private String password;
 
+        @NotEmpty(message = "이메일 입력은 필수입니다.")
+        @Pattern(regexp = "^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", message = "이메일 형식이 맞지 않습니다.")
         private String email;
 
+        @Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$", message = "올바른 전화번호를 입력해주세요.")
         private String phone;
 
 //        private Boolean state;
@@ -62,7 +71,7 @@ public class MemberRequestDto {
 
         private Education education;
 
-        private int educationGrade;
+        private Integer educationGrade;
 
         private LocalDate birth;
 
@@ -72,9 +81,18 @@ public class MemberRequestDto {
 
         private String kakaoId;
 
+        @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$", message = "이메일 형식이 맞지 않습니다.")
         private String contactEmail;
 
         private Long isPublic;
+
+        @NotNull
+        @AssertTrue(message = "아이디 중복 검사가 필요합니다.")
+        private Boolean loginIdChecked;
+
+        @NotNull
+        @AssertTrue(message = "이메일 인증이 필요합니다.")
+        private Boolean emailChecked;
 
         public Member toMember(){
             return Member.builder().
@@ -121,7 +139,7 @@ public class MemberRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class EmailAddressDto {
+    public static class EmailAddresRequestsDto {
         private String emailAddress;
     }
 

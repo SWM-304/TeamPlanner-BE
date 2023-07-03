@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAInsertClause;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.querydsl.jpa.impl.JPAUpdateClause;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -104,5 +105,9 @@ public abstract class Querydsl4RepositorySupport {
 
         return PageableExecutionUtils.getPage(content, pageable,
                 countResult::fetchCount);
+    }
+
+    protected <T> JPAUpdateClause update(EntityPath<T> from) {
+        return getQueryFactory().update(from);
     }
 }

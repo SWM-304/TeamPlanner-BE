@@ -13,7 +13,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
 public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

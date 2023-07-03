@@ -1,6 +1,9 @@
 package com.tbfp.teamplannerbe.domain.member.dto;
 
+import com.tbfp.teamplannerbe.domain.member.ErrorCode;
 import lombok.*;
+
+import java.util.List;
 
 public class MemberResponseDto {
 
@@ -22,4 +25,25 @@ public class MemberResponseDto {
         private String accessToken;
     }
 
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class SignUpResponseDto {
+        private boolean success;
+        private List<String> messages;
+        private List<ErrorCode> errorCodes;
+    }
+
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CheckDuplicateResponseDto {
+        private boolean success;
+        private List<String> messages;
+        private List<ErrorCode> errorCodes;
+    }
 }

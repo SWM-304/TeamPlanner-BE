@@ -75,15 +75,13 @@ public class MailSenderService {
         int PASSWORD_LENGTH = 12;
         String PASSWORD_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567890123456789!@#$%^&*";
 
-        StringBuilder password = new StringBuilder(PASSWORD_LENGTH);
         SecureRandom random = new SecureRandom();
 
-        for (int i = 0; i < PASSWORD_LENGTH; i++) {
-            int randomIndex = random.nextInt(PASSWORD_CHARACTERS.length());
-            char randomChar = PASSWORD_CHARACTERS.charAt(randomIndex);
-            password.append(randomChar);
-        }
+        String password = random.ints(PASSWORD_LENGTH, 0, PASSWORD_CHARACTERS.length())
+                .mapToObj(PASSWORD_CHARACTERS::charAt)
+                .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
+                .toString();
 
-        return password.toString();
+        return password;
     }
 }

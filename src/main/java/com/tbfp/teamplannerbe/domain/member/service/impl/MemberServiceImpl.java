@@ -96,8 +96,7 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public boolean isDuplicate(String username){
-        if(findMemberByUsername(username).isPresent()) return true;
-        return false;
+        return findMemberByUsername(username).isPresent();
     }
 
 

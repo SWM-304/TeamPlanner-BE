@@ -66,13 +66,12 @@ public class MemberRepository extends Querydsl4RepositorySupport{
                 fetch());
     }
 
-    public void updateMemberPassword(Member member, String password){
-        QMember qMember = QMember.member; // Querydsl의 Q 클래스를 사용하여 쿼리 작성
+    public void updateMemberPassword(Member theMember, String password){
 
         // 쿼리 실행
-        update(qMember)
-                .set(qMember.password, password) // 비밀번호 업데이트
-                .where(qMember.id.eq(member.getId())) // 회원 ID로 조건 설정
+        update(member)
+                .set(member.password, password) // 비밀번호 업데이트
+                .where(member.id.eq(theMember.getId())) // 회원 ID로 조건 설정
                 .execute();
     }
 }

@@ -34,7 +34,8 @@ public class MemberRepository extends Querydsl4RepositorySupport{
     public Optional<Member> findMemberByLoginId(String loginId) {
         return Optional.ofNullable(select(member)
                 .from(member)
-                .where(member.loginId.eq(loginId)).fetchOne());
+                .where(member.loginId.eq(loginId).and(member.state.eq(true))).
+                fetchOne());
     }
 
     public Optional<Member> findByProviderTypeAndProviderId(ProviderType providerType, String providerId) {
@@ -48,5 +49,12 @@ public class MemberRepository extends Querydsl4RepositorySupport{
     public Member save(Member member) {
         getEntityManager().persist(member);
         return member;
+    }
+
+    public void updateMemberStateFalseByLoginId(String loginId){
+        update(member)
+                .set(member.state, false)
+                .where(member.loginId.eq(loginId))
+                .execute();
     }
 }

@@ -18,8 +18,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${MAIL_ADDRESS}
-    password: ${MAIL_PASSWORD}
+    username: ENC(RMzRozI9X940vUzLbfZWCrziavdCrVJ9uHuJ37TQYvHq5KLnjqTh0w==)
+    password: ENC(274mAiMFCwMnPvWvtwj8Km0UcrBWMrx18Qfy1ySENps=)
     properties:
       mail:
         smtp:
@@ -63,6 +63,7 @@ spring:
 logging.level:
 
   #  org.hibernate.SQL: debug
+
   org.hibernate.type: trace
 
 jwt:

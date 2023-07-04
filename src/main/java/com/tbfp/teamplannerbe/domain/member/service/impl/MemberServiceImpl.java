@@ -5,8 +5,10 @@ import com.tbfp.teamplannerbe.domain.auth.entity.RefreshToken;
 import com.tbfp.teamplannerbe.domain.auth.repository.RefreshTokenRepository;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
+import com.tbfp.teamplannerbe.domain.member.ErrorCode;
 import com.tbfp.teamplannerbe.domain.member.VerificationStatus;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.SignUpRequestDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.SignUpResponseDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.entity.Profile;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
@@ -18,11 +20,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.Errors;
+import org.springframework.validation.FieldError;
 
 import java.time.LocalDateTime;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType.REFRESH_TOKEN_FOR_USER_NOT_FOUND;
 
@@ -93,6 +95,50 @@ public class MemberServiceImpl implements MemberService {
         return false;
     }
 
+
+
+
+    @Override
+    @Transactional
+    public SignUpResponseDto buildSignUpResponse(String loginId, Errors errors) {
+
+        List<String> errorMessages = new ArrayList<>();
+        List<ErrorCode> errorCodes = new ArrayList<>();
+
+        //Id 중복
+        if(isDuplicate(loginId)){
+            errorCodes.add(ErrorCode.DUPLICATE_LOGINID);
+            return SignUpResponseDto.builder().
+                    success(false).
+                    messages(Collections.singletonList("이미 존재하는 아이디입니다.")).
+                    errorCodes(errorCodes).
+                    build();
+        }
+
+        //Validation error
+        if (errors.hasErrors()) {
+            List<FieldError> fieldErrors = errors.getFieldErrors();
+
+            for(FieldError fieldError : fieldErrors){
+                errorMessages.add(fieldError.getDefaultMessage());
+                ErrorCode errorCode = ErrorCode.mapToErrorCode(fieldError.getField());
+                errorCodes.add(errorCode);
+            }
+
+            return SignUpResponseDto.builder().
+                    success(false).
+                    messages(errorMessages).
+                    errorCodes(errorCodes).
+                    build();
+        }
+
+        return SignUpResponseDto.builder().
+                success(true).
+                messages(Collections.singletonList("회원가입이 완료되었습니다.")).
+                errorCodes(null).
+                build();
+    }
+
     private Hashtable<String, Hashtable<String,Object>> authenticateTable = new Hashtable<>();
     @Override
     @Transactional
@@ -111,7 +157,6 @@ public class MemberServiceImpl implements MemberService {
             innerHashTable.put("expireDateTime",expireDateTime);
             authenticateTable.put(emailAddress,innerHashTable);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             throw new IllegalArgumentException("이메일 전송 중 오류가 발생했습니다.", e);
         }
     }
@@ -142,4 +187,13 @@ public class MemberServiceImpl implements MemberService {
         return VerificationStatus.UNMATCHED;
     }
 
+    @Override
+    @Transactional
+    public boolean deleteMember(String loginId){
+        if(isDuplicate(loginId)){
+            memberRepository.updateMemberStateFalseByLoginId(loginId);
+            return true;
+        }
+        return false;
+    }
 }

@@ -63,6 +63,12 @@ dependencies {
     //    jasypt
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3'
 
+    // Selenium WebDriver
+    implementation 'org.seleniumhq.selenium:selenium-java:3.141.59'
+
+    // ChromeDriver
+    implementation 'io.github.bonigarcia:webdrivermanager:5.1.1'
+
 
     //javamail
     implementation 'org.springframework.boot:spring-boot-starter-mail'
@@ -70,10 +76,12 @@ dependencies {
 
     //validation
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '2.7.13'
-    
+
+    //jsoup
+    implementation 'org.jsoup:jsoup:1.14.3'
+
     // json-simple
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
-    
     //gson
     implementation 'com.google.code.gson:gson:2.8.9'
 
@@ -92,7 +100,6 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
-
 }
 
 tasks.named('test') {

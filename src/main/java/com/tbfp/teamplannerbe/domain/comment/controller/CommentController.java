@@ -1,8 +1,8 @@
-package com.tbfp.teamplannerbe.domain.Comment.controller;
+package com.tbfp.teamplannerbe.domain.comment.controller;
 
 
-import com.tbfp.teamplannerbe.domain.Comment.dto.CommentRequestDto;
-import com.tbfp.teamplannerbe.domain.Comment.service.CommentService;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;

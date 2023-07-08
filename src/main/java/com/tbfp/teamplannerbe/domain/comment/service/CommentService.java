@@ -1,7 +1,7 @@
-package com.tbfp.teamplannerbe.domain.Comment.service;
+package com.tbfp.teamplannerbe.domain.comment.service;
 
-import com.tbfp.teamplannerbe.domain.Comment.dto.CommentRequestDto;
-import com.tbfp.teamplannerbe.domain.Comment.dto.CommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto;
 
 public interface CommentService {
     Long sendComment(CommentRequestDto.CommentSendRequestDto commentSendRequestDto);

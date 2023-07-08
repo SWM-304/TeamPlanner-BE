@@ -1,14 +1,14 @@
-package com.tbfp.teamplannerbe.domain.Comment.service.impl;
+package com.tbfp.teamplannerbe.domain.comment.service.impl;
 
 
-import com.tbfp.teamplannerbe.domain.Comment.dto.CommentRequestDto;
-import com.tbfp.teamplannerbe.domain.Comment.dto.CommentResponseDto;
-import com.tbfp.teamplannerbe.domain.Comment.entity.Comment;
-import com.tbfp.teamplannerbe.domain.Comment.repository.CommentJpaRepository;
-import com.tbfp.teamplannerbe.domain.Comment.repository.CommentRepository;
-import com.tbfp.teamplannerbe.domain.Comment.service.CommentService;
-import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.board.repository.BoardRepository;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
+import com.tbfp.teamplannerbe.domain.comment.repository.CommentJpaRepository;
+import com.tbfp.teamplannerbe.domain.comment.repository.CommentRepository;
+import com.tbfp.teamplannerbe.domain.comment.service.CommentService;
+import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
@@ -26,11 +26,8 @@ import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorTyp
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
-
-    private final MemberRepository memberRepository;
-
     private final BoardRepository boardRepository;
-
+    private final MemberRepository memberRepository;
     private final CommentJpaRepository commentJpaRepository;
 //
 //    @PersistenceContext
@@ -53,7 +50,7 @@ public class CommentServiceImpl implements CommentService {
         Member member = memberRepository.findMemberByLoginId(commentSendRequestDto.getMemberId())
                 .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
 
-        Board board = boardRepository.findByBoardId(commentSendRequestDto.getBoardId())
+        Board board = boardRepository.findById(commentSendRequestDto.getBoardId())
                 .orElseThrow(() -> new ApplicationException(BOARD_NOT_FIND));
 
         Comment comment = Comment.builder()
@@ -77,7 +74,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public void deleteComment(Long boardId, Long commentId) {
-        Optional<Board> findBoard = Optional.ofNullable(boardRepository.findByBoardId(boardId)
+        Optional<Board> findBoard = Optional.ofNullable(boardRepository.findById(boardId)
                 .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND)));
 
         Optional<Comment> findComment = Optional.ofNullable(commentRepository.findBycommentId(commentId).
@@ -165,7 +162,7 @@ public class CommentServiceImpl implements CommentService {
         Member member = memberRepository.findMemberByLoginId(bigCommentSendRequestDto.getMemberId())
                 .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
 
-        Board board = boardRepository.findByBoardId(bigCommentSendRequestDto.getBoardId())
+        Board board = boardRepository.findById(bigCommentSendRequestDto.getBoardId())
                 .orElseThrow(() -> new ApplicationException(BOARD_NOT_FIND));
 
         if (bigCommentSendRequestDto.getParentCommentId() != null) {

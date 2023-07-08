@@ -1,5 +1,6 @@
 drop table if exists profile;
 drop table if exists comment;
+drop table if exists board_like;
 drop table if exists board;
 drop table if exists member;
 create table board (

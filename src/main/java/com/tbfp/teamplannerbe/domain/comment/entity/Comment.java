@@ -1,7 +1,7 @@
-package com.tbfp.teamplannerbe.domain.Comment.entity;
+package com.tbfp.teamplannerbe.domain.comment.entity;
 
 
-import com.tbfp.teamplannerbe.domain.Comment.dto.CommentRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;

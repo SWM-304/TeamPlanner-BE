@@ -14,9 +14,9 @@ public interface BoardService {
 
     Long upsert(Board board);
 
-    BoardResponseDto.BoardDetailResponseDto getBoardDetail(Long boardId);
+    List<BoardResponseDto.BoardDetailResponseDto> getBoardDetail(Long boardId);
 
 //    List<BoardResponseDto.BoardSimpleListResponseDto> getBoardList(String category);
 
-    Page<BoardResponseDto.BoardSimpleListResponseDto> searchPageSimple(BoardSearchCondition condition, Pageable pageable);
+    Page<Board> searchPageSimple(BoardSearchCondition condition, Pageable pageable);
 }

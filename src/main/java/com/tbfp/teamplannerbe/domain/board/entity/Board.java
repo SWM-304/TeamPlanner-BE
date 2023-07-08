@@ -1,7 +1,7 @@
 package com.tbfp.teamplannerbe.domain.board.entity;
 
 
-import com.tbfp.teamplannerbe.domain.Comment.entity.Comment;
+import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
 import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
@@ -64,6 +64,10 @@ public class Board extends BaseTimeEntity {
 
     private String activityPeriod; //활동기간
 
+    private Long view;
+
+    private Long likeCount;
+
     @OneToMany(mappedBy="board",cascade = CascadeType.ALL)
     private List<Comment> comments=new ArrayList<>();
 
@@ -118,5 +122,9 @@ public class Board extends BaseTimeEntity {
                 .homepage(homepage)
                 .build();
 
+    }
+
+    public void plusLikeCount(Long count) {
+        this.likeCount=count;
     }
 }

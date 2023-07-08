@@ -2,6 +2,8 @@ package com.tbfp.teamplannerbe.domain.board.controller;
 
 
 import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
+import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto.BoardDetailResponseDto;
+import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto.BoardSimpleListResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardSearchCondition;
 import com.tbfp.teamplannerbe.domain.board.service.BoardService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -58,10 +60,10 @@ public class BoardController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
             @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
     })
-    public Page<BoardResponseDto.BoardSimpleListResponseDto> boardList(BoardSearchCondition boardSearchCondition,
+    public ResponseEntity<?> boardList(BoardSearchCondition boardSearchCondition,
                                  Pageable pageable){
 
-        return ResponseEntity.status(HttpStatus.OK).body(boardService.searchPageSimple(boardSearchCondition,pageable)).getBody();
+        return ResponseEntity.status(HttpStatus.OK).body(boardService.searchPageSimple(boardSearchCondition,pageable).map(BoardSimpleListResponseDto::toDTO));
     }
 
 }

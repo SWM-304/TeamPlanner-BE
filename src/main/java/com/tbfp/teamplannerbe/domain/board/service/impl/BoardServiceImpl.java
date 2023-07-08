@@ -1,7 +1,6 @@
 package com.tbfp.teamplannerbe.domain.board.service.impl;
 
-import com.tbfp.teamplannerbe.domain.Comment.dto.CommentResponseDto;
-import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
+import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto.BoardDetailResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardSearchCondition;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.board.repository.BoardRepository;
@@ -13,7 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,7 +32,8 @@ public class BoardServiceImpl implements BoardService {
     @Transactional
     public Long upsert(Board board) {
         // Check if the board already exists
-        Board findBoard = Optional.ofNullable(boardRepository.findByactivitykey(board.getActivityKey())).orElse(new Board());
+        Board findBoard = boardRepository.findByActivityKey(board.getActivityKey())
+                .orElse(new Board());
         findBoard.overwrite(board);
         if (findBoard.getId() == null) {
             log.info("\tinsert board");
@@ -51,10 +51,12 @@ public class BoardServiceImpl implements BoardService {
      */
 
     @Transactional(readOnly = true)
-    public BoardResponseDto.BoardDetailResponseDto getBoardDetail(Long boardId) {
-        Board board = boardRepository.findById(boardId);
-        BoardResponseDto.BoardDetailResponseDto boardDetailDto = board.toDTO();
-        return boardDetailDto;
+    public List<BoardDetailResponseDto> getBoardDetail(Long boardId) {
+        List<Board> board = boardRepository.getBoardAndComment(boardId);
+
+        List<BoardDetailResponseDto> result = board.stream().map(i -> new BoardDetailResponseDto(i))
+                .collect(Collectors.toList());
+        return result;
     }
 
 
@@ -78,21 +80,10 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<BoardResponseDto.BoardSimpleListResponseDto> searchPageSimple(BoardSearchCondition condition, Pageable pageable) {
-        Page<Board> getBoardList = boardRepository.applyPagination(condition, pageable);
+    public Page<Board> searchPageSimple(BoardSearchCondition condition, Pageable pageable) {
+        Page<Board> getBoardList = boardRepository.getBoardList(condition, pageable);
 
-        // 게시글 및 댓글 , 대댓글 같이나오게
-        Page<BoardResponseDto.BoardSimpleListResponseDto> boardSimpleListResponseDtoPage = getBoardList.
-                map(board -> new BoardResponseDto.BoardSimpleListResponseDto(
-                board.getActivityName(),
-                board.getActivityImg(),
-                board.getCategory(),
-                board.getComments().stream().
-                        filter(comment -> comment.isState()).
-                        map(comment->new CommentResponseDto.boardWithCommentListResponseDto(comment)).
-                        collect(Collectors.toList())
-        ));
-        return boardSimpleListResponseDtoPage;
+        return getBoardList;
     }
 
 

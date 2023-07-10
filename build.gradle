@@ -43,8 +43,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
-//    implementation 'org.flywaydb:flyway-core'
-//    implementation 'org.flywaydb:flyway-mysql'
+    // flyway
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-mysql'
+
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
     implementation 'org.jetbrains:annotations:24.0.0'
 
@@ -62,6 +64,12 @@ dependencies {
     //    jasypt
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3'
 
+    // Selenium WebDriver
+    implementation 'org.seleniumhq.selenium:selenium-java:3.141.59'
+
+    // ChromeDriver
+    implementation 'io.github.bonigarcia:webdrivermanager:5.1.1'
+
 
     //javamail
     implementation 'org.springframework.boot:spring-boot-starter-mail'
@@ -69,10 +77,12 @@ dependencies {
 
     //validation
     implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '2.7.13'
-    
+
+    //jsoup
+    implementation 'org.jsoup:jsoup:1.14.3'
+
     // json-simple
     implementation 'com.googlecode.json-simple:json-simple:1.1.1'
-    
     //gson
     implementation 'com.google.code.gson:gson:2.8.9'
 
@@ -81,8 +91,10 @@ dependencies {
 
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-
+    
+    //aop
     implementation 'org.springframework.boot:spring-boot-starter-aop'
+
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -91,7 +103,6 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
-
 }
 
 tasks.named('test') {

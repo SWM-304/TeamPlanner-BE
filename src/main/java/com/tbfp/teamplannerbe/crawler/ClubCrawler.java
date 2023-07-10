@@ -73,10 +73,10 @@ public class ClubCrawler {
 
                     Board board = Board.builder()
                             .activityKey(key)
-                            .activitiyName(title)
+                            .activityName(title)
                             .activityUrl(activity_url)
                             .activityImg(activity_img)
-                            .activitiyDetail(activitiy_detail)
+                            .activityDetail(activitiy_detail)
                             .category("동아리")
                             .companyType(company_Type)
                             .target(target)

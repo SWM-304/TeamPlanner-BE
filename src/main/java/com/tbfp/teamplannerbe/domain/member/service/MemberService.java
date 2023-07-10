@@ -1,30 +1,36 @@
 package com.tbfp.teamplannerbe.domain.member.service;
 
-import com.tbfp.teamplannerbe.domain.member.VerificationStatus;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.SignUpRequestDto;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.SignUpResponseDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
-import org.springframework.validation.Errors;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface MemberService {
     List<Member> members();
 
-    Optional<Member> findMemberByLoginId(String loginId);
+    Optional<Member> findMemberByUsername(String username);
 
     String renewAccessToken(String refreshToken);
 
-    void registerMember(SignUpRequestDto signUpRequestDto);
+    Map<String,List<String>> getEnums();
 
-    boolean isDuplicate(String loginId);
+    void registerMember(MemberRequestDto.SignUpRequestDto signUpRequestDto);
 
-    SignUpResponseDto buildSignUpResponse(String loginId, Errors errors);
+    MemberResponseDto.CheckDuplicateResponseDto checkDuplicate(MemberRequestDto.CheckDuplicateRequestDto checkDuplicateRequestDto);
 
-    void sendVerificationEmail(String emailAddress);
+    MemberResponseDto.SignUpResponseDto buildSignUpResponse(MemberRequestDto.SignUpRequestDto signUpRequestDto);
 
-    VerificationStatus verifyCode(String emailAddress, String userInputCode);
+    MemberResponseDto.EmailAddressResponseDto sendVerificationEmail(MemberRequestDto.EmailAddressRequestDto emailAddressRequestDto);
 
-    boolean deleteMember(String loginId);
+    MemberResponseDto.VerificationResponseDto verifyCode(MemberRequestDto.VerificationRequestDto verificationRequestDto);
+
+    void deleteMember(String username);
+
+    MemberResponseDto.ForgotUsernameResponseDto findForgotUsername(MemberRequestDto.ForgotUsernameRequestDto forgotUsernameRequestDto);
+
+    MemberResponseDto.ForgotPasswordResponseDto findForgotPassword(MemberRequestDto.ForgotPasswordRequestDto forgotPasswordRequestDto);
+
 }

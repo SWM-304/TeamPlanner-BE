@@ -1,7 +1,7 @@
 package com.tbfp.teamplannerbe.domain.member.dto;
 
-import com.tbfp.teamplannerbe.domain.member.ErrorCode;
 import lombok.*;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -31,9 +31,7 @@ public class MemberResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class SignUpResponseDto {
-        private boolean success;
-        private List<String> messages;
-        private List<ErrorCode> errorCodes;
+        private String message;
     }
 
     @Builder
@@ -41,9 +39,56 @@ public class MemberResponseDto {
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class CheckDuplicateResponseDto {
-        private boolean success;
-        private List<String> messages;
-        private List<ErrorCode> errorCodes;
+    public static class CheckDuplicateResponseDto{
+        private String message;
     }
+
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class EmailAddressResponseDto{
+        private String message;
+    }
+
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class VerificationResponseDto{
+        private String message;
+    }
+
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ForgotUsernameResponseDto {
+        private List<String> usernames;
+        private String message;
+    }
+
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ForgotPasswordResponseDto {
+        private String message;
+    }
+
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ErrorResponseDto{
+        private HttpStatus httpStatus;
+        private Integer code;
+        private String message;
+    }
+
 }

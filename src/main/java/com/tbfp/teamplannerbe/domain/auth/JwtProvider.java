@@ -22,18 +22,18 @@ public class JwtProvider {
     private final String HEADER_NAME = "Authorization";
     private final String TOKEN_PREFIX = "Bearer ";
 
-    public String generateAccessToken(String loginId) {
+    public String generateAccessToken(String username) {
         return JWT.create()
-                .withSubject(loginId)
+                .withSubject(username)
                 .withExpiresAt(new Date(System.currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_TIME))
-                .withClaim("loginId", loginId)
+                .withClaim("username", username)
                 .sign(Algorithm.HMAC512(SECRET_KEY));
     }
-    public String generateRefreshToken(String loginId) {
+    public String generateRefreshToken(String username) {
         return JWT.create()
-                .withSubject(loginId)
+                .withSubject(username)
                 .withExpiresAt(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRATION_TIME))
-                .withClaim("loginId", loginId)
+                .withClaim("username", username)
                 .sign(Algorithm.HMAC512(SECRET_KEY));
     }
 
@@ -53,18 +53,18 @@ public class JwtProvider {
         return header;
     }
 
-    public String getLoginId(HttpServletRequest request) {
+    public String getUsername(HttpServletRequest request) {
         String accessToken = getHeader(request).replace(TOKEN_PREFIX, "");
 
         return JWT.require(Algorithm.HMAC512(SECRET_KEY))
                 .build()
                 .verify(accessToken)
-                .getClaim("loginId").asString();
+                .getClaim("username").asString();
     }
-    public String getLoginIdFromToken(String token) {
+    public String getUsernameFromToken(String token) {
         return JWT.require(Algorithm.HMAC512(SECRET_KEY))
                 .build()
                 .verify(token)
-                .getClaim("loginId").asString();
+                .getClaim("username").asString();
     }
 }

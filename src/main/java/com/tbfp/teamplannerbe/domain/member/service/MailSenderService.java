@@ -8,6 +8,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import javax.mail.internet.MimeMessage;
+import java.security.SecureRandom;
 import java.util.Random;
 
 @Service
@@ -68,5 +69,19 @@ public class MailSenderService {
         Integer checkNum = r.nextInt(888888) + 111111;
 
         return checkNum;
+    }
+
+    public String getRandomPassword() {
+        int PASSWORD_LENGTH = 12;
+        String PASSWORD_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567890123456789!@#$%^&*";
+
+        SecureRandom random = new SecureRandom();
+
+        String password = random.ints(PASSWORD_LENGTH, 0, PASSWORD_CHARACTERS.length())
+                .mapToObj(PASSWORD_CHARACTERS::charAt)
+                .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
+                .toString();
+
+        return password;
     }
 }

@@ -5,14 +5,9 @@ import com.tbfp.teamplannerbe.domain.auth.entity.RefreshToken;
 import com.tbfp.teamplannerbe.domain.auth.repository.RefreshTokenRepository;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
-import com.tbfp.teamplannerbe.domain.member.ErrorCode;
-import com.tbfp.teamplannerbe.domain.member.VerificationStatus;
-import com.tbfp.teamplannerbe.domain.member.VerifyPurpose;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.SignUpRequestDto;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.ForgotPasswordResponseDto;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.EmailAddressResponseDto;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.ForgotUsernameResponseDto;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.SignUpResponseDto;
+import com.tbfp.teamplannerbe.domain.member.*;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.entity.Profile;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
@@ -24,14 +19,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.Errors;
-import org.springframework.validation.FieldError;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
-import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType.REFRESH_TOKEN_FOR_USER_NOT_FOUND;
+import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType.*;
 
 @Service
 @RequiredArgsConstructor
@@ -81,7 +75,23 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public void registerMember(SignUpRequestDto signUpRequestDto){
+    public MemberResponseDto.SignUpResponseDto buildSignUpResponse(MemberRequestDto.SignUpRequestDto signUpRequestDto) {
+
+        String username = signUpRequestDto.getUsername();
+        //Id 중복
+        if(findMemberByUsername(username).isPresent()){
+            throw new ApplicationException(DUPLICATE_USERNAME);
+        }
+        registerMember(signUpRequestDto);
+
+        return MemberResponseDto.SignUpResponseDto.builder().
+                message("회원가입이 완료되었습니다.").
+                build();
+    }
+
+    @Override
+    @Transactional
+    public void registerMember(MemberRequestDto.SignUpRequestDto signUpRequestDto){
         try {
             signUpRequestDto.setPassword(bCryptPasswordEncoder.encode(signUpRequestDto.getPassword()));
             Member member = signUpRequestDto.toMember();
@@ -89,57 +99,38 @@ public class MemberServiceImpl implements MemberService {
             memberRepository.save(member);
             profileRepository.save(profile);
         } catch (Exception e){
-            throw new IllegalArgumentException("회원 생성에 실패했습니다.");
+            throw new ApplicationException(MEMBER_REGISTER_FAIL);
         }
     }
 
     @Override
     @Transactional
-    public boolean isDuplicate(String username){
-        return findMemberByUsername(username).isPresent();
+    public Map<String,List<String>> getEnums(){
+        Map<String, List<String>> enumsMap = new HashMap<>();
+
+        enumsMap.put("job", Arrays.stream(Job.values())
+                .map(Job::name)
+                .collect(Collectors.toList()));
+
+        enumsMap.put("education", Arrays.stream(Education.values())
+                .map(Education::name)
+                .collect(Collectors.toList()));
+
+        enumsMap.put("gender", Arrays.stream(Gender.values())
+                .map(Gender::name)
+                .collect(Collectors.toList()));
+
+        return enumsMap;
     }
-
-
-
-
     @Override
     @Transactional
-    public SignUpResponseDto buildSignUpResponse(String username, Errors errors) {
-
-        List<String> errorMessages = new ArrayList<>();
-        List<ErrorCode> errorCodes = new ArrayList<>();
-
-        //Id 중복
-        if(isDuplicate(username)){
-            errorCodes.add(ErrorCode.DUPLICATE_USERNAME);
-            return SignUpResponseDto.builder().
-                    success(false).
-                    messages(Collections.singletonList("이미 존재하는 아이디입니다.")).
-                    errorCodes(errorCodes).
-                    build();
+    public MemberResponseDto.CheckDuplicateResponseDto checkDuplicate(MemberRequestDto.CheckDuplicateRequestDto checkDuplicateRequestDto){
+        String username = checkDuplicateRequestDto.getUsername();
+        if(findMemberByUsername(username).isPresent()){
+            throw new ApplicationException(DUPLICATE_USERNAME);
         }
-
-        //Validation error
-        if (errors.hasErrors()) {
-            List<FieldError> fieldErrors = errors.getFieldErrors();
-
-            for(FieldError fieldError : fieldErrors){
-                errorMessages.add(fieldError.getDefaultMessage());
-                ErrorCode errorCode = ErrorCode.mapToErrorCode(fieldError.getField());
-                errorCodes.add(errorCode);
-            }
-
-            return SignUpResponseDto.builder().
-                    success(false).
-                    messages(errorMessages).
-                    errorCodes(errorCodes).
-                    build();
-        }
-
-        return SignUpResponseDto.builder().
-                success(true).
-                messages(Collections.singletonList("회원가입이 완료되었습니다.")).
-                errorCodes(null).
+        return MemberResponseDto.CheckDuplicateResponseDto.builder().
+                message("사용 가능한 아이디입니다.").
                 build();
     }
 
@@ -147,28 +138,10 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public EmailAddressResponseDto sendVerificationEmail(String emailAddress, VerifyPurpose verifyPurpose, Errors errors) {//인증번호 발급, 재발급
+    public MemberResponseDto.EmailAddressResponseDto sendVerificationEmail(MemberRequestDto.EmailAddressRequestDto emailAddressRequestDto) {//인증번호 발급, 재발급
 
-        List<String> errorMessages = new ArrayList<>();
-        List<ErrorCode> errorCodes = new ArrayList<>();
-
-        //Validation error
-        if (errors.hasErrors()) {
-            List<FieldError> fieldErrors = errors.getFieldErrors();
-
-            for(FieldError fieldError : fieldErrors){
-                errorMessages.add(fieldError.getDefaultMessage());
-                ErrorCode errorCode = ErrorCode.mapToErrorCode(fieldError.getField());
-                errorCodes.add(errorCode);
-            }
-
-            return EmailAddressResponseDto.builder().
-                    success(false).
-                    messages(errorMessages).
-                    errorCodes(errorCodes).
-                    build();
-        }
-
+        String emailAddress = emailAddressRequestDto.getEmailAddress();
+        VerifyPurpose verifyPurpose = emailAddressRequestDto.getVerifyPurpose();
         try {
             if (authenticateMap.containsKey(emailAddress)) authenticateMap.remove(emailAddress);
 
@@ -185,23 +158,16 @@ public class MemberServiceImpl implements MemberService {
             innerMap.put("verifyPurpose",verifyPurpose);
             authenticateMap.put(emailAddress,innerMap);
 
-            return EmailAddressResponseDto.builder().
-                    success(true).
-                    messages(null).
-                    errorCodes(null).
+            return MemberResponseDto.EmailAddressResponseDto.builder().
+                    message("이메일로 인증번호 발송에 성공했습니다.").
                     build();
         } catch (Exception e) {
-            return EmailAddressResponseDto.builder().
-                    success(false).
-                    messages(Collections.singletonList("전송 중 오류가 발생했습니다.")).
-                    errorCodes(Collections.singletonList(ErrorCode.INVALID_DEFAULT))
-                    .build();
+            throw new ApplicationException(MAIL_ERROR);
         }
     }
 
-    @Override
-    @Transactional
-    public VerificationStatus verifyCode(String emailAddress, String userInputCode, VerifyPurpose verifyPurpose){
+    public VerificationStatus getVerificationStatus(String emailAddress, String userInputCode, VerifyPurpose verifyPurpose){
+
         try{
             authenticateMap.containsKey(emailAddress);
         } catch (NullPointerException e){
@@ -210,19 +176,33 @@ public class MemberServiceImpl implements MemberService {
 
         Map<String,Object> mapInfo = authenticateMap.get(emailAddress);
 
+        if(mapInfo==null){
+            return VerificationStatus.UNPROVIDED;
+        }
         String verificationCode = mapInfo.get("verificationCode").toString();
         LocalDateTime expireDateTime = (LocalDateTime) mapInfo.get("expireDateTime");
         VerifyPurpose verifyPurposeInMap = (VerifyPurpose) mapInfo.get("verifyPurpose");
 
         //다른 타입의 인증번호
         if(!verifyPurposeInMap.equals(verifyPurpose)){
+            sendVerificationEmail(
+                    MemberRequestDto.EmailAddressRequestDto.builder().
+                            emailAddress(emailAddress).
+                            verifyPurpose(verifyPurpose).
+                            build()
+            );
             return VerificationStatus.UNPROVIDED;
         }
         //인증번호 기한 만료
         if (expireDateTime.isBefore(LocalDateTime.now())){//인증번호 만료시
             authenticateMap.remove(emailAddress);
             //인증번호 재발급
-            sendVerificationEmail(emailAddress,verifyPurpose,null);
+            sendVerificationEmail(
+                    MemberRequestDto.EmailAddressRequestDto.builder().
+                            emailAddress(emailAddress).
+                            verifyPurpose(verifyPurpose).
+                            build()
+            );
             return VerificationStatus.EXPIRED;
         }
         //인증번호 일치
@@ -234,75 +214,81 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public boolean deleteMember(String username){
-        if(isDuplicate(username)){
-            memberRepository.updateMemberStateFalseByUsername(username);
-            return true;
+    public MemberResponseDto.VerificationResponseDto verifyCode(MemberRequestDto.VerificationRequestDto verificationRequestDto){
+        VerificationStatus verificationStatus = getVerificationStatus(
+                verificationRequestDto.getEmailAddress(),
+                verificationRequestDto.getCode(),
+                verificationRequestDto.getVerifyPurpose()
+        );
+
+        switch (verificationStatus) {
+            case MATCHED:
+                return MemberResponseDto.VerificationResponseDto.builder().
+                        message("이메일 인증에 성공했습니다.").
+                        build();
+            case UNMATCHED:
+                throw new ApplicationException(VERIFICATION_CODE_UNMATCHED);
+            case EXPIRED:
+                throw new ApplicationException(VERIFICATION_CODE_EXPIRED);
+            case UNPROVIDED:
+                throw new ApplicationException(VERIFICATION_CODE_UNPROVIDED);
+            default:
+                throw new RuntimeException("이메일 인증에 예기치 못한 오류가 발생했습니다.");
         }
-        return false;
     }
 
     @Override
     @Transactional
-    public ForgotUsernameResponseDto findForgotUsername(String emailAddress, Boolean emailChecked){
-        if(!emailChecked){
-            return ForgotUsernameResponseDto.builder().
-                    success(false).
-                    usernames(null).
-                    messages(Collections.singletonList("이메일 인증이 완료되지 않았습니다.")).
-                    errorCodes(Collections.singletonList(ErrorCode.UNVERIFIED)).
-                    build();
+    public void deleteMember(String username){
+        if(!findMemberByUsername(username).isPresent()){
+            throw new ApplicationException(USER_NOT_FOUND);
         }
+        memberRepository.updateMemberStateFalseByUsername(username);
+    }
+
+    @Override
+    @Transactional
+    public MemberResponseDto.ForgotUsernameResponseDto findForgotUsername(MemberRequestDto.ForgotUsernameRequestDto forgotUsernameRequestDto){
+        String emailAddress = forgotUsernameRequestDto.getEmailAddress();
+        String code = forgotUsernameRequestDto.getCode();
+        VerificationStatus verificationStatus = getVerificationStatus(emailAddress,code,VerifyPurpose.FORGOT_ID);
+
+        Boolean emailChecked = true;
+        if(verificationStatus!=VerificationStatus.MATCHED) emailChecked = false;
+
+        if(!emailChecked) throw new ApplicationException(UNVERIFIED_EMAIL);
 
         List<String> usernameList = memberRepository.findUsernamesByEmail(emailAddress).orElse(Collections.emptyList());
-        if(usernameList.isEmpty()){
-            //그 멤버에 대해 id 주기
-            return ForgotUsernameResponseDto.builder().
-                    success(false).
-                    usernames(null).
-                    messages(Collections.singletonList("가입된 아이디가 없습니다.")).
-                    errorCodes(Collections.singletonList(ErrorCode.USERNAME_ABSENT)).
-                    build();
-        }
-        return ForgotUsernameResponseDto.builder().
-                        success(true).
+        if(usernameList.isEmpty()) throw new ApplicationException(USER_NOT_FOUND);
+
+        return MemberResponseDto.ForgotUsernameResponseDto.builder().
                         usernames(usernameList).
-                        messages(Collections.singletonList("아이디 조회에 성공했습니다.")).
-                        errorCodes(null).
+                        message("아이디 조회에 성공했습니다.").
                         build();
     }
 
     @Override
     @Transactional
-    public ForgotPasswordResponseDto findForgotPassword(String username, String emailAddress, Boolean emailChecked) {
-        if (!emailChecked) {
-            return ForgotPasswordResponseDto.builder().
-                    success(false).
-                    messages(Collections.singletonList("이메일 인증이 완료되지 않았습니다.")).
-                    errorCodes(Collections.singletonList(ErrorCode.UNVERIFIED)).
-                    build();
-        }
+    public MemberResponseDto.ForgotPasswordResponseDto findForgotPassword(MemberRequestDto.ForgotPasswordRequestDto forgotPasswordRequestDto) {
+        String username = forgotPasswordRequestDto.getUsername();
+        String emailAddress = forgotPasswordRequestDto.getEmailAddress();
+        String code = forgotPasswordRequestDto.getCode();
+        VerificationStatus verificationStatus = getVerificationStatus(emailAddress,code,VerifyPurpose.FORGOT_PASSWORD);
+
+        Boolean emailChecked = true;
+        if(verificationStatus!=VerificationStatus.MATCHED) emailChecked = false;
+
+        if (!emailChecked) throw new ApplicationException(UNVERIFIED_EMAIL);
 
         if(!memberRepository.findUsernamesByEmail(emailAddress).orElse(Collections.emptyList()).contains(username)){
-            return ForgotPasswordResponseDto.builder().
-                    success(false).
-                    messages(Collections.singletonList("입력하신 아이디에 등록된 이메일이 아닙니다.")).
-                    errorCodes(Collections.singletonList(ErrorCode.INVALID_CONTACTEMAIL)).
-                    build();
+            throw new ApplicationException(INVALID_CONTACT_EMAIL);
         }
 
         Optional<Member> optionalMember = memberRepository.findMemberByUsername(username);
-        if(!optionalMember.isPresent()){
-            return ForgotPasswordResponseDto.builder().
-                    success(false).
-                    messages(Collections.singletonList("가입된 아이디가 없습니다.")).
-                    errorCodes(Collections.singletonList(ErrorCode.USERNAME_ABSENT)).
-                    build();
-        }
-        Member member = optionalMember.get();
-
+        if(!optionalMember.isPresent()) throw new ApplicationException(USER_NOT_FOUND);
 
         //임시 비밀번호 전송
+        Member member = optionalMember.get();
         try {
             String newPassword = mailSenderService.getRandomPassword();
             String mailSubject = "TeamPlanner 임시 발급된 비밀번호입니다.";
@@ -312,18 +298,12 @@ public class MemberServiceImpl implements MemberService {
             String encodedPassword = bCryptPasswordEncoder.encode(newPassword);
             memberRepository.updateMemberPassword(member, encodedPassword);
 
-            return ForgotPasswordResponseDto.builder().
-                    success(true).
-                    messages(Collections.singletonList("임시 비밀번호를 이메일로 보냈습니다. 반드시 접속 후 재설정해주세요")).
-                    errorCodes(null).
+            return MemberResponseDto.ForgotPasswordResponseDto.builder().
+                    message("임시 비밀번호를 이메일로 보냈습니다. 반드시 접속 후 재설정해주세요").
                     build();
 
         } catch (Exception e) {
-            return ForgotPasswordResponseDto.builder().
-                    success(false).
-                    messages(Collections.singletonList("임시 비밀번호 전송 중 오류가 발생했습니다.")).
-                    errorCodes(Collections.singletonList(ErrorCode.INVALID_DEFAULT))
-                    .build();
+            throw new ApplicationException(MAIL_ERROR);
         }
     }
 }

@@ -2,18 +2,8 @@ package com.tbfp.teamplannerbe.domain.member.controller;
 
 import com.tbfp.teamplannerbe.domain.auth.JwtProvider;
 import com.tbfp.teamplannerbe.domain.auth.cookie.CookieUtil;
-import com.tbfp.teamplannerbe.domain.member.*;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.ForgotPasswordRequestDto;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.ForgotUsernameRequestDto;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.EmailAddressRequestDto;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.CheckDuplicateRequestDto;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.VerificationRequestDto;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.SignUpRequestDto;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.MemberRenewAccessTokenRequestDto;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.ForgotPasswordResponseDto;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.EmailAddressResponseDto;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.ForgotUsernameResponseDto;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.SignUpResponseDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto;
 import com.tbfp.teamplannerbe.domain.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -23,14 +13,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.security.Principal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/member")
@@ -55,7 +44,7 @@ public class MemberController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
             @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
     })
-    public ResponseEntity renewAccessToken(@RequestBody MemberRenewAccessTokenRequestDto memberRenewAccessTokenRequestDto, HttpServletResponse response) {
+    public ResponseEntity renewAccessToken(@RequestBody MemberRequestDto.MemberRenewAccessTokenRequestDto memberRenewAccessTokenRequestDto, HttpServletResponse response) {
         log.info("memberRenewAccessTokenRequestDto.getRefreshToken() = " + memberRenewAccessTokenRequestDto.getRefreshToken());
         String accessToken = memberService.renewAccessToken(memberRenewAccessTokenRequestDto.getRefreshToken());
         CookieUtil.addCookie(response, "accessToken", accessToken, jwtProvider.ACCESS_TOKEN_EXPIRATION_TIME);
@@ -71,116 +60,44 @@ public class MemberController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<SignUpResponseDto> registerMember(@Validated @RequestBody SignUpRequestDto signUpRequestDto, Errors errors) {
-        // 회원 가입 서비스 호출
-        String username = signUpRequestDto.getUsername();
-        SignUpResponseDto signUpResponseDto = memberService.buildSignUpResponse(username, errors);
-
-        if(!signUpResponseDto.isSuccess()){
-            return ResponseEntity.badRequest().body(signUpResponseDto);
-        }
-
-        memberService.registerMember(signUpRequestDto);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(signUpResponseDto);
+    public ResponseEntity<MemberResponseDto.SignUpResponseDto> registerMember(@Valid @RequestBody MemberRequestDto.SignUpRequestDto signUpRequestDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(memberService.buildSignUpResponse(signUpRequestDto));
     }
 
     @GetMapping("/signup/enums")
     public ResponseEntity<Map<String, List<String>>> getEnums() {
-        Map<String, List<String>> enumsMap = new HashMap<>();
-
-        List<String> jobEnum = Arrays.stream(Job.values())
-                .map(Job::name)
-                .collect(Collectors.toList());
-        enumsMap.put("job", jobEnum);
-
-        List<String> educationEnum = Arrays.stream(Education.values())
-                .map(Education::name)
-                .collect(Collectors.toList());
-        enumsMap.put("education", educationEnum);
-
-        List<String> genderEnum = Arrays.stream(Gender.values())
-                .map(Gender::name)
-                .collect(Collectors.toList());
-        enumsMap.put("gender", genderEnum);
-
-        return ResponseEntity.ok(enumsMap);
+        return ResponseEntity.ok(memberService.getEnums());
     }
 
-    @PostMapping("/signup/is-duplicate")
-    public ResponseEntity<String> checkDuplicate(@RequestBody CheckDuplicateRequestDto checkDuplicateRequestDto){
-        String username = checkDuplicateRequestDto.getUsername();
-        if(memberService.isDuplicate(username)){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("이미 존재하는 아이디입니다.");
-        }
-        return ResponseEntity.ok("생성 가능한 아이디입니다.");
+    @PostMapping("/signup/check-duplicate")
+    public ResponseEntity<MemberResponseDto.CheckDuplicateResponseDto> checkDuplicate(@RequestBody MemberRequestDto.CheckDuplicateRequestDto checkDuplicateRequestDto){
+        return ResponseEntity.ok(memberService.checkDuplicate(checkDuplicateRequestDto));
     }
 
     @PostMapping("/signup/send-verification")
-    public ResponseEntity<EmailAddressResponseDto> sendVerificationEmail(@Validated @RequestBody EmailAddressRequestDto emailAddressRequestDto, Errors errors) {
-        EmailAddressResponseDto emailAddressResponseDto = memberService.sendVerificationEmail(emailAddressRequestDto.getEmailAddress(), emailAddressRequestDto.getVerifyPurpose(), errors);
-        if(!emailAddressResponseDto.isSuccess()){
-            ResponseEntity.badRequest().body(emailAddressResponseDto);
-        }
-        return ResponseEntity.ok().body(emailAddressResponseDto);
+    public ResponseEntity<MemberResponseDto.EmailAddressResponseDto> sendVerificationEmail(@Validated @RequestBody MemberRequestDto.EmailAddressRequestDto emailAddressRequestDto) {
+        return ResponseEntity.ok().body(memberService.sendVerificationEmail(emailAddressRequestDto));
     }
 
     @PostMapping("/signup/verify")
-    public ResponseEntity<String> verifyCode(@RequestBody VerificationRequestDto verificationRequestDto){
-        try {
-            // 인증번호 검증 로직 수행
-            String emailAddress = verificationRequestDto.getEmailAddress();
-            String code = verificationRequestDto.getCode().toString();
-            VerifyPurpose verifyPurpose = verificationRequestDto.getVerifyPurpose();
-
-            VerificationStatus verificationStatus = memberService.verifyCode(emailAddress,code,verifyPurpose);
-
-            switch (verificationStatus) {
-                case MATCHED:
-                    return ResponseEntity.ok("이메일 인증에 성공했습니다.");
-                case UNMATCHED:
-                    return ResponseEntity.status(400).body("이메일 인증에 실패했습니다 : Verification code is unmatched");
-                case EXPIRED:
-                    return ResponseEntity.status(400).body("이메일 인증에 실패했습니다. 인증번호를 재발송했습니다. : Verification code is expired");
-                case UNPROVIDED:
-                    return ResponseEntity.status(400).body("이메일 인증에 실패했습니다 : Verification code is unprovided");
-                default:
-                    return ResponseEntity.status(400).body("Unexpected Error");
-            }
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("인증 처리 실패");
-        }
+    public ResponseEntity<MemberResponseDto.VerificationResponseDto> verifyCode(@Valid @RequestBody MemberRequestDto.VerificationRequestDto verificationRequestDto){
+        return ResponseEntity.ok().body(memberService.verifyCode(verificationRequestDto));
     }
 
     @DeleteMapping("/{username}")
     public ResponseEntity<String> deleteMember(@PathVariable("username") String username){
-        if(memberService.deleteMember(username)) return ResponseEntity.ok().body("회원 삭제가 완료되었습니다.");
-        return ResponseEntity.badRequest().body("존재하지 않는 회원입니다.");
+        memberService.deleteMember(username);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/forgot-username")
-    public ResponseEntity<ForgotUsernameResponseDto> giveUsername(@RequestBody ForgotUsernameRequestDto forgotUsernameRequestDto){
-        String emailAddress = forgotUsernameRequestDto.getEmailAddress();
-        Boolean emailChecked = forgotUsernameRequestDto.getEmailChecked();
-        ForgotUsernameResponseDto forgotUsernameResponseDto = memberService.findForgotUsername(emailAddress,emailChecked);
-        if(!forgotUsernameResponseDto.isSuccess()){
-            return ResponseEntity.badRequest().body(forgotUsernameResponseDto);
-        }
-        return ResponseEntity.ok().body(forgotUsernameResponseDto);
+    public ResponseEntity<MemberResponseDto.ForgotUsernameResponseDto> giveUsername(@RequestBody MemberRequestDto.ForgotUsernameRequestDto forgotUsernameRequestDto){
+        return ResponseEntity.ok().body(memberService.findForgotUsername(forgotUsernameRequestDto));
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<ForgotPasswordResponseDto> givePassword(@RequestBody ForgotPasswordRequestDto forgotPasswordRequestDto){
-        String username = forgotPasswordRequestDto.getUsername();
-        String emailAddress = forgotPasswordRequestDto.getEmailAddress();
-        Boolean emailChecked = forgotPasswordRequestDto.getEmailChecked();
-        ForgotPasswordResponseDto forgotPasswordResponseDto = memberService.findForgotPassword(username, emailAddress,emailChecked);
-
-        if(!forgotPasswordResponseDto.isSuccess()){
-            return ResponseEntity.badRequest().body(forgotPasswordResponseDto);
-        }
-        return ResponseEntity.ok().body(forgotPasswordResponseDto);
+    public ResponseEntity<MemberResponseDto.ForgotPasswordResponseDto> givePassword(@RequestBody MemberRequestDto.ForgotPasswordRequestDto forgotPasswordRequestDto){
+        return ResponseEntity.ok().body(memberService.findForgotPassword(forgotPasswordRequestDto));
     }
 
 

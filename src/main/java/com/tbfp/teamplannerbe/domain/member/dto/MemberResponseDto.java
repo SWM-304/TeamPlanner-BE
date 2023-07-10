@@ -1,7 +1,7 @@
 package com.tbfp.teamplannerbe.domain.member.dto;
 
-import com.tbfp.teamplannerbe.domain.member.ErrorCode;
 import lombok.*;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -31,9 +31,16 @@ public class MemberResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class SignUpResponseDto {
-        private boolean success;
-        private List<String> messages;
-        private List<ErrorCode> errorCodes;
+        private String message;
+    }
+
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CheckDuplicateResponseDto{
+        private String message;
     }
 
     @Builder
@@ -42,9 +49,16 @@ public class MemberResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class EmailAddressResponseDto{
-        private boolean success;
-        private List<String> messages;
-        private List<ErrorCode> errorCodes;
+        private String message;
+    }
+
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class VerificationResponseDto{
+        private String message;
     }
 
     @Builder
@@ -53,10 +67,8 @@ public class MemberResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ForgotUsernameResponseDto {
-        private boolean success;
         private List<String> usernames;
-        private List<String> messages;
-        private List<ErrorCode> errorCodes;
+        private String message;
     }
 
     @Builder
@@ -65,9 +77,18 @@ public class MemberResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ForgotPasswordResponseDto {
-        private boolean success;
-        private List<String> messages;
-        private List<ErrorCode> errorCodes;
+        private String message;
+    }
+
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ErrorResponseDto{
+        private HttpStatus httpStatus;
+        private Integer code;
+        private String message;
     }
 
 }

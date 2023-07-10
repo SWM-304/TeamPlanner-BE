@@ -1,16 +1,11 @@
 package com.tbfp.teamplannerbe.domain.member.service;
 
-import com.tbfp.teamplannerbe.domain.member.VerificationStatus;
-import com.tbfp.teamplannerbe.domain.member.VerifyPurpose;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.SignUpRequestDto;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.ForgotPasswordResponseDto;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.EmailAddressResponseDto;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.ForgotUsernameResponseDto;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.SignUpResponseDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
-import org.springframework.validation.Errors;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface MemberService {
@@ -20,20 +15,22 @@ public interface MemberService {
 
     String renewAccessToken(String refreshToken);
 
-    void registerMember(SignUpRequestDto signUpRequestDto);
+    Map<String,List<String>> getEnums();
 
-    boolean isDuplicate(String username);
+    void registerMember(MemberRequestDto.SignUpRequestDto signUpRequestDto);
 
-    SignUpResponseDto buildSignUpResponse(String username, Errors errors);
+    MemberResponseDto.CheckDuplicateResponseDto checkDuplicate(MemberRequestDto.CheckDuplicateRequestDto checkDuplicateRequestDto);
 
-    EmailAddressResponseDto sendVerificationEmail(String emailAddress, VerifyPurpose verifyPurpose, Errors errors);
+    MemberResponseDto.SignUpResponseDto buildSignUpResponse(MemberRequestDto.SignUpRequestDto signUpRequestDto);
 
-    VerificationStatus verifyCode(String emailAddress, String userInputCode, VerifyPurpose verifyPurpose);
+    MemberResponseDto.EmailAddressResponseDto sendVerificationEmail(MemberRequestDto.EmailAddressRequestDto emailAddressRequestDto);
 
-    boolean deleteMember(String username);
+    MemberResponseDto.VerificationResponseDto verifyCode(MemberRequestDto.VerificationRequestDto verificationRequestDto);
 
-    ForgotUsernameResponseDto findForgotUsername(String emailAddress, Boolean emailChecked);
+    void deleteMember(String username);
 
-    ForgotPasswordResponseDto findForgotPassword(String username, String emailAddress, Boolean emailChecked);
+    MemberResponseDto.ForgotUsernameResponseDto findForgotUsername(MemberRequestDto.ForgotUsernameRequestDto forgotUsernameRequestDto);
+
+    MemberResponseDto.ForgotPasswordResponseDto findForgotPassword(MemberRequestDto.ForgotPasswordRequestDto forgotPasswordRequestDto);
 
 }

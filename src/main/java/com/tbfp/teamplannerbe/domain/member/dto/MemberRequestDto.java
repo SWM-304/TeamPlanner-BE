@@ -166,7 +166,7 @@ public class MemberRequestDto {
     @AllArgsConstructor
     public static class ForgotUsernameRequestDto {
         private String emailAddress;
-        private Boolean emailChecked;
+        private String code;
     }
 
     @Getter
@@ -177,7 +177,7 @@ public class MemberRequestDto {
     public static class ForgotPasswordRequestDto {
         private String username;
         private String emailAddress;
-        private Boolean emailChecked;
+        private String code;
     }
 
 }

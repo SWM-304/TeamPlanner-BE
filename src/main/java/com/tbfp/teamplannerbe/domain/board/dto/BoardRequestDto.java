@@ -69,7 +69,6 @@ public class BoardRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class updateBoardReqeustDto {
-        private Long boardId;
         private String activitiyName; // 공고 제목
         private String activityUrl; //주최 url
         private String activityImg; //이미지

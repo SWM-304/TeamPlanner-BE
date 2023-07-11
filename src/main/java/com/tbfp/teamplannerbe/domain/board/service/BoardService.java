@@ -30,5 +30,5 @@ public interface BoardService {
 
     void deleteBoard(Long boardId, String userId);
 
-    Boolean updateBoard(updateBoardReqeustDto updateBoardReqeustDto, String userId);
+    Boolean updateBoard(Long boardId,updateBoardReqeustDto updateBoardReqeustDto, String userId);
 }

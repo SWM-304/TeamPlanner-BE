@@ -83,16 +83,16 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.OK).body(boardService.searchPageSimple(boardSearchCondition,pageable).map(BoardSimpleListResponseDto::toDTO));
     }
 
-    @PutMapping()
+    @PutMapping("{boardId}")
     @Operation(summary = "공고수정", description = "공고 수정")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
             @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
     })
-    public ResponseEntity<?> updateBoard(@RequestBody updateBoardReqeustDto updateDto,Principal principal){
+    public ResponseEntity<?> updateBoard(@PathVariable Long boardId,@RequestBody updateBoardReqeustDto updateDto,Principal principal){
 
-        boardService.updateBoard(updateDto,principal.getName());
+        boardService.updateBoard(boardId,updateDto,principal.getName());
         return ResponseEntity.status(HttpStatus.OK).body("수정이 완료 되었습니다");
     }
 
@@ -113,3 +113,7 @@ public class BoardController {
 
 
 }
+
+
+
+

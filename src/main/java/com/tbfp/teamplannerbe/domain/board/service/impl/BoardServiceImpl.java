@@ -137,9 +137,9 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public Boolean updateBoard(updateBoardReqeustDto updateBoardReqeustDto, String userId) {
+    public Boolean updateBoard(Long boardId,updateBoardReqeustDto updateBoardReqeustDto, String userId) {
 
-        Board findBoard = boardRepository.findById(updateBoardReqeustDto.getBoardId()).
+        Board findBoard = boardRepository.findById(boardId).
                 orElseThrow(()->new ApplicationException(ApplicationErrorType.BOARD_NOT_FIND));
         memberJpaRepository.findByLoginId(userId)
                 .orElseThrow(()->new ApplicationException(ApplicationErrorType.USER_NOT_FOUND));

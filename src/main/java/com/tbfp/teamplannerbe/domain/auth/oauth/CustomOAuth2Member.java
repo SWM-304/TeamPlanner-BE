@@ -10,7 +10,7 @@ import java.util.Map;
 
 @Getter
 public class CustomOAuth2Member extends DefaultOAuth2User {
-    private String loginId;
+    private String username;
     private MemberRole memberRole;
 
 
@@ -22,9 +22,9 @@ public class CustomOAuth2Member extends DefaultOAuth2User {
      * @param nameAttributeKey the key used to access the user's &quot;name&quot; from
      *                         {@link #getAttributes()}
      */
-    public CustomOAuth2Member(Collection<? extends GrantedAuthority> authorities, Map<String, Object> attributes, String nameAttributeKey, String loginId, MemberRole memberRole) {
+    public CustomOAuth2Member(Collection<? extends GrantedAuthority> authorities, Map<String, Object> attributes, String nameAttributeKey, String username, MemberRole memberRole) {
         super(authorities, attributes, nameAttributeKey);
-        this.loginId = loginId;
+        this.username = username;
         this.memberRole = memberRole;
     }
 }

@@ -1,4 +1,4 @@
-package com.tbfp.teamplannerbe.domain.Comment.dto;
+package com.tbfp.teamplannerbe.domain.comment.dto;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;

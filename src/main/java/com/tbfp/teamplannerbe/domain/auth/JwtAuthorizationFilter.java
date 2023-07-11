@@ -39,11 +39,11 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             return;
         }
 
-        String username = jwtProvider.getUsername(request);
+        String loginId = jwtProvider.getLoginId(request);
 
-        if (username != null) {
-            log.info("username = " + username);
-            Member member = memberService.findMemberByUsername(username).orElseThrow(() -> new ApplicationException(ApplicationErrorType.USER_NOT_FOUND));
+        if (loginId != null) {
+            log.info("loginId = " + loginId);
+            Member member = memberService.findMemberByLoginId(loginId).orElseThrow(() -> new ApplicationException(ApplicationErrorType.USER_NOT_FOUND));
             MemberDetails memberDetails = new MemberDetails(member);
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(memberDetails, null, null);
             SecurityContextHolder.getContext().setAuthentication(authentication);

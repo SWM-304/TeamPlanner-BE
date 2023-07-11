@@ -1,7 +1,12 @@
 package com.tbfp.teamplannerbe.domain.board.controller;
 
 
+import com.tbfp.teamplannerbe.domain.board.dto.BoardRequestDto;
+import com.tbfp.teamplannerbe.domain.board.dto.BoardRequestDto.createBoardResquestDto;
+import com.tbfp.teamplannerbe.domain.board.dto.BoardRequestDto.updateBoardReqeustDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
+import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto.BoardDetailResponseDto;
+import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto.BoardSimpleListResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardSearchCondition;
 import com.tbfp.teamplannerbe.domain.board.service.BoardService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +20,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/v1/board")
@@ -43,7 +50,19 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoardDetail(boardId));
     }
 
+    @PostMapping("")
+    @Operation(summary = "공고 생성 API", description = "사용자가 직접 공고생성을 할 수 있다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
+    })
+    public ResponseEntity<?> createBaord(@RequestBody createBoardResquestDto createBoardResquestDto,Principal principal){
 
+
+        return ResponseEntity.status(HttpStatus.OK).body(boardService.createBoard(createBoardResquestDto,principal.getName()));
+
+    }
     /**
      *
      *
@@ -51,17 +70,46 @@ public class BoardController {
      * 예) localhost:8080/api/v1/board/list
      * @return
      */
-    @GetMapping("/list")
+    @GetMapping("")
     @Operation(summary = "공고리스트 출력 및 페이징 and 동적검색기능", description = "localhost:8080/api/v1/board/list2?category=공모전&page=0&size=2&sortBy=boardId")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
             @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
     })
-    public Page<BoardResponseDto.BoardSimpleListResponseDto> boardList(BoardSearchCondition boardSearchCondition,
+    public ResponseEntity<?> boardList(BoardSearchCondition boardSearchCondition,
                                  Pageable pageable){
 
-        return ResponseEntity.status(HttpStatus.OK).body(boardService.searchPageSimple(boardSearchCondition,pageable)).getBody();
+        return ResponseEntity.status(HttpStatus.OK).body(boardService.searchPageSimple(boardSearchCondition,pageable).map(BoardSimpleListResponseDto::toDTO));
     }
+
+    @PutMapping()
+    @Operation(summary = "공고수정", description = "공고 수정")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
+    })
+    public ResponseEntity<?> updateBoard(@RequestBody updateBoardReqeustDto updateDto,Principal principal){
+
+        boardService.updateBoard(updateDto,principal.getName());
+        return ResponseEntity.status(HttpStatus.OK).body("수정이 완료 되었습니다");
+    }
+
+
+    @DeleteMapping("")
+    @Operation(summary = "공고삭제", description = "UserId 와 boardId로 해당하는 공고글 삭제")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
+    })
+    public ResponseEntity<?> deleteBoard(@PathVariable Long boardId,Principal principal){
+
+        boardService.deleteBoard(boardId,principal.getName());
+        return ResponseEntity.status(HttpStatus.OK).body("삭제가 완료 되었습니다");
+    }
+
+
 
 }

@@ -1,8 +1,8 @@
-package com.tbfp.teamplannerbe.domain.Comment.controller;
+package com.tbfp.teamplannerbe.domain.comment.controller;
 
 
-import com.tbfp.teamplannerbe.domain.Comment.dto.CommentRequestDto;
-import com.tbfp.teamplannerbe.domain.Comment.service.CommentService;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/comment")
+@RequestMapping("/api/v1/board/{boardId}/comment")
 @Tag(name= "CommentController", description = "댓글 API")
 public class CommentController {
 
@@ -29,7 +29,7 @@ public class CommentController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
             @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
     })
-    @PostMapping("/send")
+    @PostMapping("")
     public ResponseEntity<?> commentSend(@RequestBody CommentRequestDto.CommentSendRequestDto commentSendRequestDto){
 
         return ResponseEntity.status(HttpStatus.OK).body(commentService.sendComment(commentSendRequestDto));
@@ -41,7 +41,7 @@ public class CommentController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
             @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
     })
-    @PostMapping("/childSend")
+    @PostMapping("/{commentId}/comment")
     public ResponseEntity<?> bigCommentSend(@RequestBody CommentRequestDto.bigCommentSendRequestDto bigCommentSendRequestDto){
 
         return ResponseEntity.status(HttpStatus.OK).body(commentService.sendBigComment(bigCommentSendRequestDto));
@@ -49,7 +49,7 @@ public class CommentController {
 
 
 
-    @DeleteMapping("/delete/{boardId}/comment/{commentId}")
+    @DeleteMapping("/{commentId}")
     @Operation(summary = "댓글삭제 API", description = "공고아이디와 댓글아이디로 댓글 삭제")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공"),
@@ -62,7 +62,7 @@ public class CommentController {
     }
 
 
-    @PutMapping("/update")
+    @PutMapping("")
     @Operation(summary = "댓글수정 API", description = "공고아이디와 댓글아이디로 댓글 수정")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공"),

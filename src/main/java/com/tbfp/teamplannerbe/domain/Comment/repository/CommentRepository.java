@@ -1,13 +1,13 @@
-package com.tbfp.teamplannerbe.domain.Comment.repository;
+package com.tbfp.teamplannerbe.domain.comment.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.tbfp.teamplannerbe.domain.Comment.entity.Comment;
+import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
 import com.tbfp.teamplannerbe.domain.common.querydsl.support.Querydsl4RepositorySupport;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
-import static com.tbfp.teamplannerbe.domain.Comment.entity.QComment.comment;
+import static com.tbfp.teamplannerbe.domain.comment.entity.QComment.comment;
 
 
 @Repository

@@ -4,7 +4,6 @@ import com.tbfp.teamplannerbe.domain.auth.MemberRole;
 import com.tbfp.teamplannerbe.domain.member.Education;
 import com.tbfp.teamplannerbe.domain.member.Gender;
 import com.tbfp.teamplannerbe.domain.member.Job;
-import com.tbfp.teamplannerbe.domain.member.VerifyPurpose;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.entity.Profile;
 import lombok.*;
@@ -21,7 +20,7 @@ public class MemberRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MemberLoginRequestDto {
-        private String username;
+        private String loginId;
         private String password;
     }
 
@@ -43,7 +42,7 @@ public class MemberRequestDto {
 
         @NotEmpty(message = "아이디 설정은 필수입니다.")
         @Size(min = 4, max = 32, message = "아이디를 4~32글자로 설정해주세요.")
-        private String username;
+        private String loginId;
 
         @NotEmpty(message = "비밀번호 설정은 필수입니다.")
         @Size(min = 8, max = 64, message = "비밀번호를 8~64글자의 영문+숫자 조합으로 설정해주세요.")
@@ -89,7 +88,7 @@ public class MemberRequestDto {
 
         @NotNull
         @AssertTrue(message = "아이디 중복 검사가 필요합니다.")
-        private Boolean usernameChecked;
+        private Boolean loginIdChecked;
 
         @NotNull
         @AssertTrue(message = "이메일 인증이 필요합니다.")
@@ -97,7 +96,7 @@ public class MemberRequestDto {
 
         public Member toMember(){
             return Member.builder().
-                    username(username).
+                    loginId(loginId).
                     password(password).
                     email(email).
                     phone(phone).
@@ -132,7 +131,7 @@ public class MemberRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class CheckDuplicateRequestDto {
-        private String username;
+        private String loginId;
     }
 
     @Getter
@@ -140,10 +139,8 @@ public class MemberRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class EmailAddressRequestDto {
-        @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$", message = "이메일 형식이 맞지 않습니다.")
+    public static class EmailAddresRequestsDto {
         private String emailAddress;
-        private VerifyPurpose verifyPurpose;
     }
 
     @Getter
@@ -152,30 +149,6 @@ public class MemberRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class VerificationRequestDto {
-
-        @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$", message = "이메일 형식이 맞지 않습니다.")
-        private String emailAddress;
-        private String code;
-        private VerifyPurpose verifyPurpose;
-    }
-
-    @Getter
-    @Setter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ForgotUsernameRequestDto {
-        private String emailAddress;
-        private String code;
-    }
-
-    @Getter
-    @Setter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ForgotPasswordRequestDto {
-        private String username;
         private String emailAddress;
         private String code;
     }

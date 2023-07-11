@@ -1,1 +1,0 @@
-ALTER TABLE member RENAME COLUMN login_id TO username;

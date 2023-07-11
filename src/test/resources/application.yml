@@ -78,6 +78,3 @@ springdoc:
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
 
-jasypt:
-  encryptor:
-    password: 1234zzzz

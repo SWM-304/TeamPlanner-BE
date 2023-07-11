@@ -61,7 +61,8 @@ public class JwtProvider {
                 .verify(accessToken)
                 .getClaim("loginId").asString();
     }
-    public String getLoginIdFromToken(String token) {
+
+    public String getUsernameFromToken(String token) {
         return JWT.require(Algorithm.HMAC512(SECRET_KEY))
                 .build()
                 .verify(token)

@@ -37,3 +37,6 @@ out/
 .vscode/
 
 .DS_Store
+docker-compose.yml
+dockerfile
+

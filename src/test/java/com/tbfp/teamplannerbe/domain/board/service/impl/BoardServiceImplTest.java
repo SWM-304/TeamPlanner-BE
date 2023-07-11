@@ -188,7 +188,6 @@ class BoardServiceImplTest extends BaseControllerTest {
 
         for(int i=1;i<=30;i++){
             BoardRequestDto.updateBoardReqeustDto updateDto = BoardRequestDto.updateBoardReqeustDto.builder()
-                    .boardId((long) i)
                     .activitiyName("test2" + i)
                     .activityUrl("test2" + i)
                     .activityImg("test2" + i)
@@ -209,7 +208,7 @@ class BoardServiceImplTest extends BaseControllerTest {
                     .preferredSkills("test2" + i)
                     .activityPeriod("test2" + i)
                     .build();
-            boardService.updateBoard(updateDto,"test");
+            boardService.updateBoard((long) i,updateDto,"test");
         }
 
     }
@@ -253,8 +252,8 @@ class BoardServiceImplTest extends BaseControllerTest {
                 .andExpect(
                         result -> {
                             accessToken.set(result.getResponse().getCookie("accessToken").getValue());
-                            assertThat(jwtProvider.getLoginIdFromToken(result.getResponse().getCookie("accessToken").getValue())).isEqualTo(loginId);
-                            assertThat(jwtProvider.getLoginIdFromToken(result.getResponse().getCookie("refreshToken").getValue())).isEqualTo(loginId);
+                            assertThat(jwtProvider.getUsernameFromToken(result.getResponse().getCookie("accessToken").getValue())).isEqualTo(loginId);
+                            assertThat(jwtProvider.getUsernameFromToken(result.getResponse().getCookie("refreshToken").getValue())).isEqualTo(loginId);
                         }
                 );
 

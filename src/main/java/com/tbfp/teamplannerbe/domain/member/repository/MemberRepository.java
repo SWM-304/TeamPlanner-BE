@@ -31,7 +31,7 @@ public class MemberRepository extends Querydsl4RepositorySupport{
      *
      */
 
-    public Optional<Member> findMemberByLoginId(String loginId) {
+    public Optional<Member> findMemberByUsername(String loginId) {
         return Optional.ofNullable(select(member)
                 .from(member)
                 .where(member.loginId.eq(loginId).and(member.state.eq(true))).

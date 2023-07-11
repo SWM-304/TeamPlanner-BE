@@ -55,7 +55,7 @@ public enum ApplicationErrorType {
 
     ALREADY_LIKE_BOARD(HttpStatus.BAD_REQUEST,-8,"이미 좋아요를 누르셨습니다"),
 
-    COMMENT_NOT_FOUND(HttpStatus.BAD_REQUEST,-9,"댓글을 찾을 수 없습니다");
+    ALREADY_LIKED(HttpStatus.BAD_REQUEST, -30000, "이미 좋아요 한 글입니다.");
 
 
     private final HttpStatus httpStatus;

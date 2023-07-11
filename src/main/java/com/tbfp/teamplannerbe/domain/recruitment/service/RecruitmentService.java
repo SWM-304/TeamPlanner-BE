@@ -17,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -71,5 +73,15 @@ public class RecruitmentService {
 
         recruitment.update(recruitmentUpdateRequestDto);
         return "";
+    }
+
+    public Optional<Recruitment> findById(Long recruitmentId) {
+        return recruitmentRepository.findById(recruitmentId);
+    }
+
+    public void increaseLikeCount(Long id) {
+        Recruitment recruitment = recruitmentRepository.findById(id)
+                .orElseThrow(() -> new ApplicationException(ApplicationErrorType.NOT_FOUND));
+        recruitment.incrementLikeCount();
     }
 }

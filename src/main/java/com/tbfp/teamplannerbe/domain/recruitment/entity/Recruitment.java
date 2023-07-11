@@ -49,4 +49,8 @@ public class Recruitment extends BaseTimeEntity {
         this.currentMemberSize = recruitmentUpdateRequestDto.getNewCurrentMemberSize();
         this.maxMemberSize = recruitmentUpdateRequestDto.getNewMaxMemberSize();
     }
+
+    public void incrementLikeCount() {
+        this.likeCount++;
+    }
 }

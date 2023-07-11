@@ -1,7 +1,6 @@
 package com.tbfp.teamplannerbe.domain.recruitment.dto;
 
 
-import com.querydsl.core.annotations.QueryProjection;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
@@ -9,29 +8,12 @@ import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 
 public class RecruitmentRequestDto {
 
 
 
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    public static class RecruitmentSearchDto {
-        private String title;
-        private Integer viewCount;
-        private Integer likeCount;
-        private LocalDateTime createdAt;
 
-        @QueryProjection
-        public RecruitmentSearchDto(String title, Integer viewCount, Integer likeCount, LocalDateTime createdAt) {
-            this.title = title;
-            this.viewCount = viewCount;
-            this.likeCount = likeCount;
-            this.createdAt = createdAt;
-        }
-    }
 
     @Getter
     @Builder

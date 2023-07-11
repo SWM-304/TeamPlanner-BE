@@ -3,8 +3,8 @@ package com.tbfp.teamplannerbe.domain.recruitment.repository.impl;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.tbfp.teamplannerbe.domain.common.querydsl.support.Querydsl4RepositorySupport;
 import com.tbfp.teamplannerbe.domain.recruitment.condition.RecruitmentSearchCondition;
-import com.tbfp.teamplannerbe.domain.recruitment.dto.QRecruitmentRequestDto_RecruitmentSearchDto;
-import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentRequestDto.*;
+import com.tbfp.teamplannerbe.domain.recruitment.dto.QRecruitmentResponseDto_RecruitmentSearchDto;
+import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentResponseDto.RecruitmentSearchDto;
 import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
 import com.tbfp.teamplannerbe.domain.recruitment.repository.RecruitmentQuerydslRepository;
 import org.springframework.data.domain.Page;
@@ -24,7 +24,8 @@ public class RecruitmentQuerydslRepositoryImpl extends Querydsl4RepositorySuppor
     @Override
     public Page<RecruitmentSearchDto> searchPage(RecruitmentSearchCondition recruitmentSearchCondition, Pageable pageable) {
         return applyPagination(pageable, contentQuery -> contentQuery
-                        .select(new QRecruitmentRequestDto_RecruitmentSearchDto(
+                        .select(new QRecruitmentResponseDto_RecruitmentSearchDto(
+                                recruitment.id,
                                 recruitment.title,
                                 recruitment.viewCount,
                                 recruitment.likeCount,

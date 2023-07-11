@@ -6,11 +6,11 @@ import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
 import com.tbfp.teamplannerbe.domain.recruitment.condition.RecruitmentSearchCondition;
-import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentRequestDto;
 import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentRequestDto.RecruitmentCreateRequestDto;
 import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentRequestDto.RecruitmentUpdateRequestDto;
 import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentResponseDto.RecruitmentCreateResponseDto;
 import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentResponseDto.RecruitmentReadResponseDto;
+import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentResponseDto.RecruitmentSearchDto;
 import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,11 +77,11 @@ class RecruitmentServiceTest {
         PageRequest pageRequest = PageRequest.of(0, 10);
 
         // when
-        Page<RecruitmentRequestDto.RecruitmentSearchDto> listWithCondition = recruitmentService.getListWithCondition(cond, pageRequest);
+        Page<RecruitmentSearchDto> listWithCondition = recruitmentService.getListWithCondition(cond, pageRequest);
 
         // then
         // 0, 2, 4
-        assertThat(listWithCondition.getContent().stream().map(RecruitmentRequestDto.RecruitmentSearchDto::getTitle)).containsExactly(
+        assertThat(listWithCondition.getContent().stream().map(RecruitmentSearchDto::getTitle)).containsExactly(
                 recruitmentList.get(0).getTitle(),
                 recruitmentList.get(2).getTitle(),
                 recruitmentList.get(4).getTitle()

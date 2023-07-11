@@ -37,6 +37,8 @@ public class BoardResponseDto {
         private String competitionCategory; // 공모분야
         private String preferredSkills; //우대역량
         private String activityPeriod; //활동기간
+        private Long viewCount;
+        private Long likeCount;
         private List<boardWithCommentListResponseDto> comments=new ArrayList<>();
 
         public BoardDetailResponseDto(Board board) {
@@ -59,6 +61,8 @@ public class BoardResponseDto {
             this.competitionCategory = board.getCompetitionCategory();
             this.preferredSkills = board.getPreferredSkills();
             this.activityPeriod = board.getActivityPeriod();
+            this.viewCount=board.getView();
+            this.likeCount=board.getLikeCount();
             this.comments=board.getComments().stream().
                     map(i-> new CommentResponseDto.boardWithCommentListResponseDto(i))
                     .collect(Collectors.toList());

@@ -5,7 +5,6 @@ import com.tbfp.teamplannerbe.domain.board.repository.BoardRepository;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto;
 import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
-import com.tbfp.teamplannerbe.domain.comment.repository.CommentJpaRepository;
 import com.tbfp.teamplannerbe.domain.comment.repository.CommentRepository;
 import com.tbfp.teamplannerbe.domain.comment.service.CommentService;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
@@ -25,10 +24,9 @@ import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorTyp
 @Slf4j
 public class CommentServiceImpl implements CommentService {
 
-    private final CommentRepository commentRepository;
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
-    private final CommentJpaRepository commentJpaRepository;
+    private final CommentRepository commentRepository;
 //
 //    @PersistenceContext
 //    private EntityManager em;
@@ -77,7 +75,7 @@ public class CommentServiceImpl implements CommentService {
         Optional<Board> findBoard = Optional.ofNullable(boardRepository.findById(boardId)
                 .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND)));
 
-        Optional<Comment> findComment = Optional.ofNullable(commentRepository.findBycommentId(commentId).
+        Optional<Comment> findComment = Optional.ofNullable(commentRepository.findById(commentId).
                         orElseThrow(()->new RuntimeException("댓글을 찾을 수 없습니다")));
 
 
@@ -99,7 +97,7 @@ public class CommentServiceImpl implements CommentService {
         // 자식댓글일 경우 해결 댓글만 state 값 false
         if(findBoard.isPresent() && findComment.isPresent()){
             findComment.get().setState(false);
-            commentJpaRepository.save(findComment.get());
+            commentRepository.save(findComment.get());
         }
 
     }
@@ -119,7 +117,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public CommentResponseDto.updatedCommentResponseDto updateComment(CommentRequestDto.CommentUpdateRequestDto commentUpdateRequestDto) {
-        Comment findComment = commentJpaRepository.findByIdAndBoardId(
+        Comment findComment = commentRepository.findByIdAndBoardId(
                 commentUpdateRequestDto.getCommentId(),
                 commentUpdateRequestDto.getBoardId());
 
@@ -129,7 +127,7 @@ public class CommentServiceImpl implements CommentService {
 
         findComment.updateContent(commentUpdateRequestDto.getContent());
 
-        Comment savedComment = commentJpaRepository.save(findComment);
+        Comment savedComment = commentRepository.save(findComment);
 
         CommentResponseDto.updatedCommentResponseDto commentResponseDto = CommentResponseDto.updatedCommentResponseDto.builder()
                 .content(savedComment.getContent())
@@ -166,7 +164,7 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new ApplicationException(BOARD_NOT_FIND));
 
         if (bigCommentSendRequestDto.getParentCommentId() != null) {
-            Comment parentComment = commentJpaRepository.findById(bigCommentSendRequestDto.getParentCommentId())
+            Comment parentComment = commentRepository.findById(bigCommentSendRequestDto.getParentCommentId())
                     .orElseThrow(() -> new RuntimeException("부모 댓글을 찾을 수 없습니다"));
 
             log.info(String.valueOf(bigCommentSendRequestDto.isConfidential()));

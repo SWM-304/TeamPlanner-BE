@@ -3,7 +3,6 @@ package com.tbfp.teamplannerbe.domain.auth;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,6 +16,6 @@ public class MemberDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.info("MemberDetailsService.loadUserByUsername");
-        return new MemberDetails(memberRepository.findMemberByUsername(username).orElseThrow(() -> new UsernameNotFoundException("no user with loginId: " + username)));
+        return new MemberDetails(memberRepository.findMemberByUsername(username).orElseThrow(() -> new UsernameNotFoundException("no user with username: " + username)));
     }
 }

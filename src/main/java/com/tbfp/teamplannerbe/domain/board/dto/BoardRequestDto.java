@@ -56,7 +56,7 @@ public class BoardRequestDto {
                     .preferredSkills(preferredSkills)
                     .activityPeriod(activityPeriod)
                     .likeCount(0L)
-                    .view(0L)
+                    .viewCount(0L)
                     .member(member)
                     .build();
         }

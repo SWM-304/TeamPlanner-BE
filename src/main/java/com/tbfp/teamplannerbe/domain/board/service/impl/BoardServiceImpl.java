@@ -69,7 +69,7 @@ public class BoardServiceImpl implements BoardService {
         Board findBoard = boardRepository.findById(boardId).
                 orElseThrow(()-> new ApplicationException(ApplicationErrorType.BOARD_NOT_FOUND));
 
-        findBoard.plusViewCount(findBoard.getView()+1);
+        findBoard.plusViewCount(findBoard.getViewCount()+1);
 
         boardRepository.save(findBoard);
 

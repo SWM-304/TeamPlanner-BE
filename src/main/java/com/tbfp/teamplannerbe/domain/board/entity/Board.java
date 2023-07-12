@@ -64,7 +64,7 @@ public class Board extends BaseTimeEntity {
 
     private String activityPeriod; //활동기간
 
-    private Long view;
+    private Long viewCount;
 
     private Long likeCount;
 
@@ -129,7 +129,7 @@ public class Board extends BaseTimeEntity {
     }
 
     public void plusViewCount(Long view){
-        this.view=view;
+        this.viewCount=view;
     }
     public void plusLikeCount(Long count) {
         this.likeCount=count;

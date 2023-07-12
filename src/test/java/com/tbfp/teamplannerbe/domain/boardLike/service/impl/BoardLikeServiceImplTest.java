@@ -204,28 +204,5 @@ class BoardLikeServiceImplTest extends BaseControllerTest {
                 .build());
     }
 
-    public String 로그인성공(String id,String password) throws Exception {
-        String username = id;
-        String rawPassword = password;
-        AtomicReference<String> accessToken= new AtomicReference<>("");
-        MemberRequestDto.MemberLoginRequestDto memberLoginRequestDto = new MemberRequestDto.MemberLoginRequestDto(username, rawPassword);
 
-        ResultActions resultActions = mockMvc.perform(
-                post("/api/v1/member/login")
-                        .content(objectMapper.writeValueAsString(memberLoginRequestDto))
-        );
-
-        resultActions.andExpect(status().isOk())
-                .andExpect(result -> System.out.println("result = " + result))
-                .andExpect(
-                        result -> {
-                            accessToken.set(result.getResponse().getCookie("accessToken").getValue());
-                            assertThat(jwtProvider.getUsernameFromToken(result.getResponse().getCookie("accessToken").getValue())).isEqualTo(username);
-                            assertThat(jwtProvider.getUsernameFromToken(result.getResponse().getCookie("refreshToken").getValue())).isEqualTo(username);
-                        }
-                );
-
-        return accessToken.get();
-
-    }
 }

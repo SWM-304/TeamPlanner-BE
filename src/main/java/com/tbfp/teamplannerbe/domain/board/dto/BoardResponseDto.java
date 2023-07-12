@@ -60,7 +60,7 @@ public class BoardResponseDto {
             this.competitionCategory = board.getCompetitionCategory();
             this.preferredSkills = board.getPreferredSkills();
             this.activityPeriod = board.getActivityPeriod();
-            this.viewCount=board.getView();
+            this.viewCount=board.getViewCount();
             this.likeCount=board.getLikeCount();
             if(board.getComments()!=null){
                 this.comments=board.getComments().stream().
@@ -108,7 +108,7 @@ public class BoardResponseDto {
         private String activitiyName; // 공고 제목
         private String activityImg; //이미지
         private String category; //카테고리
-        private Long view; //조회수
+        private Long viewCount; //조회수
         private Long likeCount; //좋아요
 
 
@@ -118,7 +118,7 @@ public class BoardResponseDto {
             this.activitiyName = board.getActivityName();
             this.activityImg = board.getActivityImg();
             this.category = board.getCategory();
-            this.view=board.getView();
+            this.viewCount=board.getViewCount();
             this.likeCount= board.getLikeCount();
         }
 
@@ -128,7 +128,7 @@ public class BoardResponseDto {
                     .activitiyName(board.getActivityName())
                     .activityImg(board.getActivityImg())
                     .category(board.getCategory())
-                    .view(board.getView())
+                    .viewCount(board.getViewCount())
                     .likeCount(board.getLikeCount())
                     .build();
         }

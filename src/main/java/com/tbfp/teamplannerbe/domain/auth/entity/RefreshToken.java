@@ -13,6 +13,6 @@ import javax.persistence.Id;
 @ToString
 public class RefreshToken {
     @Id
-    private String id; // member loginId
+    private String id; // member username
     private String token;
 }

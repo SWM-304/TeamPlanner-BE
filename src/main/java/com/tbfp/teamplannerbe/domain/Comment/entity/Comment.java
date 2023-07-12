@@ -1,7 +1,7 @@
-package com.tbfp.teamplannerbe.domain.Comment.entity;
+package com.tbfp.teamplannerbe.domain.comment.entity;
 
 
-import com.tbfp.teamplannerbe.domain.Comment.dto.CommentRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
@@ -11,9 +11,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
 public class Comment extends BaseTimeEntity {
 
@@ -27,10 +25,9 @@ public class Comment extends BaseTimeEntity {
 
     private boolean state;
 
-//    private String memberId;
-
     @Column(nullable = false)
     private int depth;  // 댓글의 깊이
+
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "BOARD_ID")
@@ -39,6 +36,7 @@ public class Comment extends BaseTimeEntity {
     @JoinColumn(name="MEMBER_ID")
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
 
     @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "parent_comment_id")
@@ -52,12 +50,24 @@ public class Comment extends BaseTimeEntity {
         this.depth = parentComment.getDepth() + 1;  // 깊이 설정
     }
 
-    public void setState(boolean state){
+    public void changeState(boolean state){
         this.state= state;
     }
 
     public void updateContent(String newContent) {
         this.content = newContent;
+    }
+
+    @Builder
+    public Comment(Long id, String content, boolean state, int depth, Board board, Member member, Comment parentComment, boolean isConfidential) {
+        this.id = id;
+        this.content = content;
+        this.state = state;
+        this.depth = depth;
+        this.board = board;
+        this.member = member;
+        this.parentComment = parentComment;
+        this.isConfidential = isConfidential;
     }
 
     public CommentRequestDto.CommentUpdateRequestDto toDTO() {

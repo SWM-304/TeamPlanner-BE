@@ -1,7 +1,7 @@
 package com.tbfp.teamplannerbe.domain.board.entity;
 
 
-import com.tbfp.teamplannerbe.domain.Comment.entity.Comment;
+import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
 import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
@@ -64,12 +64,20 @@ public class Board extends BaseTimeEntity {
 
     private String activityPeriod; //활동기간
 
+    private Long view;
+
+    private Long likeCount;
+
+
     @OneToMany(mappedBy="board",cascade = CascadeType.ALL)
     private List<Comment> comments=new ArrayList<>();
 
     @JoinColumn(name="MEMBER_ID")
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+
+
 
 
     public void overwrite(Board board) {
@@ -97,26 +105,33 @@ public class Board extends BaseTimeEntity {
 
     public BoardResponseDto.BoardDetailResponseDto toDTO() {
         return BoardResponseDto.BoardDetailResponseDto.builder()
-                .activitiy_name(activityName)
-                .activity_field(activityField)
-                .activitiy_detail(activityDetail)
-                .activity_area(activityArea)
-                .activity_benefits(activityBenefits)
-                .activity_img(activityImg)
-                .activity_period(activityPeriod)
-                .activity_url(activityUrl)
-                .category(category)
-                .target(target)
-                .company_Type(companyType)
-                .recruitment_count(recruitmentCount)
-                .recruitment_period(recruitmentPeriod)
-                .interest_area(interestArea)
-                .preferred_skills(preferredSkills)
-                .prize_scale(prizeScale)
-                .competition_category(competitionCategory)
-                .meetingTime(meetingTime)
-                .homepage(homepage)
+                .activitiyName(activityName)
+                .activityUrl(activityField)
+                .activityImg(activityDetail)
+                .activitiyDetail(activityArea)
+                .category(activityBenefits)
+                .companyType(activityImg)
+                .target(activityPeriod)
+                .activityArea(activityUrl)
+                .recruitmentPeriod(category)
+                .recruitmentCount(target)
+                .meetingTime(companyType)
+                .homepage(recruitmentCount)
+                .activityBenefits(recruitmentPeriod)
+                .interestArea(interestArea)
+                .activityField(preferredSkills)
+                .prizeScale(prizeScale)
+                .competitionCategory(competitionCategory)
+                .preferredSkills(meetingTime)
+                .activityPeriod(homepage)
                 .build();
 
+    }
+
+    public void plusViewCount(Long view){
+        this.view=view;
+    }
+    public void plusLikeCount(Long count) {
+        this.likeCount=count;
     }
 }

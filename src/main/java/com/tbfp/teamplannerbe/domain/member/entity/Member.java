@@ -1,7 +1,5 @@
 package com.tbfp.teamplannerbe.domain.member.entity;
 
-
-import com.tbfp.teamplannerbe.domain.Comment.entity.Comment;
 import com.tbfp.teamplannerbe.domain.auth.MemberRole;
 import com.tbfp.teamplannerbe.domain.auth.ProviderType;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
@@ -47,7 +45,7 @@ public class Member extends BaseTimeEntity {
     private String providerId;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<Comment> applies = new ArrayList<>();
+    private List<com.tbfp.teamplannerbe.domain.comment.entity.Comment> applies = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Board> boardList = new ArrayList<>();

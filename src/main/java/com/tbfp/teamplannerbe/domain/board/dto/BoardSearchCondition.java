@@ -1,9 +1,12 @@
 package com.tbfp.teamplannerbe.domain.board.dto;
 
 
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class BoardSearchCondition {
 
     private String category;

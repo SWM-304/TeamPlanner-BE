@@ -6,6 +6,7 @@ import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
+import com.tbfp.teamplannerbe.domain.member.service.MemberService;
 import com.tbfp.teamplannerbe.domain.recruitment.condition.RecruitmentSearchCondition;
 import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentRequestDto.*;
 import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentResponseDto.*;
@@ -26,6 +27,7 @@ public class RecruitmentService {
     private final RecruitmentRepository recruitmentRepository;
     private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
+    private final MemberService memberService;
 
     public Page<RecruitmentSearchDto> getListWithCondition(RecruitmentSearchCondition recruitmentSearchCondition, Pageable pageable) {
         return recruitmentRepository.searchPage(recruitmentSearchCondition, pageable);
@@ -83,5 +85,17 @@ public class RecruitmentService {
         Recruitment recruitment = recruitmentRepository.findById(id)
                 .orElseThrow(() -> new ApplicationException(ApplicationErrorType.NOT_FOUND));
         recruitment.incrementLikeCount();
+    }
+
+    public Recruitment findByIdOrElseThrowApplicationException(Long recruitmentId) {
+        return recruitmentRepository.findById(recruitmentId).orElseThrow(() -> new ApplicationException(ApplicationErrorType.RECRUITMENT_NOT_FOUND));
+    }
+
+    public RecruitmentWithCommentResponseDto getOneWithComment(String username, Long recruitmentId) {
+        Recruitment recruitment = recruitmentRepository.findByIdFetchComment(recruitmentId).orElseThrow(() -> new ApplicationException(ApplicationErrorType.RECRUITMENT_NOT_FOUND));
+        Member member = memberService.findMemberByUsernameOrElseThrowApplicationException(username);
+        boolean isAuthorOfRecruitment = recruitment.getAuthor().getUsername().equals(member.getUsername());
+
+        return RecruitmentWithCommentResponseDto.toDto(isAuthorOfRecruitment, username, recruitment);
     }
 }

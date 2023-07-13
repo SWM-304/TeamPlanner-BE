@@ -4,9 +4,12 @@ import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentRequestDto.RecruitmentUpdateRequestDto;
+import com.tbfp.teamplannerbe.domain.recruitmentComment.entity.RecruitmentComment;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -38,6 +41,10 @@ public class Recruitment extends BaseTimeEntity {
     private Integer viewCount = 0;
     @Builder.Default
     private Integer likeCount = 0;
+
+    @OneToMany(mappedBy = "recruitment", fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<RecruitmentComment> commentList = new ArrayList<>();
 
     public void incrementViewCount() {
         this.viewCount++;

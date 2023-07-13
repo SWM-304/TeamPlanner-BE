@@ -58,8 +58,26 @@ public class RecruitmentController {
         );
     }
 
-    /**
-     * read one recruitment
+//    /**
+//     * read one recruitment
+//     * @param recruitmentId target id
+//     * add view count
+//     * @return recruitment info
+//     */
+//    @GetMapping("/{recruitmentId}")
+//    @Operation(summary = "모집글 조회", description = "모집글 조회")
+//    @ApiResponses({
+//            @ApiResponse(responseCode = "200", description = "성공"),
+//            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+//            @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
+//    })
+//    public ResponseEntity getOne(@PathVariable Long recruitmentId) {
+//        return ResponseEntity.ok().body(
+//                recruitmentService.getOne(recruitmentId)
+//        );
+//    }
+     /**
+     * read one recruitment with comments
      * @param recruitmentId target id
      * add view count
      * @return recruitment info
@@ -71,9 +89,9 @@ public class RecruitmentController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
             @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
     })
-    public ResponseEntity getOne(@PathVariable Long recruitmentId) {
+    public ResponseEntity getOne(Principal principal, @PathVariable Long recruitmentId) {
         return ResponseEntity.ok().body(
-                recruitmentService.getOne(recruitmentId)
+                recruitmentService.getOneWithComment(principal.getName(),recruitmentId)
         );
     }
 

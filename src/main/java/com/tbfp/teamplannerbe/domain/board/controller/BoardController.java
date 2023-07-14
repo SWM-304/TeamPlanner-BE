@@ -97,7 +97,7 @@ public class BoardController {
     }
 
 
-    @DeleteMapping("")
+    @DeleteMapping("/{boardId}")
     @Operation(summary = "공고삭제", description = "UserId 와 boardId로 해당하는 공고글 삭제")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공"),

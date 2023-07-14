@@ -76,7 +76,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public void deleteComment(Long boardId, Long commentId) {
         Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
+                .orElseThrow(() -> new ApplicationException(BOARD_NOT_FOUND));
 
         Comment findComment=commentRepository.findById(commentId).
                 orElseThrow(()->new ApplicationException(COMMENT_NOT_FOUND));
@@ -120,12 +120,12 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public updatedCommentResponseDto updateComment(CommentUpdateRequestDto commentUpdateRequestDto) {
-        Comment findComment = commentRepository.findByIdAndBoardId(
-                commentUpdateRequestDto.getCommentId(),
-                commentUpdateRequestDto.getBoardId());
+
+        Comment findComment = commentRepository.findByIdAndStateIsTrue(
+                commentUpdateRequestDto.getCommentId());
 
         if(findComment==null){
-            throw new RuntimeException("공고글 및 댓글이 존재 하지 않습니다");
+            throw new ApplicationException(COMMENT_NOT_FOUND);
         }
 
         findComment.updateContent(commentUpdateRequestDto.getContent());

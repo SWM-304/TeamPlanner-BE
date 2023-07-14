@@ -108,6 +108,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
+    @Transactional
     public savedBoardIdResponseDto createBoard(createBoardResquestDto createBoardResquestDto,String userId) {
 
 
@@ -125,6 +126,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
+    @Transactional
     public void deleteBoard(Long boardId, String userId) {
 
         memberJpaRepository.findByUsername(userId)
@@ -137,6 +139,7 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
+    @Transactional
     public Boolean updateBoard(Long boardId,updateBoardReqeustDto updateBoardReqeustDto, String userId) {
 
         Board findBoard = boardRepository.findById(boardId).

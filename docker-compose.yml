@@ -1,0 +1,44 @@
+version: "3.7"
+
+services:
+  db-mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_HOST: ${MYSQL_ROOT_HOST}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - 3306:3306
+    command:
+      - "mysqld"
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_unicode_ci"
+    networks:
+      - springboot-mysql-net
+
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+    networks:
+      - springboot-mysql-net
+
+  test-app:
+    image: springbootapp:latest
+    ports:
+      - 8080:8080
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      jasypt.encryptor.password: ${JASYPT_KEY}
+    depends_on:
+      - db-mysql
+      - redis
+    networks:
+      - springboot-mysql-net
+
+networks:
+  springboot-mysql-net:
+         driver: bridge

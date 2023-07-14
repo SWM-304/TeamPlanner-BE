@@ -1,6 +1,7 @@
-package com.tbfp.teamplannerbe.domain.Comment.dto;
+package com.tbfp.teamplannerbe.domain.comment.dto;
 
-import com.tbfp.teamplannerbe.domain.Comment.entity.Comment;
+
+import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -9,9 +10,8 @@ public class CommentResponseDto {
 
 
     @Getter
-    @Setter
     @Builder
-    @NoArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
     public static class boardWithCommentListResponseDto{
         private String username;
@@ -21,24 +21,18 @@ public class CommentResponseDto {
         private boolean isConfidential;
 
 
-        /**
-         *
-         * username 지금 얘 때문에 공고리스트 출력할 때 쿼리가 3방나감 comment에 userId 컬럼달아 놓으면
-         * 쿼리 1방 줄일 수 있음.
-         */
         public boardWithCommentListResponseDto(Comment comment) {
             this.username = comment.getMember().getUsername();
             this.content = comment.getContent();
             this.updatedAt = String.valueOf(comment.getUpdatedAt());
             this.isConfidential=comment.isConfidential();
-            this.parentId=comment.getParentComment().getId();
+            this.parentId = comment.getParentComment()==null ? null : comment.getParentComment().getId();
         }
     }
 
     @Getter
-    @Setter
     @Builder
-    @NoArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
     public static class updatedCommentResponseDto {
 

@@ -262,9 +262,9 @@ public class MemberServiceImpl implements MemberService {
         if(usernameList.isEmpty()) throw new ApplicationException(USER_NOT_FOUND);
 
         return MemberResponseDto.ForgotUsernameResponseDto.builder().
-                        usernames(usernameList).
-                        message("아이디 조회에 성공했습니다.").
-                        build();
+                usernames(usernameList).
+                message("아이디 조회에 성공했습니다.").
+                build();
     }
 
     @Override

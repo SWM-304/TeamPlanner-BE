@@ -26,28 +26,28 @@ class RefreshTokenRepositoryTest {
 
     @Test
     void redisSetAndGet() {
-        String loginId = "member1";
+        String username = "member1";
         String tokenValue = "token value";
 
-        RefreshToken token = RefreshToken.builder().id(loginId).token(tokenValue).build();
+        RefreshToken token = RefreshToken.builder().id(username).token(tokenValue).build();
         refreshTokenRedisRepository.save(token);
 
-        RefreshToken foundToken = refreshTokenRedisRepository.findById(loginId).get();
+        RefreshToken foundToken = refreshTokenRedisRepository.findById(username).get();
 
         assertThat(foundToken.getToken()).isEqualTo(tokenValue);
     }
     @Test
     void overwrite() {
-        String loginId = "member1";
+        String username = "member1";
         String tokenValue1 = "token value1";
         String tokenValue2 = "token value2";
 
-        RefreshToken token = RefreshToken.builder().token(tokenValue1).id(loginId).build();
+        RefreshToken token = RefreshToken.builder().token(tokenValue1).id(username).build();
         refreshTokenRedisRepository.save(token);
-        RefreshToken token2 = RefreshToken.builder().token(tokenValue2).id(loginId).build();
+        RefreshToken token2 = RefreshToken.builder().token(tokenValue2).id(username).build();
         refreshTokenRedisRepository.save(token2);
 
-        RefreshToken foundToken = refreshTokenRedisRepository.findById(loginId).get();
+        RefreshToken foundToken = refreshTokenRedisRepository.findById(username).get();
 
         assertThat(foundToken.getToken()).isEqualTo(tokenValue2);
     }

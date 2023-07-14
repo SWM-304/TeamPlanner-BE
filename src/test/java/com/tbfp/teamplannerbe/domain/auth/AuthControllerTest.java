@@ -25,14 +25,14 @@ class AuthControllerTest extends BaseControllerTest {
 
     @BeforeEach
     public void beforeAll() {
-        em.persist(Member.builder().loginId("member1").password(new BCryptPasswordEncoder().encode("1234")).state(true).build());
+        em.persist(Member.builder().username("member1").password(new BCryptPasswordEncoder().encode("1234")).state(true).build());
     }
 
     @Test
-    public void loginIdPasswordLogin() throws Exception {
-        String loginId = "member1";
+    public void usernamePasswordLogin() throws Exception {
+        String username = "member1";
         String rawPassword = "1234";
-        MemberLoginRequestDto memberLoginRequestDto = new MemberLoginRequestDto(loginId, rawPassword);
+        MemberLoginRequestDto memberLoginRequestDto = new MemberLoginRequestDto(username, rawPassword);
 
         ResultActions resultActions = mockMvc.perform(
                 post("/api/v1/member/login")
@@ -43,18 +43,18 @@ class AuthControllerTest extends BaseControllerTest {
                 .andExpect(result -> System.out.println("result = " + result))
                 .andExpect(
                         result -> {
-                            assertThat(jwtProvider.getLoginIdFromToken(result.getResponse().getCookie("accessToken").getValue())).isEqualTo(loginId);
-                            assertThat(jwtProvider.getLoginIdFromToken(result.getResponse().getCookie("refreshToken").getValue())).isEqualTo(loginId);
+                            assertThat(jwtProvider.getUsernameFromToken(result.getResponse().getCookie("accessToken").getValue())).isEqualTo(username);
+                            assertThat(jwtProvider.getUsernameFromToken(result.getResponse().getCookie("refreshToken").getValue())).isEqualTo(username);
                         }
                 );
     }
 
     @Test
-    public void loginIdPasswordLoginFail() throws Exception {
+    public void usernamePasswordLoginFail() throws Exception {
         // given
-        String loginId = "member1";
+        String username = "member1";
         String rawPassword = "wrongPassword";
-        MemberLoginRequestDto memberLoginRequestDto = new MemberLoginRequestDto(loginId, rawPassword);
+        MemberLoginRequestDto memberLoginRequestDto = new MemberLoginRequestDto(username, rawPassword);
 
         // when
         ResultActions resultActions = mockMvc.perform(

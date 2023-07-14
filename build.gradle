@@ -48,7 +48,7 @@ dependencies {
     implementation 'org.flywaydb:flyway-mysql'
 
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity5'
-    implementation 'org.jetbrains:annotations:24.0.0'
+
 
     // jwt
     implementation 'com.auth0:java-jwt:4.4.0'
@@ -58,6 +58,7 @@ dependencies {
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.12'
     // queryDsl
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    implementation 'org.jetbrains:annotations:24.0.0'
     annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
 
 
@@ -91,9 +92,11 @@ dependencies {
 
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    
-    //aop
-    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+
+    //javamail
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework:spring-context:5.3.19'
 
 
     compileOnly 'org.projectlombok:lombok'

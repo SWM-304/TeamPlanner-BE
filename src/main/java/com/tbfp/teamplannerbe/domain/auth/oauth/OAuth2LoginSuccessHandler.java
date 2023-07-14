@@ -13,10 +13,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
@@ -26,7 +24,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     private final RefreshTokenService refreshTokenService;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         log.info("OAuth2 Login 성공!");
         CustomOAuth2Member oAuth2Member = (CustomOAuth2Member) authentication.getPrincipal();
 
@@ -38,12 +36,12 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         }
     }
 
-    private void loginSuccess(HttpServletResponse response, CustomOAuth2Member oAuth2Member) throws IOException {
+    private void loginSuccess(HttpServletResponse response, CustomOAuth2Member oAuth2Member) {
         log.info("OAuth2LoginSuccessHandler.loginSuccess");
-        String accessToken = jwtProvider.generateAccessToken(oAuth2Member.getLoginId());
-        String refreshToken = jwtProvider.generateRefreshToken(oAuth2Member.getLoginId());
+        String accessToken = jwtProvider.generateAccessToken(oAuth2Member.getUsername());
+        String refreshToken = jwtProvider.generateRefreshToken(oAuth2Member.getUsername());
 
-        refreshTokenService.setRefreshToken(oAuth2Member.getLoginId(), refreshToken);
+        refreshTokenService.setRefreshToken(oAuth2Member.getUsername(), refreshToken);
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_OK);

@@ -101,8 +101,7 @@ public class CrawlingTest {
 
             //class="nav" 인 모든 태그를 가진 WebElement리스트를 받아온다.
             //WebElement는 html의 태그를 가지는 클래스이다.
-            List<WebElement> elements = driver.findElements(By.cssSelector(".nav-menu-list button[data-active='true']"));
-
+            List<WebElement> elements = driver.findElements(By.cssSelector(".nav-menu-list [data-active='true']"));
 
         for (WebElement element : elements) {
 
@@ -158,10 +157,10 @@ public class CrawlingTest {
 
                             Board board = Board.builder()
                                     .activityKey(activitiyKey)
-                                    .activitiyName(activityName)
+                                    .activityName(activityName)
                                     .activityUrl(activityUrl)
                                     .activityImg(activityImg.attr("src"))
-                                    .activitiyDetail(activitiyDetail)
+                                    .activityDetail(activitiyDetail)
                                     .category("공모전")
                                     .companyType(companyType)
                                     .target(target)
@@ -232,10 +231,10 @@ public class CrawlingTest {
 
                             Board board = Board.builder()
                                     .activityKey(activitiyKey)
-                                    .activitiyName(activityName)
+                                    .activityName(activityName)
                                     .activityUrl(activityUrl)
                                     .activityImg(activityImg.attr("src"))
-                                    .activitiyDetail(activitiyDetail)
+                                    .activityDetail(activitiyDetail)
                                     .category("대외활동")
                                     .companyType(companyType)
                                     .target(target)
@@ -305,10 +304,10 @@ public class CrawlingTest {
 
                             Board board = Board.builder()
                                     .activityKey(activitiyKey)
-                                    .activitiyName(activityName)
+                                    .activityName(activityName)
                                     .activityUrl(activityUrl)
                                     .activityImg(activityImg.attr("src"))
-                                    .activitiyDetail(activitiyDetail)
+                                    .activityDetail(activitiyDetail)
                                     .category("동아리")
                                     .companyType(companyType)
                                     .target(target)
@@ -367,10 +366,11 @@ public class CrawlingTest {
             // Find the sitemap URLs
 
             String[] split = robotsTxt.split("Sitemap:");
-            maxNumber=split.length-5;
+            maxNumber=split.length-6;
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println(maxNumber);
         return maxNumber;
     }
 }

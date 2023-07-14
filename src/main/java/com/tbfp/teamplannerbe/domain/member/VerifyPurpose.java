@@ -1,5 +1,4 @@
 package com.tbfp.teamplannerbe.domain.member;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

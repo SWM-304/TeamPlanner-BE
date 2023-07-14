@@ -49,7 +49,7 @@ class CommentServiceImplTest extends BaseControllerTest {
                 .content("내용테스트입니다")
                 .memberId("test")
                 .build());
-        Comment comment = commentRepository.findByIdAndBoardId(commentId, boardId);
+        Comment comment = commentRepository.findByIdAndStateIsTrue(commentId);
         Assertions.assertThat(comment.getContent()).isEqualTo("내용테스트입니다");
     }
     @Test
@@ -65,7 +65,7 @@ class CommentServiceImplTest extends BaseControllerTest {
                 .build());
 
         commentRepository.deleteById(commentId);
-        Comment comment = commentRepository.findByIdAndBoardId(commentId, boardId);
+        Comment comment = commentRepository.findByIdAndStateIsTrue(commentId);
         Assertions.assertThat(comment).isNull();
     }
 
@@ -118,7 +118,7 @@ class CommentServiceImplTest extends BaseControllerTest {
     public void 셋업멤버() {
 
         memberService.registerMember(MemberRequestDto.SignUpRequestDto.builder()
-                .username("test1")
+                .username("test")
                 .password("1234")
                 .email("asdas@gmail.com")
                 .phone("010-0000-0000")

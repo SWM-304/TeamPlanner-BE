@@ -193,7 +193,7 @@ class BoardServiceImplTest extends BaseControllerTest {
     public void 셋업멤버() {
 
         memberService.registerMember(MemberRequestDto.SignUpRequestDto.builder()
-                .username("test1")
+                .username("test")
                 .password("1234")
                 .email("asdas@gmail.com")
                 .phone("010-0000-0000")

@@ -1,10 +1,9 @@
 package com.tbfp.teamplannerbe.domain.member.entity;
 
-
-import com.tbfp.teamplannerbe.domain.Comment.entity.Comment;
 import com.tbfp.teamplannerbe.domain.auth.MemberRole;
 import com.tbfp.teamplannerbe.domain.auth.ProviderType;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
+import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
 import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
 import lombok.*;
 

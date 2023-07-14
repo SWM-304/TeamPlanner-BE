@@ -1,14 +1,17 @@
-package com.tbfp.teamplannerbe.domain.Comment.service.impl;
+package com.tbfp.teamplannerbe.domain.comment.service.impl;
 
 
-import com.tbfp.teamplannerbe.domain.Comment.dto.CommentRequestDto;
-import com.tbfp.teamplannerbe.domain.Comment.dto.CommentResponseDto;
-import com.tbfp.teamplannerbe.domain.Comment.entity.Comment;
-import com.tbfp.teamplannerbe.domain.Comment.repository.CommentJpaRepository;
-import com.tbfp.teamplannerbe.domain.Comment.repository.CommentRepository;
-import com.tbfp.teamplannerbe.domain.Comment.service.CommentService;
-import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.board.repository.BoardRepository;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CommentSendRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CommentUpdateRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.bigCommentSendRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.updatedCommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
+import com.tbfp.teamplannerbe.domain.comment.repository.CommentRepository;
+import com.tbfp.teamplannerbe.domain.comment.service.CommentService;
+import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
@@ -16,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.Optional;
 
 import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType.*;
 
@@ -25,13 +27,9 @@ import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorTyp
 @Slf4j
 public class CommentServiceImpl implements CommentService {
 
-    private final CommentRepository commentRepository;
-
-    private final MemberRepository memberRepository;
-
     private final BoardRepository boardRepository;
-
-    private final CommentJpaRepository commentJpaRepository;
+    private final MemberRepository memberRepository;
+    private final CommentRepository commentRepository;
 //
 //    @PersistenceContext
 //    private EntityManager em;
@@ -49,12 +47,12 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     @Transactional
-    public Long sendComment(CommentRequestDto.CommentSendRequestDto commentSendRequestDto) {
+    public Long sendComment(CommentSendRequestDto commentSendRequestDto) {
         Member member = memberRepository.findMemberByUsername(commentSendRequestDto.getMemberId())
                 .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
 
-        Board board = boardRepository.findByBoardId(commentSendRequestDto.getBoardId())
-                .orElseThrow(() -> new ApplicationException(BOARD_NOT_FIND));
+        Board board = boardRepository.findById(commentSendRequestDto.getBoardId())
+                .orElseThrow(() -> new ApplicationException(BOARD_NOT_FOUND));
 
         Comment comment = Comment.builder()
                 .content(commentSendRequestDto.getContent())
@@ -77,11 +75,11 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public void deleteComment(Long boardId, Long commentId) {
-        Optional<Board> findBoard = Optional.ofNullable(boardRepository.findByBoardId(boardId)
-                .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND)));
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new ApplicationException(BOARD_NOT_FOUND));
 
-        Optional<Comment> findComment = Optional.ofNullable(commentRepository.findBycommentId(commentId).
-                        orElseThrow(()->new RuntimeException("댓글을 찾을 수 없습니다")));
+        Comment findComment=commentRepository.findById(commentId).
+                orElseThrow(()->new ApplicationException(COMMENT_NOT_FOUND));
 
 
 //        // 공고글 하고 Comment 둘다 있고 부모댓글이라면 삭제가능
@@ -100,9 +98,9 @@ public class CommentServiceImpl implements CommentService {
 //            em.clear();
 //        }
         // 자식댓글일 경우 해결 댓글만 state 값 false
-        if(findBoard.isPresent() && findComment.isPresent()){
-            findComment.get().setState(false);
-            commentJpaRepository.save(findComment.get());
+        if(findComment.isState()){
+            findComment.changeState(false);
+            commentRepository.save(findComment);
         }
 
     }
@@ -121,20 +119,20 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     @Transactional
-    public CommentResponseDto.updatedCommentResponseDto updateComment(CommentRequestDto.CommentUpdateRequestDto commentUpdateRequestDto) {
-        Comment findComment = commentJpaRepository.findByIdAndBoardId(
-                commentUpdateRequestDto.getCommentId(),
-                commentUpdateRequestDto.getBoardId());
+    public updatedCommentResponseDto updateComment(CommentUpdateRequestDto commentUpdateRequestDto) {
+
+        Comment findComment = commentRepository.findByIdAndStateIsTrue(
+                commentUpdateRequestDto.getCommentId());
 
         if(findComment==null){
-            throw new RuntimeException("공고글 및 댓글이 존재 하지 않습니다");
+            throw new ApplicationException(COMMENT_NOT_FOUND);
         }
 
         findComment.updateContent(commentUpdateRequestDto.getContent());
 
-        Comment savedComment = commentJpaRepository.save(findComment);
+        Comment savedComment = commentRepository.save(findComment);
 
-        CommentResponseDto.updatedCommentResponseDto commentResponseDto = CommentResponseDto.updatedCommentResponseDto.builder()
+        updatedCommentResponseDto commentResponseDto = updatedCommentResponseDto.builder()
                 .content(savedComment.getContent())
                 .boardId(savedComment.getBoard().getId())
                 .memberId(savedComment.getMember().getUsername())
@@ -159,20 +157,20 @@ public class CommentServiceImpl implements CommentService {
      *
      */
     @Transactional
-    public Long sendBigComment(CommentRequestDto.bigCommentSendRequestDto bigCommentSendRequestDto) {
+    public Long sendBigComment(bigCommentSendRequestDto bigCommentSendRequestDto) {
 
         Comment childComment=null;
         Member member = memberRepository.findMemberByUsername(bigCommentSendRequestDto.getMemberId())
                 .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
 
-        Board board = boardRepository.findByBoardId(bigCommentSendRequestDto.getBoardId())
-                .orElseThrow(() -> new ApplicationException(BOARD_NOT_FIND));
+        Board board = boardRepository.findById(bigCommentSendRequestDto.getBoardId())
+                .orElseThrow(() -> new ApplicationException(BOARD_NOT_FOUND));
 
         if (bigCommentSendRequestDto.getParentCommentId() != null) {
-            Comment parentComment = commentJpaRepository.findById(bigCommentSendRequestDto.getParentCommentId())
+            Comment parentComment = commentRepository.findById(bigCommentSendRequestDto.getParentCommentId())
                     .orElseThrow(() -> new RuntimeException("부모 댓글을 찾을 수 없습니다"));
 
-            log.info(String.valueOf(bigCommentSendRequestDto.isConfidential()));
+
             childComment = Comment.builder()
                     .content(bigCommentSendRequestDto.getContent())
                     .state(true)
@@ -181,10 +179,13 @@ public class CommentServiceImpl implements CommentService {
                     .isConfidential(true)
                     .build();
 
-            parentComment.setParentComment(childComment);
+            if(parentComment.getId()!=childComment.getId()){
+                parentComment.setParentComment(childComment);
+            }
 
-            commentRepository.save(parentComment);  // 부모 댓글 저장
-
+//            System.out.println("=================");
+//            commentRepository.save(parentComment);  // 부모 댓글 저장
+//            System.out.println("=================");
             childComment.setParentComment(parentComment);
 
             commentRepository.save(childComment);  // 대댓글 저장

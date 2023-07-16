@@ -35,6 +35,8 @@ public enum ApplicationErrorType {
 
     MAIL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, -20004, "메일 전송 중 오류가 발생했습니다."),
 
+    DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST,-20005,"이미 사용중인 닉네임입니다."),
+
     SIGNUP_REQUEST_INVALID_USERNAME(HttpStatus.BAD_REQUEST, -21000, "username"),
 
     SIGNUP_REQUEST_INVALID_PASSWORD(HttpStatus.BAD_REQUEST, -21001, "password"),

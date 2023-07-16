@@ -39,6 +39,13 @@ public class MemberRepository extends Querydsl4RepositorySupport{
                 fetchOne());
     }
 
+    public Optional<Member> findMemberByNickname(String nickname) {
+        return Optional.ofNullable(select(member)
+                .from(member)
+                .where(member.username.eq(nickname).and(member.state.eq(true))).
+                fetchOne());
+    }
+
     public Optional<Member> findByProviderTypeAndProviderId(ProviderType providerType, String providerId) {
         return Optional.ofNullable(
                 selectFrom(member)

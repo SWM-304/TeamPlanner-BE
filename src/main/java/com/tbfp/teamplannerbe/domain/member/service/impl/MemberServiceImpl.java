@@ -82,6 +82,12 @@ public class MemberServiceImpl implements MemberService {
         if(findMemberByUsername(username).isPresent()){
             throw new ApplicationException(DUPLICATE_USERNAME);
         }
+
+        String nickname = signUpRequestDto.getNickname();
+        //닉네임 중복
+        if(memberRepository.findMemberByNickname(nickname).isPresent()){
+            throw new ApplicationException(DUPLICATE_NICKNAME);
+        }
         registerMember(signUpRequestDto);
 
         return MemberResponseDto.SignUpResponseDto.builder().

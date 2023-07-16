@@ -50,7 +50,11 @@ public class MemberRequestDto {
         @Pattern(regexp = "^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]+$", message = "비밀번호는 영문과 숫자의 조합이어야 합니다.")
         private String password;
 
-        @NotEmpty(message = "이메일 입력은 필수입니다.")
+        @NotEmpty(message = "닉네임 설정은 필수입니다.")
+        @Size(min = 1, max = 12, message = "닉네임을 12글자 이하로 설정헤주세요.")
+        private String nickname;
+
+        @NotEmpty(message = "이메일 인증은 필수입니다.")
         @Pattern(regexp = "^[a-zA-Z0-9+-_.]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", message = "이메일 형식이 맞지 않습니다.")
         private String email;
 

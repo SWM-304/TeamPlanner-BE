@@ -30,6 +30,7 @@ import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorTyp
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
@@ -45,7 +46,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    @Transactional
     public List<Member> members() {
         return memberRepository.basicSelect();
     }
@@ -305,5 +305,10 @@ public class MemberServiceImpl implements MemberService {
         } catch (Exception e) {
             throw new ApplicationException(MAIL_ERROR);
         }
+    }
+
+    @Override
+    public Member findMemberByUsernameOrElseThrowApplicationException(String username) {
+        return memberRepository.findMemberByUsername(username).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
     }
 }

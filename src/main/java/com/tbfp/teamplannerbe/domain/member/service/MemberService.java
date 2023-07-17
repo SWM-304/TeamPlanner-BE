@@ -33,4 +33,5 @@ public interface MemberService {
 
     MemberResponseDto.ForgotPasswordResponseDto findForgotPassword(MemberRequestDto.ForgotPasswordRequestDto forgotPasswordRequestDto);
 
+    Member findMemberByUsernameOrElseThrowApplicationException(String username);
 }

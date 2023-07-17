@@ -80,3 +80,7 @@ jwt:
 springdoc:
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
+
+sentry:
+  dsn: ENC(mc0kn2uoyKM3t4jOH1/QiRd1yitFssU4GkZXMg5NADZIJQXxwygMhCGu6mUcjA3jq6rFUM56Mn/mQsK4xWOXrv7rADfChUgSGsJdMkuMCOhTl3a0DPSTTCeFW3xJx4dyjOH9OLtRXic=)
+  traces-sample-rate: 1.0

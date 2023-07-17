@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 public enum ApplicationErrorType {
 
 
+    NOT_FOUND(HttpStatus.NOT_FOUND, -100, "요청한 페이지를 찾을 수 없습니다."),
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, -101, "권한이 없습니다."),
     GUEST_USER(HttpStatus.UNAUTHORIZED, -1, "소셜로그인유저 추가 회원가입 필요"),
 
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, -2, "유저를 찾을 수 없습니다."),
@@ -56,7 +58,7 @@ public enum ApplicationErrorType {
     COMMENT_NOT_FOUND(HttpStatus.BAD_REQUEST,-9,"댓글을 찾을 수 없습니다");
 
 
-    private HttpStatus httpStatus;
-    private Integer code;
-    private String message;
+    private final HttpStatus httpStatus;
+    private final Integer code;
+    private final String message;
 }

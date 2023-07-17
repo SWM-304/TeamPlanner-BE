@@ -1,4 +1,4 @@
-package com.tbfp.teamplannerbe.domain.Comment.dto;
+package com.tbfp.teamplannerbe.domain.comment.dto;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -6,9 +6,8 @@ import javax.validation.constraints.NotBlank;
 public class CommentRequestDto {
 
     @Getter
-    @Setter
     @Builder
-    @NoArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
     public static class CommentSendRequestDto {
 
@@ -22,9 +21,8 @@ public class CommentRequestDto {
     }
 
     @Getter
-    @Setter
     @Builder
-    @NoArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
     public static class bigCommentSendRequestDto {
 
@@ -44,9 +42,8 @@ public class CommentRequestDto {
         }
     }
     @Getter
-    @Setter
     @Builder
-    @NoArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
     public static class CommentUpdateRequestDto{
         @NotBlank

@@ -21,7 +21,7 @@ public enum ApplicationErrorType {
 
     INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, -4, "유효하지 않은 리프레시 토큰"),
 
-    BOARD_NOT_FIND(HttpStatus.NO_CONTENT,-5,"공고글을 찾을 수 없습니다"),
+    BOARD_NOT_FOUND(HttpStatus.NO_CONTENT,-5,"공고글을 찾을 수 없습니다"),
 
     COMMNET_NOT_FINE(HttpStatus.NO_CONTENT,-6,"댓글을 찾을 수 없습니다"),
 
@@ -53,9 +53,9 @@ public enum ApplicationErrorType {
 
     VERIFICATION_CODE_UNPROVIDED(HttpStatus.BAD_REQUEST,-22002, "인증번호가 발급되지 않아 재전송했습니다."),
 
+    ALREADY_LIKE_BOARD(HttpStatus.BAD_REQUEST,-8,"이미 좋아요를 누르셨습니다"),
 
-
-    ;
+    COMMENT_NOT_FOUND(HttpStatus.BAD_REQUEST,-9,"댓글을 찾을 수 없습니다");
 
 
     private final HttpStatus httpStatus;

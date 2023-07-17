@@ -1,14 +1,18 @@
-package com.tbfp.teamplannerbe.domain.Comment.service;
+package com.tbfp.teamplannerbe.domain.comment.service;
 
-import com.tbfp.teamplannerbe.domain.Comment.dto.CommentRequestDto;
-import com.tbfp.teamplannerbe.domain.Comment.dto.CommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CommentSendRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CommentUpdateRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.bigCommentSendRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.updatedCommentResponseDto;
 
 public interface CommentService {
-    Long sendComment(CommentRequestDto.CommentSendRequestDto commentSendRequestDto);
+    Long sendComment(CommentSendRequestDto commentSendRequestDto);
 
     void deleteComment(Long boardId, Long commentId);
 
-    CommentResponseDto.updatedCommentResponseDto updateComment(CommentRequestDto.CommentUpdateRequestDto commentUpdateRequestDto);
+    updatedCommentResponseDto updateComment(CommentUpdateRequestDto commentUpdateRequestDto);
 
-    Long sendBigComment(CommentRequestDto.bigCommentSendRequestDto bigCommentSendRequestDto);
+    Long sendBigComment(bigCommentSendRequestDto bigCommentSendRequestDto);
 }

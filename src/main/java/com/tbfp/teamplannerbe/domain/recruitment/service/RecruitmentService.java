@@ -36,7 +36,7 @@ public class RecruitmentService {
     @Transactional
     public RecruitmentCreateResponseDto createRecruitment(String username, RecruitmentCreateRequestDto recruitmentCreateRequestDto) {
         Member member = memberRepository.findMemberByUsername(username).orElseThrow(() -> new ApplicationException(ApplicationErrorType.UNAUTHORIZED));
-        Board board = boardRepository.findByBoardId(recruitmentCreateRequestDto.getBoardId()).orElseThrow(() -> new ApplicationException(ApplicationErrorType.NOT_FOUND));
+        Board board = boardRepository.findById(recruitmentCreateRequestDto.getBoardId()).orElseThrow(() -> new ApplicationException(ApplicationErrorType.NOT_FOUND));
         return new RecruitmentCreateResponseDto(
                 recruitmentRepository.save(recruitmentCreateRequestDto.toEntity(member, board)).getId()
         );

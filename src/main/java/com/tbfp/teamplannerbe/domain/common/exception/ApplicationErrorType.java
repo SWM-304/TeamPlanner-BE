@@ -59,7 +59,9 @@ public enum ApplicationErrorType {
 
     ALREADY_LIKED(HttpStatus.BAD_REQUEST, -30000, "이미 좋아요 한 글입니다."),
     RECRUITMENT_NOT_FOUND(HttpStatus.BAD_REQUEST, -44001, "모집글을 찾을 수 없습니다."),
-    RECRUITMENT_COMMENT_NOT_FOUND(HttpStatus.BAD_REQUEST, -44002, "모집글 댓글을 찾을 수 없습니다.");
+    RECRUITMENT_COMMENT_NOT_FOUND(HttpStatus.BAD_REQUEST, -44002, "모집글 댓글을 찾을 수 없습니다."),
+    RECRUITMENT_APPLY_ALREADY_APPLIED(HttpStatus.BAD_REQUEST, -50001, "이미 참여 신청한 모집글입니다."),
+    RECRUITMENT_APPLY_NOT_APPLIED(HttpStatus.BAD_REQUEST, -50002, "참여 신청하지 않은 모집글입니다.");
 
 
     private final HttpStatus httpStatus;

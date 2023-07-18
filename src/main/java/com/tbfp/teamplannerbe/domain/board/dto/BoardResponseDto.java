@@ -111,17 +111,6 @@ public class BoardResponseDto {
         private Long viewCount; //조회수
         private Long likeCount; //좋아요
 
-
-
-        public BoardSimpleListResponseDto(Board board) {
-            this.boardId=board.getId();
-            this.activitiyName = board.getActivityName();
-            this.activityImg = board.getActivityImg();
-            this.category = board.getCategory();
-            this.viewCount=board.getView();
-            this.likeCount= board.getLikeCount();
-        }
-
         public static BoardResponseDto.BoardSimpleListResponseDto toDTO(Board board) {
             return BoardSimpleListResponseDto.builder()
                     .boardId(board.getId())

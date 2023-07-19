@@ -18,7 +18,7 @@ public class RecruitmentApplyController {
 
     // apply
     @PostMapping
-    public ResponseEntity apply(Principal principal, @PathVariable Long recruitmentId, CreateApplyRequest createApplyRequest) {
+    public ResponseEntity apply(Principal principal, @PathVariable Long recruitmentId, @RequestBody CreateApplyRequest createApplyRequest) {
         return ResponseEntity.ok(
                 recruitmentApplyService.apply(principal.getName(), recruitmentId, createApplyRequest)
         );

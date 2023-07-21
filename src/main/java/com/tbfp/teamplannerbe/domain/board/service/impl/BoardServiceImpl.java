@@ -1,9 +1,7 @@
 package com.tbfp.teamplannerbe.domain.board.service.impl;
 
-import com.tbfp.teamplannerbe.domain.board.dto.BoardRequestDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardRequestDto.createBoardResquestDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardRequestDto.updateBoardReqeustDto;
-import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto.BoardDetailResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto.savedBoardIdResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardSearchCondition;
@@ -13,7 +11,6 @@ import com.tbfp.teamplannerbe.domain.board.service.BoardService;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
-import com.tbfp.teamplannerbe.domain.member.repository.MemberJpaRepository;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,9 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,7 +28,7 @@ import java.util.stream.Collectors;
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
-    private final MemberJpaRepository memberJpaRepository;
+    private final MemberRepository memberRepository;
 
 
     /**
@@ -112,7 +107,7 @@ public class BoardServiceImpl implements BoardService {
     public savedBoardIdResponseDto createBoard(createBoardResquestDto createBoardResquestDto,String userId) {
 
 
-        Member member = memberJpaRepository.findByUsername(userId)
+        Member member = memberRepository.findByUsername(userId)
                 .orElseThrow(() -> new ApplicationException(ApplicationErrorType.USER_NOT_FOUND));
 
         Board entityBoard = boardRepository.save(createBoardResquestDto.toEntity(member));
@@ -129,7 +124,7 @@ public class BoardServiceImpl implements BoardService {
     @Transactional
     public void deleteBoard(Long boardId, String userId) {
 
-        memberJpaRepository.findByUsername(userId)
+        memberRepository.findByUsername(userId)
                         .orElseThrow(()->new ApplicationException(ApplicationErrorType.USER_NOT_FOUND));
 
         Board board = boardRepository.findById(boardId)
@@ -144,7 +139,7 @@ public class BoardServiceImpl implements BoardService {
 
         Board findBoard = boardRepository.findById(boardId).
                 orElseThrow(()->new ApplicationException(ApplicationErrorType.BOARD_NOT_FOUND));
-        memberJpaRepository.findByUsername(userId)
+        memberRepository.findByUsername(userId)
                 .orElseThrow(()->new ApplicationException(ApplicationErrorType.USER_NOT_FOUND));
 
         findBoard.overwrite(updateBoardReqeustDto.toEntity());

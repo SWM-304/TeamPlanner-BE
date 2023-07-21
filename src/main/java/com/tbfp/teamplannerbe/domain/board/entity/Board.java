@@ -4,6 +4,7 @@ import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
 import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
 import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
+import com.tbfp.teamplannerbe.domain.team.entity.Team;
 import lombok.*;
 
 import javax.persistence.*;
@@ -68,8 +69,10 @@ public class Board extends BaseTimeEntity {
     private Long likeCount;
 
 
-    @OneToMany(mappedBy="board",cascade = CascadeType.ALL)
+    @Builder.Default
+    @OneToMany(mappedBy="board")
     private List<Comment> comments=new ArrayList<>();
+
 
     @JoinColumn(name="MEMBER_ID")
     @ManyToOne(fetch = FetchType.LAZY)

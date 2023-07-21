@@ -17,4 +17,6 @@ public interface RecruitmentApplyRepository extends JpaRepository<RecruitmentApp
 //    List<RecruitmentApply> findAllByApplicantFetchRecruitmentFetchBoard(@Param("memberId") Long memberId);
 
     Optional<RecruitmentApply> findRecruitmentApplyByRecruitment_IdAndApplicant_Username(Long recruitmentId, String username);
+
+    Optional<RecruitmentApply> findRecruitmentApplyByRecruitment_IdAndApplicant_Id(Long recruitmentId,Long applicantId);
 }

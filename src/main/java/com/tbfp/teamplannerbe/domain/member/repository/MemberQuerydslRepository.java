@@ -2,6 +2,7 @@ package com.tbfp.teamplannerbe.domain.member.repository;
 
 import com.tbfp.teamplannerbe.domain.auth.ProviderType;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
+import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,4 +24,7 @@ public interface MemberQuerydslRepository {
     Optional<List<String>> findUsernamesByEmail(String email);
 
     void updateMemberPassword(Member theMember, String password);
+
+    List<Recruitment> getApplicantList(String username);
+
 }

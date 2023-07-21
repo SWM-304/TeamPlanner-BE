@@ -2,6 +2,8 @@ package com.tbfp.teamplannerbe.domain.recruitment.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
 import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
+import com.tbfp.teamplannerbe.domain.recruitmentApply.entity.RecruitmentApply;
+import com.tbfp.teamplannerbe.domain.recruitmentApply.entity.RecruitmentApplyStateEnum;
 import com.tbfp.teamplannerbe.domain.recruitmentComment.entity.RecruitmentComment;
 import lombok.*;
 
@@ -133,6 +135,27 @@ public class RecruitmentResponseDto {
 //                        .memberProfileImg(recruitmentComment.getMember().getProfileImg()) // future
                         .build();
             }
+        }
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @ToString
+    public static class RecruitmentWithMemberWithApply{
+
+        private RecruitmentApplyStateEnum state; // 승인여부상태
+        private String userName; //유저아이디
+        private String userProfile; //유저 프로필
+        private String recruitmentTitle; // 모집글 제목
+        private String content; // 지원할 때 쓰는 content
+
+        @Builder
+        public RecruitmentWithMemberWithApply(RecruitmentApply apply) {
+            this.state=apply.getState();
+            this.userName = apply.getApplicant().getUsername();
+            this.userProfile = apply.getApplicant().getPhone(); //프로필 없어서 userPhone 로함
+            this.recruitmentTitle = apply.getRecruitment().getTitle();
+            this.content = apply.getContent();
         }
     }
 

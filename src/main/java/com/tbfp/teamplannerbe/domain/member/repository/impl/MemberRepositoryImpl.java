@@ -4,11 +4,15 @@ import com.tbfp.teamplannerbe.domain.auth.ProviderType;
 import com.tbfp.teamplannerbe.domain.common.querydsl.support.Querydsl4RepositorySupport;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberQuerydslRepository;
+import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
 
 import java.util.List;
 import java.util.Optional;
 
+import static com.tbfp.teamplannerbe.domain.board.entity.QBoard.board;
 import static com.tbfp.teamplannerbe.domain.member.entity.QMember.member;
+import static com.tbfp.teamplannerbe.domain.recruitment.entity.QRecruitment.recruitment;
+import static com.tbfp.teamplannerbe.domain.recruitmentApply.entity.QRecruitmentApply.recruitmentApply;
 
 public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements MemberQuerydslRepository {
     public MemberRepositoryImpl() {
@@ -68,5 +72,25 @@ public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements 
                 .set(member.password, password) // 비밀번호 업데이트
                 .where(member.id.eq(theMember.getId())) // 회원 ID로 조건 설정
                 .execute();
+    }
+
+    public List<Recruitment> getApplicantList(String username) {
+        List<Recruitment> content = selectFrom(recruitment)
+                .leftJoin(recruitment.board, board).fetchJoin()
+                .leftJoin(recruitment.author, member).fetchJoin()
+                .leftJoin(recruitment.recruitmentApplyList, recruitmentApply).fetchJoin()
+                .where(recruitment.author.username.eq(username))
+                .fetch();
+//        JPAQuery<Long> countQuery =
+//                select(recruitment.count()).
+//                        from(recruitment).
+//                        leftJoin(recruitment.board, board).fetchJoin()
+//                        .leftJoin(recruitment.author, member).fetchJoin()
+//                        .leftJoin(recruitment.recruitmentApplyList, recruitmentApply).fetchJoin()
+//                        .where(recruitment.author.username.eq(username));
+//
+//        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
+        return content;
+
     }
 }

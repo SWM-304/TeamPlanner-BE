@@ -1,9 +1,15 @@
 package com.tbfp.teamplannerbe.domain.member.dto;
 
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto;
+import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentResponseDto;
+import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentResponseDto.RecruitmentWithMemberWithApply;
+import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
 import lombok.*;
 import org.springframework.http.HttpStatus;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class MemberResponseDto {
 
@@ -90,5 +96,26 @@ public class MemberResponseDto {
         private Integer code;
         private String message;
     }
+
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class RecruitmentApplicantResponseDto{
+        private String activityName; // 공모전 , 대외활동 명
+        @Builder.Default
+        private List<RecruitmentWithMemberWithApply> applicantIntro=new ArrayList<>();
+
+
+
+        public RecruitmentApplicantResponseDto(Recruitment recruitment) {
+            this.activityName = recruitment.getBoard().getActivityName();
+            this.applicantIntro = recruitment.getRecruitmentApplyList().stream()
+                    .map(i -> new RecruitmentResponseDto.RecruitmentWithMemberWithApply(i)).collect(Collectors.toList());
+
+        }
+    }
+
+
 
 }

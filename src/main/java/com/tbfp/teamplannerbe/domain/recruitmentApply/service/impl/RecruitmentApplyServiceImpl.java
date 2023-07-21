@@ -52,6 +52,10 @@ public class RecruitmentApplyServiceImpl implements RecruitmentApplyService {
         Member member = memberService.findMemberByUsernameOrElseThrowApplicationException(username);
         Recruitment recruitment = recruitmentService.findByIdOrElseThrowApplicationException(recruitmentId);
 
+        if(recruitment.getAuthor().getUsername().equals(username)){
+            throw new ApplicationException(ApplicationErrorType.AUTHOR_CANNOT_PARTICIPATE);
+        }
+
         return CreateApplyResponse.builder()
                 .recruitmentApplyId(
                         recruitmentApplyRepository.save(

@@ -30,4 +30,8 @@ public class RecruitmentApply extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member applicant;
+
+    public void updateState(RecruitmentApplyStateEnum state){
+        this.state=state;
+    }
 }

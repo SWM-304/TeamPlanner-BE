@@ -1,9 +1,8 @@
 package com.tbfp.teamplannerbe.domain.team.service.impl;
 
-import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
-import com.tbfp.teamplannerbe.domain.member.repository.MemberJpaRepository;
+import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
 import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
 import com.tbfp.teamplannerbe.domain.recruitment.repository.RecruitmentRepository;
 import com.tbfp.teamplannerbe.domain.recruitmentApply.entity.RecruitmentApply;
@@ -36,7 +35,7 @@ public class TeamServiceImpl implements TeamService {
 
     private final TeamRepository teamRepository;
     private final RecruitmentRepository recruitmentRepository;
-    private final MemberJpaRepository memberJpaRepository;
+    private final MemberRepository memberRepository;
     private final MemberTeamRepository memberTeamRepository;
     private final RecruitmentApplyRepository recruitmentApplyRepository;
 
@@ -66,7 +65,7 @@ public class TeamServiceImpl implements TeamService {
         // 해당하는 모집글이 아직도 존재하는지 확인
         Recruitment recruitment = recruitmentRepository.findById(creatTeamRequestDto.getRecruitId())
                 .orElseThrow(() -> new ApplicationException(RECRUITMENT_NOT_FOUND));
-        Member leaderMember = memberJpaRepository.findByUsername(username).
+        Member leaderMember = memberRepository.findByUsername(username).
                 orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
 
 
@@ -77,7 +76,7 @@ public class TeamServiceImpl implements TeamService {
 
         // 승인 할 멤버들이 존재하는지 검사
         List<Member> selectedMembers = creatTeamRequestDto.getSelectedUserIds().stream()
-                .map(memberId -> memberJpaRepository.findById(memberId)
+                .map(memberId -> memberRepository.findById(memberId)
                         .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND)))
                 .collect(Collectors.toList());
 

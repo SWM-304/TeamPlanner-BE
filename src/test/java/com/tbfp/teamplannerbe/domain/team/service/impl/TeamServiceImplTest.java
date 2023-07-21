@@ -2,35 +2,23 @@ package com.tbfp.teamplannerbe.domain.team.service.impl;
 
 import com.tbfp.teamplannerbe.domain.board.dto.BoardRequestDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
-import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.board.service.BoardService;
 import com.tbfp.teamplannerbe.domain.member.Education;
 import com.tbfp.teamplannerbe.domain.member.Gender;
 import com.tbfp.teamplannerbe.domain.member.Job;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
-import com.tbfp.teamplannerbe.domain.member.repository.MemberJpaRepository;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
 import com.tbfp.teamplannerbe.domain.member.service.MemberService;
-import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentRequestDto;
 import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentRequestDto.RecruitmentCreateRequestDto;
-import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentResponseDto;
 import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentResponseDto.RecruitmentCreateResponseDto;
-import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
-import com.tbfp.teamplannerbe.domain.recruitment.repository.RecruitmentRepository;
 import com.tbfp.teamplannerbe.domain.recruitment.service.RecruitmentService;
-import com.tbfp.teamplannerbe.domain.recruitmentApply.dto.RecruitmentApplyRequestDto;
 import com.tbfp.teamplannerbe.domain.recruitmentApply.dto.RecruitmentApplyRequestDto.CreateApplyRequest;
-import com.tbfp.teamplannerbe.domain.recruitmentApply.dto.RecruitmentApplyResponseDto;
-import com.tbfp.teamplannerbe.domain.recruitmentApply.dto.RecruitmentApplyResponseDto.CreateApplyResponse;
 import com.tbfp.teamplannerbe.domain.recruitmentApply.entity.RecruitmentApply;
 import com.tbfp.teamplannerbe.domain.recruitmentApply.repository.RecruitmentApplyRepository;
 import com.tbfp.teamplannerbe.domain.recruitmentApply.service.RecruitmentApplyService;
-import com.tbfp.teamplannerbe.domain.team.dto.TeamReqeustDto;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamReqeustDto.CreatTeamRequestDto;
-import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto.createdTeamResponseDto;
-import com.tbfp.teamplannerbe.domain.team.entity.MemberTeam;
 import com.tbfp.teamplannerbe.domain.team.entity.Team;
 import com.tbfp.teamplannerbe.domain.team.repository.MemberTeamRepository;
 import com.tbfp.teamplannerbe.domain.team.repository.TeamRepository;
@@ -39,14 +27,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,7 +44,8 @@ class TeamServiceImplTest {
      @Autowired
      TeamRepository teamRepository;
      @Autowired
-     MemberJpaRepository memberJpaRepository;
+     MemberRepository memberRepository
+             ;
      @Autowired
      MemberTeamRepository memberTeamRepository;
      @Autowired
@@ -98,7 +82,7 @@ class TeamServiceImplTest {
 
         RecruitmentCreateResponseDto result = recruitmentService.createRecruitment("test0", recruitment);
 
-        List<Member> member = memberJpaRepository.findAll();
+        List<Member> member = memberRepository.findAll();
 
         //then
         for (Member member1 : member) {
@@ -136,7 +120,7 @@ class TeamServiceImplTest {
         //모집글 작성
         RecruitmentCreateResponseDto recruitmentCreateResponseDto = recruitmentService.createRecruitment("test0", recruitment);
 
-        List<Member> member = memberJpaRepository.findAll();
+        List<Member> member = memberRepository.findAll();
         List<Long> array=new ArrayList<>();
         //모집글에 참가신청
         for (Member member1 : member) {
@@ -186,7 +170,7 @@ class TeamServiceImplTest {
         //모집글 작성
         RecruitmentCreateResponseDto recruitmentCreateResponseDto = recruitmentService.createRecruitment("test0", recruitment);
 
-        List<Member> member = memberJpaRepository.findAll();
+        List<Member> member = memberRepository.findAll();
         List<Long> array=new ArrayList<>();
         //모집글에 참가신청
         for (Member member1 : member) {
@@ -244,7 +228,7 @@ class TeamServiceImplTest {
         //모집글 작성
         RecruitmentCreateResponseDto recruitmentCreateResponseDto = recruitmentService.createRecruitment("test0", recruitment);
 
-        List<Member> member = memberJpaRepository.findAll();
+        List<Member> member = memberRepository.findAll();
         List<Long> array=new ArrayList<>();
         //모집글에 참가신청
         for (Member member1 : member) {

@@ -1,18 +1,18 @@
 package com.tbfp.teamplannerbe.domain.comment.service;
 
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CommentSendRequestDto;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CommentUpdateRequestDto;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.bigCommentSendRequestDto;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.updatedCommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CreateCommentRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.UpdateCommentRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CommentToCommentCreateRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.CreatedCommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.CreatedchildCommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.UpdatedCommentResponseDto;
 
 public interface CommentService {
-    Long sendComment(CommentSendRequestDto commentSendRequestDto);
+    CreatedCommentResponseDto sendComment(CreateCommentRequestDto createCommentRequestDto);
 
     void deleteComment(Long boardId, Long commentId);
 
-    updatedCommentResponseDto updateComment(CommentUpdateRequestDto commentUpdateRequestDto);
+    UpdatedCommentResponseDto updateComment(UpdateCommentRequestDto updateCommentRequestDto);
 
-    Long sendBigComment(bigCommentSendRequestDto bigCommentSendRequestDto);
+    CreatedchildCommentResponseDto sendBigComment(CommentToCommentCreateRequestDto commentToCommentCreateRequestDto, String username);
 }

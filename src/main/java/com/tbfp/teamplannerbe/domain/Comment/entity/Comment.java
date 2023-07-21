@@ -1,12 +1,13 @@
 package com.tbfp.teamplannerbe.domain.comment.entity;
 
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto;
 import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -69,11 +70,14 @@ public class Comment extends BaseTimeEntity {
         this.isConfidential = isConfidential;
     }
 
-    public CommentRequestDto.CommentUpdateRequestDto toDTO() {
-        return CommentRequestDto.CommentUpdateRequestDto.builder()
-                .commentId(id)
-                .boardId(board.getId())
+    public CommentResponseDto.CreatedCommentResponseDto toDto() {
+        return CommentResponseDto.CreatedCommentResponseDto.builder()
                 .content(content)
+                .boardId(board.getId())
+                .username(member.getUsername())
+                .createdDate(LocalDateTime.now())
+                .isConfidential(isConfidential)
+                .commentId(id)
                 .build();
 
     }

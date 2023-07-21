@@ -5,6 +5,7 @@ import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 
 public class CommentResponseDto {
 
@@ -13,7 +14,21 @@ public class CommentResponseDto {
     @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static class boardWithCommentListResponseDto{
+    public static class CreatedCommentResponseDto {
+        private String content;
+        private Long boardId;
+        private String username;
+        private LocalDateTime createdDate;
+        private Boolean isConfidential;
+        private Long commentId;
+
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class BoardWithCommentListResponseDto {
         private String username;
         private Long parentId;
         private String content;
@@ -21,7 +36,7 @@ public class CommentResponseDto {
         private boolean isConfidential;
 
 
-        public boardWithCommentListResponseDto(Comment comment) {
+        public BoardWithCommentListResponseDto(Comment comment) {
             this.username = comment.getMember().getUsername();
             this.content = comment.getContent();
             this.updatedAt = String.valueOf(comment.getUpdatedAt());
@@ -34,7 +49,7 @@ public class CommentResponseDto {
     @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static class updatedCommentResponseDto {
+    public static class UpdatedCommentResponseDto {
 
         @NotBlank
         private Long boardId;
@@ -42,6 +57,23 @@ public class CommentResponseDto {
         private String content;
         @NotBlank
         private String memberId;
+
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class CreatedchildCommentResponseDto {
+
+
+        private String content;
+        private Long boardId;
+        private String username;
+        private LocalDateTime createdDate;
+        private String isConfidential;
+        private Long commentId;
+        private Long parentId;
 
     }
 }

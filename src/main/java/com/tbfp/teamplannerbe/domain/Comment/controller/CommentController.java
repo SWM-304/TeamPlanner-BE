@@ -2,6 +2,8 @@ package com.tbfp.teamplannerbe.domain.comment.controller;
 
 
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CreateCommentRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CommentToCommentCreateRequestDto;
 import com.tbfp.teamplannerbe.domain.comment.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -30,9 +34,9 @@ public class CommentController {
             @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
     })
     @PostMapping("")
-    public ResponseEntity<?> commentSend(@RequestBody CommentRequestDto.CommentSendRequestDto commentSendRequestDto){
+    public ResponseEntity<?> createComment(@RequestBody CreateCommentRequestDto createCommentRequestDto){
 
-        return ResponseEntity.status(HttpStatus.OK).body(commentService.sendComment(commentSendRequestDto));
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.sendComment(createCommentRequestDto));
     }
 
     @Operation(summary = "공고에 대한 대댓글작성", description = "userId와 boardId를 통해서 대댓글을 작성한다")
@@ -42,9 +46,9 @@ public class CommentController {
             @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
     })
     @PostMapping("/{commentId}/comment")
-    public ResponseEntity<?> bigCommentSend(@RequestBody CommentRequestDto.bigCommentSendRequestDto bigCommentSendRequestDto){
+    public ResponseEntity<?> createCommentToComment(@RequestBody CommentToCommentCreateRequestDto commentToCommentCreateRequestDto, Principal principal){
 
-        return ResponseEntity.status(HttpStatus.OK).body(commentService.sendBigComment(bigCommentSendRequestDto));
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.sendBigComment(commentToCommentCreateRequestDto,principal.getName()));
     }
 
 
@@ -56,7 +60,7 @@ public class CommentController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
             @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
     })
-    public ResponseEntity<String> commentDelete(@PathVariable Long boardId, @PathVariable Long commentId){
+    public ResponseEntity<String> deleteComment(@PathVariable Long boardId, @PathVariable Long commentId){
         commentService.deleteComment(boardId,commentId);
         return ResponseEntity.status(HttpStatus.OK).body("정상적으로 삭제되었습니다");
     }
@@ -69,8 +73,8 @@ public class CommentController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
             @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
     })
-    public ResponseEntity<?> commentUpdate(@RequestBody CommentRequestDto.CommentUpdateRequestDto commentUpdateRequestDto){
-        return ResponseEntity.status(HttpStatus.OK).body(commentService.updateComment(commentUpdateRequestDto));
+    public ResponseEntity<?> updateComment(@RequestBody CommentRequestDto.UpdateCommentRequestDto updateCommentRequestDto){
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.updateComment(updateCommentRequestDto));
     }
 
 

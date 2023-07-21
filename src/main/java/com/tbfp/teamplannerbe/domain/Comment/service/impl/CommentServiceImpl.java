@@ -179,7 +179,7 @@ public class CommentServiceImpl implements CommentService {
         Optional<Comment> findParentComment = commentRepository.findById(commentToCommentCreateRequestDto.getParentCommentId());
 
         boolean isAccessible = board.getMember().getUsername().equals(member.getUsername())
-                || (findParentComment.get().isConfidential() && findParentComment.get().getMember().getUsername().equals(username));
+                || (!findParentComment.get().isConfidential() || findParentComment.get().getMember().getUsername().equals(username));
         if (!isAccessible){
             throw new ApplicationException(ApplicationErrorType.UNAUTHORIZED);
         }

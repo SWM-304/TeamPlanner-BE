@@ -1,8 +1,7 @@
 package com.tbfp.teamplannerbe.domain.board.dto;
 
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.boardWithCommentListResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.BoardWithCommentListResponseDto;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -38,7 +37,7 @@ public class BoardResponseDto {
         private String activityPeriod; //활동기간
         private Long viewCount;
         private Long likeCount;
-        private List<boardWithCommentListResponseDto> comments=new ArrayList<>();
+        private List<BoardWithCommentListResponseDto> comments=new ArrayList<>();
 
         public BoardDetailResponseDto(Board board) {
             this.activitiyName = board.getActivityName();
@@ -64,7 +63,7 @@ public class BoardResponseDto {
             this.likeCount=board.getLikeCount();
             if(board.getComments()!=null){
                 this.comments=board.getComments().stream().
-                        map(i-> new CommentResponseDto.boardWithCommentListResponseDto(i))
+                        map(i-> new BoardWithCommentListResponseDto(i))
                         .collect(Collectors.toList());
             }
 
@@ -91,7 +90,7 @@ public class BoardResponseDto {
                     .competitionCategory(board.getCompetitionCategory())
                     .preferredSkills(board.getPreferredSkills())
                     .activityPeriod(board.getActivityPeriod())
-                    .comments(board.getComments().stream().map(i -> new CommentResponseDto.boardWithCommentListResponseDto(i)).collect(Collectors.toList()))
+                    .comments(board.getComments().stream().map(i -> new BoardWithCommentListResponseDto(i)).collect(Collectors.toList()))
                     .build();
 
         }
@@ -110,17 +109,6 @@ public class BoardResponseDto {
         private String category; //카테고리
         private Long viewCount; //조회수
         private Long likeCount; //좋아요
-
-
-
-        public BoardSimpleListResponseDto(Board board) {
-            this.boardId=board.getId();
-            this.activitiyName = board.getActivityName();
-            this.activityImg = board.getActivityImg();
-            this.category = board.getCategory();
-            this.viewCount=board.getView();
-            this.likeCount= board.getLikeCount();
-        }
 
         public static BoardResponseDto.BoardSimpleListResponseDto toDTO(Board board) {
             return BoardSimpleListResponseDto.builder()

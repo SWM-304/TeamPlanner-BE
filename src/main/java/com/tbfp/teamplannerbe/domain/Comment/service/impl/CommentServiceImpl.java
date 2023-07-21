@@ -2,14 +2,17 @@ package com.tbfp.teamplannerbe.domain.comment.service.impl;
 
 
 import com.tbfp.teamplannerbe.domain.board.repository.BoardRepository;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CommentSendRequestDto;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CommentUpdateRequestDto;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.bigCommentSendRequestDto;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.updatedCommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CreateCommentRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.UpdateCommentRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CommentToCommentCreateRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.CreatedCommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.CreatedchildCommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.UpdatedCommentResponseDto;
 import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
 import com.tbfp.teamplannerbe.domain.comment.repository.CommentRepository;
 import com.tbfp.teamplannerbe.domain.comment.service.CommentService;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
+import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
@@ -17,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.Optional;
 
 import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType.*;
 
@@ -36,32 +40,33 @@ public class CommentServiceImpl implements CommentService {
      *
      * @param
      * {
-     *     "board_Id":"1",
+     *     "boardId":"1",
      *     "content":"안녕",
-     *     "member_Id":"test2"
+     *     "memberId":"test2"
      * }
      * @return
      * commnetId 예) 1
      */
     @Override
     @Transactional
-    public Long sendComment(CommentSendRequestDto commentSendRequestDto) {
-        Member member = memberRepository.findMemberByUsername(commentSendRequestDto.getMemberId())
+    public CreatedCommentResponseDto sendComment(CreateCommentRequestDto createCommentRequestDto) {
+        Member member = memberRepository.findMemberByUsername(createCommentRequestDto.getMemberId())
                 .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
 
-        Board board = boardRepository.findById(commentSendRequestDto.getBoardId())
+        Board board = boardRepository.findById(createCommentRequestDto.getBoardId())
                 .orElseThrow(() -> new ApplicationException(BOARD_NOT_FOUND));
 
         Comment comment = Comment.builder()
-                .content(commentSendRequestDto.getContent())
+                .content(createCommentRequestDto.getContent())
                 .state(true)  // 막 생성 된거니 state true
                 .board(board)
                 .depth(1)
                 .member(member)
-                .isConfidential(false)
+                .isConfidential(createCommentRequestDto.getIsConfidential())
                 .build();
         Comment savedComment = commentRepository.save(comment);
-        return savedComment.getId();
+        CreatedCommentResponseDto commentResponseDto = savedComment.toDto();
+        return commentResponseDto;
     }
 
 
@@ -106,7 +111,7 @@ public class CommentServiceImpl implements CommentService {
 
     /**
      *
-     * @param commentUpdateRequestDto
+     * @param updateCommentRequestDto
      * {
      *     "boardId":"1",
      *     "content":"수정된 글 입니다",
@@ -117,20 +122,20 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     @Transactional
-    public updatedCommentResponseDto updateComment(CommentUpdateRequestDto commentUpdateRequestDto) {
+    public UpdatedCommentResponseDto updateComment(UpdateCommentRequestDto updateCommentRequestDto) {
 
         Comment findComment = commentRepository.findByIdAndStateIsTrue(
-                commentUpdateRequestDto.getCommentId());
+                updateCommentRequestDto.getCommentId());
 
         if(findComment==null){
             throw new ApplicationException(COMMENT_NOT_FOUND);
         }
 
-        findComment.updateContent(commentUpdateRequestDto.getContent());
+        findComment.updateContent(updateCommentRequestDto.getContent());
 
         Comment savedComment = commentRepository.save(findComment);
 
-        updatedCommentResponseDto commentResponseDto = updatedCommentResponseDto.builder()
+        UpdatedCommentResponseDto commentResponseDto = UpdatedCommentResponseDto.builder()
                 .content(savedComment.getContent())
                 .boardId(savedComment.getBoard().getId())
                 .memberId(savedComment.getMember().getUsername())
@@ -139,6 +144,8 @@ public class CommentServiceImpl implements CommentService {
         return commentResponseDto;
 
     }
+
+
 
 
     /**
@@ -154,27 +161,45 @@ public class CommentServiceImpl implements CommentService {
      *
      *
      */
+    // 대댓글 달 수 있는 조건?
+    // 내가 그 댓글 볼 수 있어야함 ( 내가 쓴 댓글이거나 남이 썻는데 confidential 이 아님)
+    // 또는 내가 모집글의 작성자임
     @Transactional
-    public Long sendBigComment(bigCommentSendRequestDto bigCommentSendRequestDto) {
+    public CreatedchildCommentResponseDto sendBigComment(CommentToCommentCreateRequestDto commentToCommentCreateRequestDto, String username) {
+
+
+
 
         Comment childComment=null;
-        Member member = memberRepository.findMemberByUsername(bigCommentSendRequestDto.getMemberId())
+        Member member = memberRepository.findMemberByUsername(username)
                 .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
 
-        Board board = boardRepository.findById(bigCommentSendRequestDto.getBoardId())
+        Board board = boardRepository.findById(commentToCommentCreateRequestDto.getBoardId())
                 .orElseThrow(() -> new ApplicationException(BOARD_NOT_FOUND));
+        Optional<Comment> findParentComment = commentRepository.findById(commentToCommentCreateRequestDto.getParentCommentId());
 
-        if (bigCommentSendRequestDto.getParentCommentId() != null) {
-            Comment parentComment = commentRepository.findById(bigCommentSendRequestDto.getParentCommentId())
+        boolean isAccessible = board.getMember().getUsername().equals(member.getUsername())
+                || (!findParentComment.get().isConfidential() || findParentComment.get().getMember().getUsername().equals(username));
+        if (!isAccessible){
+            throw new ApplicationException(ApplicationErrorType.UNAUTHORIZED);
+        }
+
+
+
+        if (commentToCommentCreateRequestDto.getParentCommentId() != null) {
+            Comment parentComment = commentRepository.findById(commentToCommentCreateRequestDto.getParentCommentId())
                     .orElseThrow(() -> new RuntimeException("부모 댓글을 찾을 수 없습니다"));
 
 
+
+
+
             childComment = Comment.builder()
-                    .content(bigCommentSendRequestDto.getContent())
+                    .content(commentToCommentCreateRequestDto.getContent())
                     .state(true)
                     .board(board)
                     .member(member)
-                    .isConfidential(true)
+                    .isConfidential(commentToCommentCreateRequestDto.getIsConfidential())
                     .build();
 
             if(parentComment.getId()!=childComment.getId()){
@@ -189,6 +214,17 @@ public class CommentServiceImpl implements CommentService {
             commentRepository.save(childComment);  // 대댓글 저장
 
         }
-        return childComment.getId();
+        CreatedchildCommentResponseDto commentToComment = CreatedchildCommentResponseDto.builder()
+                .boardId(childComment.getBoard().getId())
+                .commentId(childComment.getId())
+                .parentId(childComment.getParentComment().getId())
+                .createdDate(childComment.getCreatedAt())
+                .content(childComment.getContent())
+                .username(childComment.getMember().getUsername())
+                .isConfidential(String.valueOf(childComment.isConfidential()))
+                .build();
+
+
+        return commentToComment;
     }
 }

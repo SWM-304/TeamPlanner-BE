@@ -82,6 +82,8 @@ public class RecruitmentCommentService {
         Member member = memberService.findMemberByUsernameOrElseThrowApplicationException(username);
         RecruitmentComment parentRecruitmentComment = recruitmentCommentRepository.findById(parentRecruitmentCommentId).orElseThrow(() -> new ApplicationException(ApplicationErrorType.RECRUITMENT_COMMENT_NOT_FOUND));
 
+
+
         // condition check
         if ( !
                 (

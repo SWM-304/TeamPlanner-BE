@@ -1,11 +1,8 @@
 package com.tbfp.teamplannerbe.domain.board.controller;
 
 
-import com.tbfp.teamplannerbe.domain.board.dto.BoardRequestDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardRequestDto.createBoardResquestDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardRequestDto.updateBoardReqeustDto;
-import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
-import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto.BoardDetailResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto.BoardSimpleListResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardSearchCondition;
 import com.tbfp.teamplannerbe.domain.board.service.BoardService;
@@ -15,7 +12,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,7 +53,7 @@ public class BoardController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
             @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
     })
-    public ResponseEntity<?> createBaord(@RequestBody createBoardResquestDto createBoardResquestDto,Principal principal){
+    public ResponseEntity<?> createBoard(@RequestBody createBoardResquestDto createBoardResquestDto, Principal principal){
 
 
         return ResponseEntity.status(HttpStatus.OK).body(boardService.createBoard(createBoardResquestDto,principal.getName()));

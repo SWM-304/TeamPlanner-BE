@@ -25,6 +25,8 @@ public class MemberRequestDto {
         private String password;
     }
 
+
+
     @Getter
     @Setter
     @Builder

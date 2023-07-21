@@ -8,7 +8,7 @@ import com.tbfp.teamplannerbe.domain.boardLike.repository.BoardLikeRepository;
 import com.tbfp.teamplannerbe.domain.boardLike.service.BoardLikeService;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
-import com.tbfp.teamplannerbe.domain.member.repository.MemberJpaRepository;
+import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +19,7 @@ import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorTyp
 @RequiredArgsConstructor
 public class BoardLikeServiceImpl implements BoardLikeService {
 
-    private final MemberJpaRepository memberJpaRepository;
+    private final MemberRepository memberRepository;
     private final BoardRepository boardRepository;
     private final BoardLikeRepository boardLikeRepository;
 
@@ -36,7 +36,7 @@ public class BoardLikeServiceImpl implements BoardLikeService {
     @Transactional
     public void createLikesOnBoard(Long boardId, Long memberId) {
 
-        Member member = memberJpaRepository.findById(memberId)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
 
         Board board = boardRepository.findById(boardId)
@@ -68,7 +68,7 @@ public class BoardLikeServiceImpl implements BoardLikeService {
     @Override
     @Transactional
     public void deleteLikesOnBoard(Long boardLikeId, Long memberId) {
-        memberJpaRepository.findById(memberId)
+        memberRepository.findById(memberId)
                 .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
 
         //좋아요 삭제 시 해당 boardLikeCount -=1

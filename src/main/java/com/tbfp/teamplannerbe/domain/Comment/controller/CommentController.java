@@ -2,8 +2,8 @@ package com.tbfp.teamplannerbe.domain.comment.controller;
 
 
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.createCommentRequestDto;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.commentToCommentCreateRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CreateCommentRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CommentToCommentCreateRequestDto;
 import com.tbfp.teamplannerbe.domain.comment.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,7 +34,7 @@ public class CommentController {
             @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
     })
     @PostMapping("")
-    public ResponseEntity<?> createComment(@RequestBody createCommentRequestDto createCommentRequestDto){
+    public ResponseEntity<?> createComment(@RequestBody CreateCommentRequestDto createCommentRequestDto){
 
         return ResponseEntity.status(HttpStatus.OK).body(commentService.sendComment(createCommentRequestDto));
     }
@@ -46,7 +46,7 @@ public class CommentController {
             @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
     })
     @PostMapping("/{commentId}/comment")
-    public ResponseEntity<?> createCommentToComment(@RequestBody commentToCommentCreateRequestDto commentToCommentCreateRequestDto, Principal principal){
+    public ResponseEntity<?> createCommentToComment(@RequestBody CommentToCommentCreateRequestDto commentToCommentCreateRequestDto, Principal principal){
 
         return ResponseEntity.status(HttpStatus.OK).body(commentService.sendBigComment(commentToCommentCreateRequestDto,principal.getName()));
     }
@@ -73,7 +73,7 @@ public class CommentController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
             @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
     })
-    public ResponseEntity<?> updateComment(@RequestBody CommentRequestDto.updateCommentRequestDto updateCommentRequestDto){
+    public ResponseEntity<?> updateComment(@RequestBody CommentRequestDto.UpdateCommentRequestDto updateCommentRequestDto){
         return ResponseEntity.status(HttpStatus.OK).body(commentService.updateComment(updateCommentRequestDto));
     }
 

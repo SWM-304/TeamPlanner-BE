@@ -5,9 +5,9 @@ import com.tbfp.teamplannerbe.domain.board.dto.BoardRequestDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
 import com.tbfp.teamplannerbe.domain.board.service.BoardService;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.createdCommentResponseDto;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.createdchildCommentResponseDto;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.updatedCommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.CreatedCommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.CreatedchildCommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.UpdatedCommentResponseDto;
 import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
 import com.tbfp.teamplannerbe.domain.comment.repository.CommentRepository;
 import com.tbfp.teamplannerbe.domain.comment.service.CommentService;
@@ -46,7 +46,7 @@ class CommentServiceImplTest extends BaseControllerTest {
         Long boardId = 공모전생성();
 
 
-        createdCommentResponseDto createdCommentResponseDto = commentService.sendComment(CommentRequestDto.createCommentRequestDto.builder()
+        CreatedCommentResponseDto createdCommentResponseDto = commentService.sendComment(CommentRequestDto.CreateCommentRequestDto.builder()
                 .boardId(boardId)
                 .content("내용테스트입니다")
                 .isConfidential(Boolean.TRUE)
@@ -61,7 +61,7 @@ class CommentServiceImplTest extends BaseControllerTest {
         Long boardId = 공모전생성();
 
 
-        createdCommentResponseDto createdCommentResponseDto = commentService.sendComment(CommentRequestDto.createCommentRequestDto.builder()
+        CreatedCommentResponseDto createdCommentResponseDto = commentService.sendComment(CommentRequestDto.CreateCommentRequestDto.builder()
                 .boardId(boardId)
                 .content("내용테스트입니다")
                 .isConfidential(Boolean.TRUE)
@@ -77,15 +77,15 @@ class CommentServiceImplTest extends BaseControllerTest {
     public void 대댓글쓰기(){
         셋업멤버();
         Long boardId = 공모전생성();
-        createdCommentResponseDto createdCommentResponseDto = commentService.sendComment(CommentRequestDto.createCommentRequestDto.builder()
+        CreatedCommentResponseDto createdCommentResponseDto = commentService.sendComment(CommentRequestDto.CreateCommentRequestDto.builder()
                 .boardId(boardId)
                 .content("내용테스트입니다")
                 .isConfidential(Boolean.TRUE)
                 .memberId("test")
                 .build());
 
-        createdchildCommentResponseDto createdchildCommentResponseDto = commentService.sendBigComment(
-                CommentRequestDto.commentToCommentCreateRequestDto.builder()
+        CreatedchildCommentResponseDto createdchildCommentResponseDto = commentService.sendBigComment(
+                CommentRequestDto.CommentToCommentCreateRequestDto.builder()
                         .isConfidential(Boolean.valueOf("true"))
                         .boardId(boardId)
                         .parentCommentId(createdCommentResponseDto.getCommentId())
@@ -108,7 +108,7 @@ class CommentServiceImplTest extends BaseControllerTest {
 
 
 
-        createdCommentResponseDto createdCommentResponseDto = commentService.sendComment(CommentRequestDto.createCommentRequestDto.builder()
+        CreatedCommentResponseDto createdCommentResponseDto = commentService.sendComment(CommentRequestDto.CreateCommentRequestDto.builder()
                 .boardId(boardId)
                 .content("내용테스트입니다")
                 .isConfidential(Boolean.TRUE)
@@ -117,8 +117,8 @@ class CommentServiceImplTest extends BaseControllerTest {
 
 
         try {
-            createdchildCommentResponseDto createdchildCommentResponseDto = commentService.sendBigComment(
-                    CommentRequestDto.commentToCommentCreateRequestDto.builder()
+            CreatedchildCommentResponseDto createdchildCommentResponseDto = commentService.sendBigComment(
+                    CommentRequestDto.CommentToCommentCreateRequestDto.builder()
                             .isConfidential(Boolean.valueOf("true"))
                             .boardId(boardId)
                             .parentCommentId(createdCommentResponseDto.getCommentId())
@@ -138,14 +138,14 @@ class CommentServiceImplTest extends BaseControllerTest {
         Long boardId = 공모전생성();
 
 
-        createdCommentResponseDto createdCommentResponseDto = commentService.sendComment(CommentRequestDto.createCommentRequestDto.builder()
+        CreatedCommentResponseDto createdCommentResponseDto = commentService.sendComment(CommentRequestDto.CreateCommentRequestDto.builder()
                 .boardId(boardId)
                 .content("내용테스트입니다")
                 .memberId("test")
                 .isConfidential(Boolean.TRUE)
                 .build());
 
-        updatedCommentResponseDto updateComment = commentService.updateComment(CommentRequestDto.updateCommentRequestDto.builder()
+        UpdatedCommentResponseDto updateComment = commentService.updateComment(CommentRequestDto.UpdateCommentRequestDto.builder()
                 .commentId(createdCommentResponseDto.getCommentId())
                 .boardId(boardId)
                 .content("댓글수정입니다")

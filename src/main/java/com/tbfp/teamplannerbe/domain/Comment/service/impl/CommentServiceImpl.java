@@ -2,13 +2,12 @@ package com.tbfp.teamplannerbe.domain.comment.service.impl;
 
 
 import com.tbfp.teamplannerbe.domain.board.repository.BoardRepository;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.createCommentRequestDto;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.updateCommentRequestDto;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.commentToCommentCreateRequestDto;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.createdCommentResponseDto;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.createdchildCommentResponseDto;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.updatedCommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CreateCommentRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.UpdateCommentRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CommentToCommentCreateRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.CreatedCommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.CreatedchildCommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.UpdatedCommentResponseDto;
 import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
 import com.tbfp.teamplannerbe.domain.comment.repository.CommentRepository;
 import com.tbfp.teamplannerbe.domain.comment.service.CommentService;
@@ -50,7 +49,7 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     @Transactional
-    public createdCommentResponseDto sendComment(createCommentRequestDto createCommentRequestDto) {
+    public CreatedCommentResponseDto sendComment(CreateCommentRequestDto createCommentRequestDto) {
         Member member = memberRepository.findMemberByUsername(createCommentRequestDto.getMemberId())
                 .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
 
@@ -66,7 +65,7 @@ public class CommentServiceImpl implements CommentService {
                 .isConfidential(createCommentRequestDto.getIsConfidential())
                 .build();
         Comment savedComment = commentRepository.save(comment);
-        createdCommentResponseDto commentResponseDto = savedComment.toDto();
+        CreatedCommentResponseDto commentResponseDto = savedComment.toDto();
         return commentResponseDto;
     }
 
@@ -123,7 +122,7 @@ public class CommentServiceImpl implements CommentService {
      */
     @Override
     @Transactional
-    public updatedCommentResponseDto updateComment(updateCommentRequestDto updateCommentRequestDto) {
+    public UpdatedCommentResponseDto updateComment(UpdateCommentRequestDto updateCommentRequestDto) {
 
         Comment findComment = commentRepository.findByIdAndStateIsTrue(
                 updateCommentRequestDto.getCommentId());
@@ -136,7 +135,7 @@ public class CommentServiceImpl implements CommentService {
 
         Comment savedComment = commentRepository.save(findComment);
 
-        updatedCommentResponseDto commentResponseDto = updatedCommentResponseDto.builder()
+        UpdatedCommentResponseDto commentResponseDto = UpdatedCommentResponseDto.builder()
                 .content(savedComment.getContent())
                 .boardId(savedComment.getBoard().getId())
                 .memberId(savedComment.getMember().getUsername())
@@ -166,7 +165,7 @@ public class CommentServiceImpl implements CommentService {
     // 내가 그 댓글 볼 수 있어야함 ( 내가 쓴 댓글이거나 남이 썻는데 confidential 이 아님)
     // 또는 내가 모집글의 작성자임
     @Transactional
-    public createdchildCommentResponseDto sendBigComment(commentToCommentCreateRequestDto commentToCommentCreateRequestDto, String username) {
+    public CreatedchildCommentResponseDto sendBigComment(CommentToCommentCreateRequestDto commentToCommentCreateRequestDto, String username) {
 
 
 
@@ -215,7 +214,7 @@ public class CommentServiceImpl implements CommentService {
             commentRepository.save(childComment);  // 대댓글 저장
 
         }
-        CommentResponseDto.createdchildCommentResponseDto commentToComment = createdchildCommentResponseDto.builder()
+        CreatedchildCommentResponseDto commentToComment = CreatedchildCommentResponseDto.builder()
                 .boardId(childComment.getBoard().getId())
                 .commentId(childComment.getId())
                 .parentId(childComment.getParentComment().getId())

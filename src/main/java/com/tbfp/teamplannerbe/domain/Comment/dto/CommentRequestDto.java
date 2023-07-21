@@ -9,7 +9,7 @@ public class CommentRequestDto {
     @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static class createCommentRequestDto {
+    public static class CreateCommentRequestDto {
 
         @NotBlank
         private Long boardId;
@@ -26,7 +26,7 @@ public class CommentRequestDto {
     @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static class commentToCommentCreateRequestDto {
+    public static class CommentToCommentCreateRequestDto {
 
         @NotBlank
         private Long parentCommentId;
@@ -41,7 +41,7 @@ public class CommentRequestDto {
     @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static class updateCommentRequestDto {
+    public static class UpdateCommentRequestDto {
         @NotBlank
         private Long commentId;
         @NotBlank

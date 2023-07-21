@@ -1,6 +1,5 @@
 package com.tbfp.teamplannerbe.domain.comment.entity;
 
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto;
 import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
@@ -71,13 +70,13 @@ public class Comment extends BaseTimeEntity {
         this.isConfidential = isConfidential;
     }
 
-    public CommentResponseDto.createdCommentResponseDto toDto() {
-        return CommentResponseDto.createdCommentResponseDto.builder()
+    public CommentResponseDto.CreatedCommentResponseDto toDto() {
+        return CommentResponseDto.CreatedCommentResponseDto.builder()
                 .content(content)
                 .boardId(board.getId())
                 .username(member.getUsername())
                 .createdDate(LocalDateTime.now())
-                .isConfidential(String.valueOf(isConfidential))
+                .isConfidential(isConfidential)
                 .commentId(id)
                 .build();
 

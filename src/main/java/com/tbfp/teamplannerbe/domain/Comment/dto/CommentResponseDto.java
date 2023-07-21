@@ -14,12 +14,12 @@ public class CommentResponseDto {
     @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static class createdCommentResponseDto{
+    public static class CreatedCommentResponseDto {
         private String content;
         private Long boardId;
         private String username;
         private LocalDateTime createdDate;
-        private String isConfidential;
+        private Boolean isConfidential;
         private Long commentId;
 
     }
@@ -28,7 +28,7 @@ public class CommentResponseDto {
     @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static class boardWithCommentListResponseDto{
+    public static class BoardWithCommentListResponseDto {
         private String username;
         private Long parentId;
         private String content;
@@ -36,7 +36,7 @@ public class CommentResponseDto {
         private boolean isConfidential;
 
 
-        public boardWithCommentListResponseDto(Comment comment) {
+        public BoardWithCommentListResponseDto(Comment comment) {
             this.username = comment.getMember().getUsername();
             this.content = comment.getContent();
             this.updatedAt = String.valueOf(comment.getUpdatedAt());
@@ -49,7 +49,7 @@ public class CommentResponseDto {
     @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static class updatedCommentResponseDto {
+    public static class UpdatedCommentResponseDto {
 
         @NotBlank
         private Long boardId;
@@ -64,7 +64,8 @@ public class CommentResponseDto {
     @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static class createdchildCommentResponseDto {
+    public static class CreatedchildCommentResponseDto {
+
 
         private String content;
         private Long boardId;

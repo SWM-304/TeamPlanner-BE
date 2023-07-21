@@ -2,11 +2,9 @@ package com.tbfp.teamplannerbe.domain.comment.service.impl;
 
 
 import com.tbfp.teamplannerbe.domain.board.repository.BoardRepository;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CommentSendRequestDto;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CommentUpdateRequestDto;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.bigCommentSendRequestDto;
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.updatedCommentResponseDto;
 import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
 import com.tbfp.teamplannerbe.domain.comment.repository.CommentRepository;

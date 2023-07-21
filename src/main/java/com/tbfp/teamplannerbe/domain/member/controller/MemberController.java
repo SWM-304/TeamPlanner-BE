@@ -100,8 +100,8 @@ public class MemberController {
         return ResponseEntity.ok().body(memberService.findForgotPassword(forgotPasswordRequestDto));
     }
     @GetMapping("/applicant-list")
-    public ResponseEntity<?> getApplicantList(Pageable pageable,Principal principal){
-        return ResponseEntity.ok().body(memberService.findApplicantList(pageable,principal.getName()));
+    public ResponseEntity<?> getApplicantList(Principal principal){
+        return ResponseEntity.ok().body(memberService.findApplicantList(principal.getName()));
     }
 
 

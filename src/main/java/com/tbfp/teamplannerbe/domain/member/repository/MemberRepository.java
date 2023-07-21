@@ -94,14 +94,12 @@ public class MemberRepository extends Querydsl4RepositorySupport {
     }
 
 
-    public List<Recruitment> getApplicantList(Pageable pageable, String username) {
+    public List<Recruitment> getApplicantList(String username) {
         List<Recruitment> content = selectFrom(recruitment)
                 .leftJoin(recruitment.board, board).fetchJoin()
                 .leftJoin(recruitment.author, member).fetchJoin()
                 .leftJoin(recruitment.recruitmentApplyList, recruitmentApply).fetchJoin()
                 .where(recruitment.author.username.eq(username))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
                 .fetch();
 //
 //        JPAQuery<Long> countQuery =

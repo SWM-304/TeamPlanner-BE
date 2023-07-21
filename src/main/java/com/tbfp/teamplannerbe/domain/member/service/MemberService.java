@@ -38,5 +38,5 @@ public interface MemberService {
     Member findMemberByUsernameOrElseThrowApplicationException(String username);
 
 
-    List<RecruitmentApplicantResponseDto> findApplicantList(Pageable pageable, String name);
+    List<RecruitmentApplicantResponseDto> findApplicantList(String name);
 }

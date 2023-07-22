@@ -81,6 +81,7 @@ public class RecruitmentService {
         return recruitmentRepository.findById(recruitmentId);
     }
 
+    @Transactional
     public void increaseLikeCount(Long id) {
         Recruitment recruitment = recruitmentRepository.findById(id)
                 .orElseThrow(() -> new ApplicationException(ApplicationErrorType.NOT_FOUND));
@@ -97,5 +98,10 @@ public class RecruitmentService {
         boolean isAuthorOfRecruitment = recruitment.getAuthor().getUsername().equals(member.getUsername());
 
         return RecruitmentWithCommentResponseDto.toDto(isAuthorOfRecruitment, username, recruitment);
+    }
+
+    // pessimistic_write lock
+    public Optional<Recruitment> findByIdForUpdate(Long recruitmentId) {
+        return recruitmentRepository.findByIdForUpdate(recruitmentId);
     }
 }

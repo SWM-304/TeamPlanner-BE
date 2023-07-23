@@ -98,6 +98,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework:spring-context:5.3.19'
 
+    // sentry
+    implementation 'io.sentry:sentry-spring-boot-starter:6.25.2'
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'

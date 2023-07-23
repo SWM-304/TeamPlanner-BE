@@ -80,3 +80,9 @@ jwt:
 springdoc:
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
+
+sentry:
+  dsn: ENC(apptDZq3vkbxbEiaNA8nYlrq6qjcyL5iaiWIqiay0ukqN4PY9ISazFdZaPgKcf2afLEp8sCjRAxWGJQ0Ok6nza+BgcoiENphrUIpS8n41P88WOzazN22S1jgVl1jvuFPuJsaq+JNMOA=)
+  # Set traces-sample-rate to 1.0 to capture 100% of transactions for performance monitoring.
+  # We recommend adjusting this value in production.
+  traces-sample-rate: 1.0

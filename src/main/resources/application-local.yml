@@ -80,3 +80,10 @@ jwt:
 springdoc:
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
+
+amazon:
+  aws:
+    accessKey: ENC(2c1CtG+taOT9pHnmFuoSHmeL12IrZLyQq6jgNbUFicI=)
+    secretKey: ENC(o2AZZVhzY12A7m7Vk8ZorqVENHq1OJO36xmTQk4MZAz0vHbsOwPIiLFpFFikkQdKntNxEE2Bxb0=)
+    region: ENC(gGm9/hJVzdCVEEmIdsfDPAnanlIsxaJl)
+    bucket: ENC(DY8KvVk0IQLZUQvhbosqcCuw9yOzwVd5ouVEybAZtFk=)

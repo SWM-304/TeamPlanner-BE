@@ -9,5 +9,5 @@ public enum VerifyPurpose {
     FORGOT_ID("아이디 찾기"),
     FORGOT_PASSWORD("비밀번호 찾기");
 
-    private final String displayName;
+    private final String label;
 }

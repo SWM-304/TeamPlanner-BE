@@ -25,6 +25,7 @@ public enum ApplicationErrorType {
 
     REFRESH_TOKEN_FOR_USER_NOT_FOUND(HttpStatus.NO_CONTENT, -7, "리프레시 토큰을 찾을 수 없습니다."),
 
+
     MEMBER_REGISTER_FAIL(HttpStatus.BAD_REQUEST, -20000, "회원 생성에 실패했습니다."),
 
     DUPLICATE_USERNAME(HttpStatus.CONFLICT,-20001,"이미 사용중인 아이디입니다."),
@@ -37,6 +38,7 @@ public enum ApplicationErrorType {
 
     DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST,-20005,"이미 사용중인 닉네임입니다."),
 
+
     SIGNUP_REQUEST_INVALID_USERNAME(HttpStatus.BAD_REQUEST, -21000, "username"),
 
     SIGNUP_REQUEST_INVALID_PASSWORD(HttpStatus.BAD_REQUEST, -21001, "password"),
@@ -47,11 +49,25 @@ public enum ApplicationErrorType {
 
     SIGNUP_REQUEST_INVALID_CONTACTEMAIL(HttpStatus.BAD_REQUEST, -21004, "contactEmail"),
 
+    SIGNUP_REQUEST_INVALID_NICKNAME(HttpStatus.BAD_REQUEST, -21005, "nickname"),
+
+
     VERIFICATION_CODE_UNMATCHED(HttpStatus.UNAUTHORIZED,-22000, "인증번호가 일치하지 않습니다."),
 
     VERIFICATION_CODE_EXPIRED(HttpStatus.BAD_REQUEST,-22001, "인증번호가 만료되어 재전송했습니다."),
 
     VERIFICATION_CODE_UNPROVIDED(HttpStatus.BAD_REQUEST,-22002, "인증번호가 발급되지 않아 재전송했습니다."),
+
+
+    PROFILE_NOT_EXIST(HttpStatus.BAD_REQUEST, -23000,"프로필이 존재하지 않습니다."),
+
+    PROFILE_ALREADY_EXIST(HttpStatus.BAD_REQUEST,-23001,"프로필이 이미 존재하여 중복 생성이 불가합니다."),
+
+    IMAGE_DELETION_UNAUTHORIZED(HttpStatus.BAD_REQUEST,-23002,"선택한 이미지 명을 삭제할 권한이 없습니다"),
+
+    IMAGE_DOESNT_EXIST(HttpStatus.BAD_REQUEST,-23003,"이미지가 존재하지 않습니다."),
+
+    PROFILE_DELETION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,-23004,"프로필 삭제중 문제가 발생했습니다."),
 
     ALREADY_LIKE_BOARD(HttpStatus.BAD_REQUEST,-8,"이미 좋아요를 누르셨습니다"),
 

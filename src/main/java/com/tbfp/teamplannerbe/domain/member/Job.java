@@ -13,6 +13,6 @@ public enum Job {
     SELF_EMPLOYED("자영업자"),
     ENTREPRENUER("사업가"),
     NONE("무직");
-    private final String displayName;
+    private final String label;
 
 }

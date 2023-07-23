@@ -9,9 +9,9 @@ import com.tbfp.teamplannerbe.domain.member.*;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
-import com.tbfp.teamplannerbe.domain.member.entity.Profile;
+import com.tbfp.teamplannerbe.domain.profile.entity.BasicProfile;
+import com.tbfp.teamplannerbe.domain.profile.repository.BasicProfileRepository;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
-import com.tbfp.teamplannerbe.domain.member.repository.ProfileRepository;
 import com.tbfp.teamplannerbe.domain.member.service.MailSenderService;
 import com.tbfp.teamplannerbe.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorTyp
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
-    private final ProfileRepository profileRepository;
+    private final BasicProfileRepository basicProfileRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
     private final MailSenderService mailSenderService;
@@ -101,9 +101,9 @@ public class MemberServiceImpl implements MemberService {
         try {
             signUpRequestDto.setPassword(bCryptPasswordEncoder.encode(signUpRequestDto.getPassword()));
             Member member = signUpRequestDto.toMember();
-            Profile profile = signUpRequestDto.toProfile(member);
+            BasicProfile basicProfile = signUpRequestDto.toBasicProfile(member);
             memberRepository.save(member);
-            profileRepository.save(profile);
+            basicProfileRepository.save(basicProfile);
         } catch (Exception e){
             throw new ApplicationException(MEMBER_REGISTER_FAIL);
         }
@@ -152,7 +152,7 @@ public class MemberServiceImpl implements MemberService {
             if (authenticateMap.containsKey(emailAddress)) authenticateMap.remove(emailAddress);
 
             Integer verificationCode = mailSenderService.getVerificationNumber();
-            String mailSubject = "TeamPlanner " + verifyPurpose.getDisplayName() + " 인증번호입니다.";
+            String mailSubject = "TeamPlanner " + verifyPurpose.getLabel() + " 인증번호입니다.";
             String mailBody = mailSubject + "\n" + verificationCode.toString();
             mailSenderService.sendEmail(emailAddress, mailSubject, mailBody);
 

@@ -28,8 +28,10 @@ public class Member extends BaseTimeEntity {
     private String username;
 
     @Column(length = 300)
-
     private String password;
+
+    @Column(length = 300)
+    private String nickname;
 
     private String email;
 

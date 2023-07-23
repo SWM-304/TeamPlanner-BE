@@ -5,8 +5,8 @@ import com.tbfp.teamplannerbe.domain.member.Education;
 import com.tbfp.teamplannerbe.domain.member.Gender;
 import com.tbfp.teamplannerbe.domain.member.Job;
 import com.tbfp.teamplannerbe.domain.member.VerifyPurpose;
+import com.tbfp.teamplannerbe.domain.profile.entity.BasicProfile;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
-import com.tbfp.teamplannerbe.domain.member.entity.Profile;
 import lombok.*;
 
 import javax.validation.constraints.*;
@@ -103,6 +103,7 @@ public class MemberRequestDto {
             return Member.builder().
                     username(username).
                     password(password).
+                    nickname(nickname).
                     email(email).
                     phone(phone).
                     state(true).
@@ -112,8 +113,8 @@ public class MemberRequestDto {
                     build();
         }
 
-        public Profile toProfile(Member member){
-            return Profile.builder().
+        public BasicProfile toBasicProfile(Member member){
+            return BasicProfile.builder().
                     profileIntro(profileIntro).
                     profileImage(profileImage).
                     job(job).

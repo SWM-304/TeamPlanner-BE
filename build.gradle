@@ -98,6 +98,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework:spring-context:5.3.19'
 
+    //aws
+    implementation 'com.amazonaws:aws-java-sdk:1.11.64'
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'

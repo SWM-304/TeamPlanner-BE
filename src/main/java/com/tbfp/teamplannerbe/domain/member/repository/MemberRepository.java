@@ -42,7 +42,7 @@ public class MemberRepository extends Querydsl4RepositorySupport{
     public Optional<Member> findMemberByNickname(String nickname) {
         return Optional.ofNullable(select(member)
                 .from(member)
-                .where(member.username.eq(nickname).and(member.state.eq(true))).
+                .where(member.nickname.eq(nickname).and(member.state.eq(true))).
                 fetchOne());
     }
 

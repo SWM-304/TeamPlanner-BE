@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType.*;
@@ -199,5 +200,24 @@ public class TeamServiceImpl implements TeamService {
 
     }
 
+    @Override
+    @Transactional
+    public TeamResponseDto.getMyTeamResponseDto getMyTeam(String username){
+        Optional<Member> member = memberRepository.findByUsername(username);
+        if(!member.isPresent()){
+            throw new ApplicationException(USER_NOT_FOUND);
+        }
+        Long memberId = member.get().getId();
+        List<MemberTeam> memberTeams = memberTeamRepository.findAllByMemberId(memberId);
+
+        System.out.println(memberTeams);
+        List<Team> teams = memberTeams.stream()
+                .map(MemberTeam::getTeam)
+                .collect(Collectors.toList());
+
+        return TeamResponseDto.getMyTeamResponseDto.builder()
+                .teams(teams)
+                .build();
+    }
 
 }

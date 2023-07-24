@@ -14,4 +14,6 @@ public interface TeamService {
     void deleteTeamMember(String username,Long teamId,Long memberId);
 
     void deleteTeam(String username,Long teamId);
+
+    TeamResponseDto.getMyTeamResponseDto getMyTeam(String username);
 }

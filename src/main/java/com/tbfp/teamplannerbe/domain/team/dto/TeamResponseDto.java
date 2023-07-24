@@ -5,6 +5,7 @@ import com.tbfp.teamplannerbe.domain.team.entity.Team;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class TeamResponseDto {
 
@@ -41,5 +42,13 @@ public class TeamResponseDto {
     @Builder
     public static class deleteTeamMemberResponseDto {
         String deleteMessage;
+    }
+
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    @Builder
+    public static class getMyTeamResponseDto {
+        List<Team> teams;
     }
 }

@@ -70,7 +70,7 @@ public class ProfileController {
     }
 
     @DeleteMapping("")
-    @Operation(summary = "프로필 수정", description = "프로필 수정")
+    @Operation(summary = "프로필 삭제", description = "프로필 삭제")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),

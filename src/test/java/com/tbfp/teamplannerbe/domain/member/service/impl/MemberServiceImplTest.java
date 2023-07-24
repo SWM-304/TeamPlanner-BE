@@ -7,7 +7,6 @@ import com.tbfp.teamplannerbe.domain.member.Gender;
 import com.tbfp.teamplannerbe.domain.member.Job;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
-import com.tbfp.teamplannerbe.domain.member.repository.MemberJpaRepository;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
 import com.tbfp.teamplannerbe.domain.member.service.MemberService;
 import org.assertj.core.api.Assertions;
@@ -20,8 +19,6 @@ import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class MemberServiceImplTest extends BaseControllerTest {
 
     @Autowired
@@ -30,8 +27,6 @@ class MemberServiceImplTest extends BaseControllerTest {
     JwtProvider jwtProvider;
     @Autowired
     MemberRepository memberRepository;
-    @Autowired
-    MemberJpaRepository memberJpaRepository;
     @Autowired
     MemberService memberService;
 
@@ -64,15 +59,8 @@ class MemberServiceImplTest extends BaseControllerTest {
                     .build());
 
 
-        List<Member> member = memberJpaRepository.findAll();
+        List<Member> member = memberRepository.findAll();
 
         Assertions.assertThat(member.stream().count()).isEqualTo(1);
-
-
-
     }
-
-
-
-   
 }

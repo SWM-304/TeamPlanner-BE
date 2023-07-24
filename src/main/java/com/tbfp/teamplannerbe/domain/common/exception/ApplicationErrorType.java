@@ -1,6 +1,7 @@
 package com.tbfp.teamplannerbe.domain.common.exception;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpStatus;
 public enum ApplicationErrorType {
 
 
+    NOT_FOUND(HttpStatus.NOT_FOUND, -100, "요청한 페이지를 찾을 수 없습니다."),
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, -101, "권한이 없습니다."),
     GUEST_USER(HttpStatus.UNAUTHORIZED, -1, "소셜로그인유저 추가 회원가입 필요"),
 
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, -2, "유저를 찾을 수 없습니다."),
@@ -71,10 +74,23 @@ public enum ApplicationErrorType {
 
     ALREADY_LIKE_BOARD(HttpStatus.BAD_REQUEST,-8,"이미 좋아요를 누르셨습니다"),
 
-    COMMENT_NOT_FOUND(HttpStatus.BAD_REQUEST,-9,"댓글을 찾을 수 없습니다");
+    COMMENT_NOT_FOUND(HttpStatus.BAD_REQUEST,-9,"댓글을 찾을 수 없습니다"),
+
+    ALREADY_LIKED(HttpStatus.BAD_REQUEST, -30000, "이미 좋아요 한 글입니다."),
+    RECRUITMENT_NOT_FOUND(HttpStatus.BAD_REQUEST, -44001, "모집글을 찾을 수 없습니다."),
+    RECRUITMENT_COMMENT_NOT_FOUND(HttpStatus.BAD_REQUEST, -44002, "모집글 댓글을 찾을 수 없습니다."),
+    RECRUITMENT_APPLY_ALREADY_APPLIED(HttpStatus.BAD_REQUEST, -50001, "이미 참여 신청한 모집글입니다."),
+    RECRUITMENT_APPLY_NOT_APPLIED(HttpStatus.BAD_REQUEST, -50002, "참여 신청하지 않은 모집글입니다."),
+    TEAM_CAPACITY_EXCEEDED(HttpStatus.BAD_REQUEST, -62000, "팀 최대인원 수를 초과하였습니다."),
+    ALREADY_TEAM_ACCEPT(HttpStatus.BAD_REQUEST,-62001,"이미 승인된 사람이 포함되어 있습니다"),
+    AUTHOR_CANNOT_PARTICIPATE(HttpStatus.BAD_REQUEST,-62002,"작성자는 참여신청을 할 수 없습니다"),
+    TEAM_NOT_FOUND(HttpStatus.BAD_REQUEST,-62003,"팀을 찾을 수 없습니다");
 
 
-    private HttpStatus httpStatus;
-    private Integer code;
-    private String message;
+
+
+
+    private final HttpStatus httpStatus;
+    private final Integer code;
+    private final String message;
 }

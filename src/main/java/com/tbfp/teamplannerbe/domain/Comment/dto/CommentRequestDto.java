@@ -9,7 +9,7 @@ public class CommentRequestDto {
     @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static class CommentSendRequestDto {
+    public static class CreateCommentRequestDto {
 
         @NotBlank
         private Long boardId;
@@ -17,6 +17,8 @@ public class CommentRequestDto {
         private String content;
         @NotBlank
         private String memberId;
+        @NotBlank
+        private Boolean isConfidential;
 
     }
 
@@ -24,7 +26,7 @@ public class CommentRequestDto {
     @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static class bigCommentSendRequestDto {
+    public static class CommentToCommentCreateRequestDto {
 
         @NotBlank
         private Long parentCommentId;
@@ -33,19 +35,13 @@ public class CommentRequestDto {
         @NotBlank
         private String content;
         @NotBlank
-        private String memberId;
-
-        private boolean isConfidential;
-
-        public boolean isConfidential() {
-            return isConfidential;
-        }
+        private Boolean isConfidential;
     }
     @Getter
     @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static class CommentUpdateRequestDto{
+    public static class UpdateCommentRequestDto {
         @NotBlank
         private Long commentId;
         @NotBlank

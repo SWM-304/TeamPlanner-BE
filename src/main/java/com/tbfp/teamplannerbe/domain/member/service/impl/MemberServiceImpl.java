@@ -8,14 +8,18 @@ import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.*;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.RecruitmentApplicantResponseDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.profile.entity.BasicProfile;
 import com.tbfp.teamplannerbe.domain.profile.repository.BasicProfileRepository;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
 import com.tbfp.teamplannerbe.domain.member.service.MailSenderService;
 import com.tbfp.teamplannerbe.domain.member.service.MemberService;
+import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,11 +29,15 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static com.tbfp.teamplannerbe.domain.board.entity.QBoard.board;
 import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType.*;
+import static com.tbfp.teamplannerbe.domain.member.entity.QMember.member;
+import static com.tbfp.teamplannerbe.domain.recruitment.entity.QRecruitment.recruitment;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
@@ -45,7 +53,6 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    @Transactional
     public List<Member> members() {
         return memberRepository.basicSelect();
     }
@@ -311,5 +318,19 @@ public class MemberServiceImpl implements MemberService {
         } catch (Exception e) {
             throw new ApplicationException(MAIL_ERROR);
         }
+    }
+  
+    @Override
+    public Member findMemberByUsernameOrElseThrowApplicationException(String username) {
+        return memberRepository.findMemberByUsername(username).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
+    }
+
+    @Override
+    public List<RecruitmentApplicantResponseDto> findApplicantList(String username) {
+        List<Recruitment> applicantList = memberRepository.getApplicantList(username);
+
+
+        List<RecruitmentApplicantResponseDto> result = applicantList.stream().map(i -> new RecruitmentApplicantResponseDto(i)).collect(Collectors.toList());
+        return result;
     }
 }

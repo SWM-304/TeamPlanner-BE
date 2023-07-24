@@ -2,7 +2,9 @@ package com.tbfp.teamplannerbe.domain.member.service;
 
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.RecruitmentApplicantResponseDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
@@ -33,4 +35,8 @@ public interface MemberService {
 
     MemberResponseDto.ForgotPasswordResponseDto findForgotPassword(MemberRequestDto.ForgotPasswordRequestDto forgotPasswordRequestDto);
 
+    Member findMemberByUsernameOrElseThrowApplicationException(String username);
+
+
+    List<RecruitmentApplicantResponseDto> findApplicantList(String name);
 }

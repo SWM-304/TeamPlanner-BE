@@ -5,6 +5,7 @@ import com.tbfp.teamplannerbe.domain.auth.ProviderType;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
 import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
+import com.tbfp.teamplannerbe.domain.team.entity.MemberTeam;
 import lombok.*;
 
 
@@ -47,11 +48,17 @@ public class Member extends BaseTimeEntity {
 
     private String providerId;
 
+    @Builder.Default
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Comment> applies = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<Board> boardList = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy ="member")
+    private List<MemberTeam> memberTeams=new ArrayList<>();
 
 }
 

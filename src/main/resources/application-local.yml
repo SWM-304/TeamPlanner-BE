@@ -4,7 +4,7 @@ spring:
       on-profile: local
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/testdb
+    url: jdbc:mysql://localhost:3306/testdb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: root
     password:
   jpa:
@@ -64,7 +64,7 @@ spring:
     baseline-on-migrate: true
     baseline-version: 0
     locations: classpath:db/migration
-    url: jdbc:mysql://localhost:3306/testdb
+    url: jdbc:mysql://localhost:3306/testdb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     user: root
     password:
 

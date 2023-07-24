@@ -5,6 +5,7 @@ import com.tbfp.teamplannerbe.domain.team.entity.Team;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TeamResponseDto {
@@ -49,6 +50,13 @@ public class TeamResponseDto {
     @AllArgsConstructor
     @Builder
     public static class getMyTeamResponseDto {
-        List<Team> teams;
+        private String teamName;
+
+
+        public static getMyTeamResponseDto toDto(Team team) {
+            return builder()
+                    .teamName(team.getTeamName())
+                    .build();
+        }
     }
 }

@@ -201,8 +201,7 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    @Transactional
-    public TeamResponseDto.getMyTeamResponseDto getMyTeam(String username){
+    public List<TeamResponseDto.getMyTeamResponseDto> getMyTeam(String username){
         Optional<Member> member = memberRepository.findByUsername(username);
         if(!member.isPresent()){
             throw new ApplicationException(USER_NOT_FOUND);

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,7 +42,7 @@ public class TeamController {
     }
 
     @GetMapping("/my-team")
-    public ResponseEntity<TeamResponseDto.getMyTeamResponseDto> getMyTeam(Principal principal){
+    public ResponseEntity<List<TeamResponseDto.getMyTeamResponseDto>> getMyTeam(Principal principal){
         return ResponseEntity.ok(teamService.getMyTeam(principal.getName()));
     }
 }

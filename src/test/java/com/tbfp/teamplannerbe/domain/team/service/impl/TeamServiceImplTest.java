@@ -18,6 +18,7 @@ import com.tbfp.teamplannerbe.domain.recruitmentApply.entity.RecruitmentApply;
 import com.tbfp.teamplannerbe.domain.recruitmentApply.repository.RecruitmentApplyRepository;
 import com.tbfp.teamplannerbe.domain.recruitmentApply.service.RecruitmentApplyService;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamReqeustDto.CreatTeamRequestDto;
+import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto.createdTeamResponseDto;
 import com.tbfp.teamplannerbe.domain.team.entity.Team;
 import com.tbfp.teamplannerbe.domain.team.repository.MemberTeamRepository;
@@ -283,6 +284,56 @@ class TeamServiceImplTest {
         RecruitmentCreateResponseDto result = recruitmentService.createRecruitment("test0", recruitment);
 
         Assertions.assertThat(result).isNotNull();
+
+
+    }
+
+    @Test
+    public void 내가속한_팀조회(){
+        //given
+        셋업멤버();
+        Long boardId = 공모전생성();
+
+        RecruitmentCreateRequestDto recruitment = RecruitmentCreateRequestDto.builder()
+                .title("모집글 제목입니다.")
+                .content("저랑 같이 팀하실분 구합니다")
+                .currentMemberSize(0)
+                .maxMemberSize(5)
+                .boardId(boardId)
+                .build();
+
+        CreateApplyRequest applyDto = CreateApplyRequest.builder()
+                .content("저 팀에 참여하고싶습니다 받아주세요 ")
+                .build();
+        //모집글 작성
+        RecruitmentCreateResponseDto recruitmentCreateResponseDto = recruitmentService.createRecruitment("test0", recruitment);
+
+        List<Member> member = memberRepository.findAll();
+        List<Long> array=new ArrayList<>();
+        //모집글에 참가신청
+        for (Member member1 : member) {
+            if(!member1.getUsername().equals("test0")){
+                recruitmentApplyService.apply(member1.getUsername(), recruitmentCreateResponseDto.getId(), applyDto);
+                array.add(member1.getId());
+            }
+        }
+
+        //when
+
+        CreatTeamRequestDto createTeamDto = CreatTeamRequestDto.builder()
+                .endDate("2023-08-18 21:46:50")
+                .startDate("2023-07-18 21:46:50")
+                .teamName("삼백사점")
+                .maxTeamSize(5L)
+                .recruitId(recruitmentCreateResponseDto.getId())
+                .selectedUserIds(array)
+                .build();
+        createdTeamResponseDto result = teamService.createTeam("test0", createTeamDto);
+
+//        TeamResponseDto.getMyTeamResponseDto getMyTeamResponseDto = teamService.getMyTeam("test0");
+//        System.out.println("\n\n\n\n\n\n\n\n"+getMyTeamResponseDto.getTeams());
+//        Assertions.assertThat(getMyTeamResponseDto.getTeams()).isNotNull();
+
 
 
     }

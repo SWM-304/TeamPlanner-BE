@@ -9,10 +9,80 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '2.7.13'
 
+    id 'jacoco'
+
     // queryDsl
     id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
+// test jacoco 관련 파일들
+
+tasks.named('test') {
+    useJUnitPlatform()
+    finalizedBy jacocoTestCoverageVerification // Add this line to execute jacocoTestCoverageVerification after the test
+    finalizedBy jacocoTestReport // Add this line to execute jacocoTestReport after the test
+}
+
+
+// Report config
+jacocoTestReport {
+    reports {
+        html.enabled true
+        xml.enabled false
+        csv.enabled false
+
+// 리포트의 저장 경로를 설정합니다.
+        html.destination file("jacoco/jacocoHtml")
+        xml.destination file("jacoco/jacoco.xml")
+    }
+
+    excludedClassFilesForReport(classDirectories)
+
+}
+
+// 커버리지 범위 및 퍼센테이지 설정
+// covereratio 테스트코드로 커버된 브래친의 비율
+// counter 어떤 지표를 사용하여 커버리지를 측정할지
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            element = 'CLASS'
+            includes = ['com.tbfp.teamplannerbe.domain.**.service.*'] // Specify your method name here
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.40
+            }
+        }
+    }
+}
+
+// jacoco Report에서 제외하기
+private excludedClassFilesForReport(classDirectories) {
+
+
+
+    classDirectories.setFrom(
+            files(classDirectories.files.collect {
+                fileTree(dir: it, exclude: [
+                        "**/Q*",
+                        "**/*Dto*",
+                        "**/*Application*",
+                        "**/*Config*",
+                        "**/*dto*",
+                        "**/*entity*",
+                        "**/*config*",
+                        "**/*common*/",
+                        "**/*controller*",
+                        "**/*repository*",
+                        "**/*condition*",
+                        "**/*crawler*"
+                ])
+            })
+    )
+}
+
+
 
 group = 'com.tbfp'
 version = '0.0.1-SNAPSHOT'
@@ -111,9 +181,7 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
-}
+
 
 
 //querydsl 추가 시작

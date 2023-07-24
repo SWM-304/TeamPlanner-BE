@@ -57,8 +57,17 @@ spring:
             user-name-attribute: id
   #  redis configuration
   redis:
-    host: localhost
-    port: 6379
+#    host: localhost
+#    port: 6379
+    cluster:
+      nodes:
+        - ENC(QUHVF2B5BpHofqiaC4T5R7Pqizp3H0q8ecxxb9+D9JYN9Bf39zYQDt4rEYEMENA4pDgkVNe3MGGc1XLx/7gGfGa9NBE867bs)
+        - ENC(XeOR57LFf6o62GLBsKD0RU4ZFjzoSilSuAOxTadcUj7fLXBHj88iG2ebM4O6ossWYDowPCWPp8lnmCIFjfP39GdO2U8o1zbA)
+        - ENC(E4n6dbNNqUTTvAswftF/Jc1QgYX2PSmtTqoBMo7RHukblzn4nRI9paG8qvd0v3KZ0hz0u7NG8RJRuEbzhO5hPiScPJ4eDB4d)
+        - ENC(D8tqBVJ0dQQpP2RQ0PJ26vL3nkIFNP24kFV3cur1lrNoCip0zU28VMKj5BOqkOmHWEu3KMt63B4RQQDNg9ltIhIRBSGCQP7s)
+        - ENC(Hz1vs4HAYLfPuU71h3AoXbE4ah5GEwyDnGV6/TMlvmiZjppiM9AReM33NqaQvhSM3mNBnQlPQt4kAg03R+z7jaDi7mOgxDfL)
+        - ENC(DrY0jzzsvi9oQgQa06Vryk1AcMZwoZ1YqtsHwN5Xv3dBNfx6y0daEmDwWohFYKeAEErXgDzVk3prDgdjGtNMG0EPYjPe2FW+)
+
   flyway:
     enabled: true
     baseline-on-migrate: true

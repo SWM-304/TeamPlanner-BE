@@ -53,6 +53,7 @@ public class SecurityConfig {
                 .antMatchers(
                         "/", "/api/v1/member/login", "/api/v1/member/renew-access-token"
                         , "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**" // swagger
+                        , "/api/test/**"
                 ).permitAll()
                 .anyRequest().authenticated()
                 .and()

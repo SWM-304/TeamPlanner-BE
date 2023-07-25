@@ -10,9 +10,9 @@ import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.RecruitmentApplicantResponseDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
-import com.tbfp.teamplannerbe.domain.member.entity.Profile;
+import com.tbfp.teamplannerbe.domain.profile.entity.BasicProfile;
+import com.tbfp.teamplannerbe.domain.profile.repository.BasicProfileRepository;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
-import com.tbfp.teamplannerbe.domain.member.repository.ProfileRepository;
 import com.tbfp.teamplannerbe.domain.member.service.MailSenderService;
 import com.tbfp.teamplannerbe.domain.member.service.MemberService;
 import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
@@ -41,7 +41,7 @@ import static com.tbfp.teamplannerbe.domain.recruitment.entity.QRecruitment.recr
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
-    private final ProfileRepository profileRepository;
+    private final BasicProfileRepository basicProfileRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
     private final MailSenderService mailSenderService;
@@ -89,6 +89,12 @@ public class MemberServiceImpl implements MemberService {
         if(findMemberByUsername(username).isPresent()){
             throw new ApplicationException(DUPLICATE_USERNAME);
         }
+
+        String nickname = signUpRequestDto.getNickname();
+        //닉네임 중복
+        if(memberRepository.findMemberByNickname(nickname).isPresent()){
+            throw new ApplicationException(DUPLICATE_NICKNAME);
+        }
         registerMember(signUpRequestDto);
 
         return MemberResponseDto.SignUpResponseDto.builder().
@@ -102,9 +108,9 @@ public class MemberServiceImpl implements MemberService {
         try {
             signUpRequestDto.setPassword(bCryptPasswordEncoder.encode(signUpRequestDto.getPassword()));
             Member member = signUpRequestDto.toMember();
-            Profile profile = signUpRequestDto.toProfile(member);
+            BasicProfile basicProfile = signUpRequestDto.toBasicProfile(member);
             memberRepository.save(member);
-            profileRepository.save(profile);
+            basicProfileRepository.save(basicProfile);
         } catch (Exception e){
             throw new ApplicationException(MEMBER_REGISTER_FAIL);
         }
@@ -153,7 +159,7 @@ public class MemberServiceImpl implements MemberService {
             if (authenticateMap.containsKey(emailAddress)) authenticateMap.remove(emailAddress);
 
             Integer verificationCode = mailSenderService.getVerificationNumber();
-            String mailSubject = "TeamPlanner " + verifyPurpose.getDisplayName() + " 인증번호입니다.";
+            String mailSubject = "TeamPlanner " + verifyPurpose.getLabel() + " 인증번호입니다.";
             String mailBody = mailSubject + "\n" + verificationCode.toString();
             mailSenderService.sendEmail(emailAddress, mailSubject, mailBody);
 
@@ -313,7 +319,7 @@ public class MemberServiceImpl implements MemberService {
             throw new ApplicationException(MAIL_ERROR);
         }
     }
-
+  
     @Override
     public Member findMemberByUsernameOrElseThrowApplicationException(String username) {
         return memberRepository.findMemberByUsername(username).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
@@ -327,6 +333,4 @@ public class MemberServiceImpl implements MemberService {
         List<RecruitmentApplicantResponseDto> result = applicantList.stream().map(i -> new RecruitmentApplicantResponseDto(i)).collect(Collectors.toList());
         return result;
     }
-
-
 }

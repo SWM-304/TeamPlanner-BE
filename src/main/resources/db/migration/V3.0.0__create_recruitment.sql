@@ -15,4 +15,3 @@ CREATE TABLE recruitment (
                              FOREIGN KEY (board_id) REFERENCES board (board_id),
                              FOREIGN KEY (member_id) REFERENCES member (member_id)
 ) engine=InnoDB;
-

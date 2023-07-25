@@ -1,0 +1,2 @@
+ALTER TABLE member
+    ADD nickname VARCHAR(300) NOT NULL;

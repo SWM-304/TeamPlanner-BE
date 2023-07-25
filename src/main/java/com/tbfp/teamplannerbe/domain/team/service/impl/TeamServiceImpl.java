@@ -214,9 +214,11 @@ public class TeamServiceImpl implements TeamService {
                 .map(MemberTeam::getTeam)
                 .collect(Collectors.toList());
 
-        return TeamResponseDto.getMyTeamResponseDto.builder()
-                .teams(teams)
-                .build();
+        List<TeamResponseDto.getMyTeamResponseDto> getMyTeamResponseDtos = teams.stream()
+                .map(team -> TeamResponseDto.getMyTeamResponseDto.toDto(team))
+                .collect(Collectors.toList());
+
+        return getMyTeamResponseDtos;
     }
 
 }

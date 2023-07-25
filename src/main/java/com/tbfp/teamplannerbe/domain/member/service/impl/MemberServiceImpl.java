@@ -92,7 +92,7 @@ public class MemberServiceImpl implements MemberService {
 
         String nickname = signUpRequestDto.getNickname();
         //닉네임 중복
-        if(memberRepository.findMemberByNickname(nickname).isPresent()){
+        if(memberRepository.findByNickname(nickname).isPresent()){
             throw new ApplicationException(DUPLICATE_NICKNAME);
         }
         registerMember(signUpRequestDto);

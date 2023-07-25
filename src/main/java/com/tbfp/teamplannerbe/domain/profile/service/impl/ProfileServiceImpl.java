@@ -36,7 +36,7 @@ public class ProfileServiceImpl implements ProfileService {
     @Transactional
     public ProfileResponseDto.ShowProfileResponseDto showProfile(String nickname){
 
-        Optional<Member> member = memberRepository.findMemberByNickname(nickname);
+        Optional<Member> member = memberRepository.findByNickname(nickname);
         if(!member.isPresent()) throw new ApplicationException(ApplicationErrorType.USER_NOT_FOUND);
 
         Long memberId = member.get().getId();

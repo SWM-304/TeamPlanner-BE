@@ -57,8 +57,9 @@ spring:
             user-name-attribute: id
   #  redis configuration
   redis:
-    host: localhost
-    port: 6379
+    host: ${SPRING_REDIS_HOST}
+    port: ${SPRING_REDIS_PORT}
+
   flyway:
     enabled: true
     baseline-on-migrate: true

@@ -25,15 +25,17 @@ import com.tbfp.teamplannerbe.domain.team.repository.MemberTeamRepository;
 import com.tbfp.teamplannerbe.domain.team.repository.TeamRepository;
 import com.tbfp.teamplannerbe.domain.team.service.TeamService;
 import org.assertj.core.api.Assertions;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 
 @SpringBootTest
@@ -330,11 +332,27 @@ class TeamServiceImplTest {
                 .build();
         createdTeamResponseDto result = teamService.createTeam("test0", createTeamDto);
 
-//        TeamResponseDto.getMyTeamResponseDto getMyTeamResponseDto = teamService.getMyTeam("test0");
-//        System.out.println("\n\n\n\n\n\n\n\n"+getMyTeamResponseDto.getTeams());
-//        Assertions.assertThat(getMyTeamResponseDto.getTeams()).isNotNull();
 
 
+        List<TeamResponseDto.GetMyTeamResponseDto> getMyTeamResponseDtos = teamService.getMyTeam("test0");
+        //Assertion
+
+        // 조회한 팀 리스트가 비어있지 않은지 확인
+        Assert.assertFalse(getMyTeamResponseDtos.isEmpty());
+
+        // 조회한 팀 정보와 기대하는 팀 정보를 비교하여 검증
+        for (TeamResponseDto.GetMyTeamResponseDto team : getMyTeamResponseDtos) {
+            Assert.assertEquals(LocalDateTime.of(2023,8,18,21,46,50), team.getEndDate());
+            Assert.assertEquals(LocalDateTime.of(2023,7,18,21,46,50), team.getStartDate());
+            Assert.assertEquals("삼백사점", team.getTeamName());
+            Assert.assertEquals(boardId,team.getBoardId());
+
+            // 팀 멤버 리스트가 기대하는 멤버 리스트와 동일한지 확인
+            List<Long> expectedMemberIds = member.stream().map(Member::getId).collect(Collectors.toList());
+            List<Long> actualMemberIds = team.getMemberIds();
+            System.out.println(actualMemberIds);
+            Assert.assertEquals(expectedMemberIds,actualMemberIds);
+        }
 
     }
 

@@ -16,5 +16,5 @@ public interface TeamService {
 
     void deleteTeam(String username,Long teamId);
 
-    List<TeamResponseDto.getMyTeamResponseDto> getMyTeam(String username);
+    List<TeamResponseDto.GetMyTeamResponseDto> getMyTeam(String username);
 }

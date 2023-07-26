@@ -42,7 +42,7 @@ public class TeamController {
     }
 
     @GetMapping("/my-team")
-    public ResponseEntity<List<TeamResponseDto.getMyTeamResponseDto>> getMyTeam(Principal principal){
+    public ResponseEntity<List<TeamResponseDto.GetMyTeamResponseDto>> getMyTeam(Principal principal){
         return ResponseEntity.ok(teamService.getMyTeam(principal.getName()));
     }
 }

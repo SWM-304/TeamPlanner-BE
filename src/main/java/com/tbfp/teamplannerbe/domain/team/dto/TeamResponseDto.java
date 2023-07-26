@@ -51,7 +51,7 @@ public class TeamResponseDto {
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
     @Builder
-    public static class getMyTeamResponseDto {
+    public static class GetMyTeamResponseDto {
         private Long id;
         private String teamName;
         private Long teamSize;
@@ -65,7 +65,7 @@ public class TeamResponseDto {
         private List<Long> memberIds = new ArrayList<>();
 
 
-        public static getMyTeamResponseDto toDto(Team team) {
+        public static GetMyTeamResponseDto toDto(Team team) {
             return builder()
                     .id(team.getId())
                     .teamName(team.getTeamName())

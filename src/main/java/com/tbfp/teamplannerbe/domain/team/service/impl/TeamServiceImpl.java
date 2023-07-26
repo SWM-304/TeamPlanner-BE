@@ -201,7 +201,7 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public List<TeamResponseDto.getMyTeamResponseDto> getMyTeam(String username){
+    public List<TeamResponseDto.GetMyTeamResponseDto> getMyTeam(String username){
         Optional<Member> member = memberRepository.findByUsername(username);
         if(!member.isPresent()){
             throw new ApplicationException(USER_NOT_FOUND);
@@ -214,8 +214,8 @@ public class TeamServiceImpl implements TeamService {
                 .map(MemberTeam::getTeam)
                 .collect(Collectors.toList());
 
-        List<TeamResponseDto.getMyTeamResponseDto> getMyTeamResponseDtos = teams.stream()
-                .map(team -> TeamResponseDto.getMyTeamResponseDto.toDto(team))
+        List<TeamResponseDto.GetMyTeamResponseDto> getMyTeamResponseDtos = teams.stream()
+                .map(team -> TeamResponseDto.GetMyTeamResponseDto.toDto(team))
                 .collect(Collectors.toList());
 
         return getMyTeamResponseDtos;

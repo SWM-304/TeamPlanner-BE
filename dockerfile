@@ -1,5 +1,5 @@
 FROM openjdk:11
-COPY ./TeamPlanner-BE-0.0.1-SNAPSHOT.jar application.jar
+COPY ./build/libs/TeamPlanner-BE-0.0.1-SNAPSHOT.jar application.jar
 ENV TZ=Asia/Seoul
 EXPOSE 8080
 

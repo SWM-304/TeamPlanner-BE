@@ -4,9 +4,9 @@ spring:
       on-profile: prod
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://43.201.38.39:3306/testdb?useSSL=false&allowPublicKeyRetrieval=true
-    username: root
-    password: ENC(eKdWCOqUWNDBo/xol2H4mA==)
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -64,9 +64,9 @@ spring:
     baseline-on-migrate: true
     baseline-version: 0
     locations: classpath:db/migration
-    url: jdbc:mysql://43.201.38.39:3306/testdb?useSSL=false&allowPublicKeyRetrieval=true
-    user: root
-    password: ENC(eKdWCOqUWNDBo/xol2H4mA==)
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
 
 logging.level:
 

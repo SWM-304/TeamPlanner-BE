@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long>, MemberQuerydslRepository {
     Optional<Member> findByUsername(String userId);
+
+    Optional<Member> findByNickname(String nickname);
 }

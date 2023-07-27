@@ -89,6 +89,7 @@ public class BoardResponseDto {
         private Long likeCount; //좋아요
         private String recruitmentPeriod;
         private Long deadlineInDays;
+        private Long commentCount;
 
         public static BoardResponseDto.BoardSimpleListResponseDto toDTO(Board board) {
 
@@ -110,6 +111,7 @@ public class BoardResponseDto {
                         .category(board.getCategory())
                         .viewCount(board.getView())
                         .likeCount(board.getLikeCount())
+                        .commentCount(board.getComments().stream().count())
                         .build();
             }
             return null;

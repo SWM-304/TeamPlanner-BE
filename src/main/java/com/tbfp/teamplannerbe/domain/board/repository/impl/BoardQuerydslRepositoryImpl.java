@@ -35,6 +35,7 @@ public class BoardQuerydslRepositoryImpl extends Querydsl4RepositorySupport impl
     public Page<Board> getBoardList(BoardSearchCondition condition, Pageable pageable) {
 
         List<Board> content=selectFrom(board)
+                .leftJoin(board.comments,comment).fetchJoin()
                 .where(categoryEq(condition.getCategory()))
                 .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset())
@@ -44,8 +45,6 @@ public class BoardQuerydslRepositoryImpl extends Querydsl4RepositorySupport impl
         JPAQuery<Long> countQuery = select(board.count())
                 .from(board)
                 .where(categoryEq(condition.getCategory()));
-
-
 
         return PageableExecutionUtils.getPage(content,pageable,countQuery::fetchOne);
     }

@@ -83,7 +83,7 @@ public class RecruitmentResponseDto {
         @Builder.Default
         private List<RecruitmentCommentDto> commentList = new ArrayList<>();
 
-        public static RecruitmentWithCommentResponseDto toDto(boolean isAuthorOfRecruitment, String username, Recruitment recruitment) {
+        public static RecruitmentWithCommentResponseDto toDto(boolean isAuthorOfRecruitment, String username, Recruitment recruitment, String profileImage) {
             return builder()
                     .id(recruitment.getId())
                     .title(recruitment.getTitle())
@@ -93,7 +93,7 @@ public class RecruitmentResponseDto {
                     .viewCount(recruitment.getViewCount())
                     .likeCount(recruitment.getLikeCount())
                     .commentList(
-                            recruitment.getCommentList().stream().map(c -> RecruitmentCommentDto.toDto(isAuthorOfRecruitment, username, c)).collect(Collectors.toList())
+                            recruitment.getCommentList().stream().map(c -> RecruitmentCommentDto.toDto(isAuthorOfRecruitment, username, c, profileImage)).collect(Collectors.toList())
                     )
                     .build();
         }
@@ -110,7 +110,7 @@ public class RecruitmentResponseDto {
             private String memberUsername;
             private String memberProfileImg;
 
-            public static RecruitmentCommentDto toDto(boolean isAuthorOfRecruitment, String username, RecruitmentComment recruitmentComment) {
+            public static RecruitmentCommentDto toDto(boolean isAuthorOfRecruitment, String username, RecruitmentComment recruitmentComment, String profileImage) {
                 String dtoUsername;
                 String dtoContent;
 
@@ -132,7 +132,7 @@ public class RecruitmentResponseDto {
                         .createdAt(recruitmentComment.getCreatedAt())
                         .memberUsername(dtoUsername)
                         .parentCommentId(recruitmentComment.getParentComment() == null ? null : recruitmentComment.getParentComment().getId())
-//                        .memberProfileImg(recruitmentComment.getMember().getProfileImg()) // future
+                        .memberProfileImg(profileImage)
                         .build();
             }
         }

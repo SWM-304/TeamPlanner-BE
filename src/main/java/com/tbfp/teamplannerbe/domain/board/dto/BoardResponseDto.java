@@ -4,6 +4,10 @@ import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.BoardWithCommentListResponseDto;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -68,32 +72,6 @@ public class BoardResponseDto {
             }
 
         }
-
-        public static BoardResponseDto.BoardDetailResponseDto toDTO(Board board) {
-            return BoardDetailResponseDto.builder()
-                    .activitiyName(board.getActivityName())
-                    .activityUrl(board.getActivityUrl())
-                    .activityImg(board.getActivityImg())
-                    .activitiyDetail(board.getActivityDetail())
-                    .category(board.getCategory())
-                    .companyType(board.getCompanyType())
-                    .target(board.getTarget())
-                    .activityArea(board.getActivityArea())
-                    .recruitmentPeriod(board.getRecruitmentPeriod())
-                    .recruitmentCount(board.getRecruitmentCount())
-                    .meetingTime(board.getMeetingTime())
-                    .homepage(board.getHomepage())
-                    .activityBenefits(board.getActivityBenefits())
-                    .interestArea(board.getInterestArea())
-                    .activityField(board.getActivityField())
-                    .prizeScale(board.getPrizeScale())
-                    .competitionCategory(board.getCompetitionCategory())
-                    .preferredSkills(board.getPreferredSkills())
-                    .activityPeriod(board.getActivityPeriod())
-                    .comments(board.getComments().stream().map(i -> new BoardWithCommentListResponseDto(i)).collect(Collectors.toList()))
-                    .build();
-
-        }
     }
 
 
@@ -109,16 +87,32 @@ public class BoardResponseDto {
         private String category; //카테고리
         private Long viewCount; //조회수
         private Long likeCount; //좋아요
+        private String recruitmentPeriod;
+        private Long deadlineInDays;
 
         public static BoardResponseDto.BoardSimpleListResponseDto toDTO(Board board) {
-            return BoardSimpleListResponseDto.builder()
-                    .boardId(board.getId())
-                    .activitiyName(board.getActivityName())
-                    .activityImg(board.getActivityImg())
-                    .category(board.getCategory())
-                    .viewCount(board.getView())
-                    .likeCount(board.getLikeCount())
-                    .build();
+
+            String[] day = board.getRecruitmentPeriod().split("~");
+
+            // "yyyy.MM.dd" 형식의 날짜 문자열을 LocalDateTime으로 변환
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.M.d");
+            LocalDateTime specificDate = LocalDate.parse(day[1].trim(), formatter).atStartOfDay();
+
+            // 현재 날짜와 마감일 사이의 날짜 차이 계산
+            Long deadlineInDays = ChronoUnit.DAYS.between(LocalDateTime.now(), specificDate);
+            if (deadlineInDays>=0){
+                return BoardSimpleListResponseDto.builder()
+                        .recruitmentPeriod(board.getRecruitmentPeriod())
+                        .boardId(board.getId())
+                        .deadlineInDays(deadlineInDays)
+                        .activitiyName(board.getActivityName())
+                        .activityImg(board.getActivityImg())
+                        .category(board.getCategory())
+                        .viewCount(board.getView())
+                        .likeCount(board.getLikeCount())
+                        .build();
+            }
+            return null;
         }
     }
 

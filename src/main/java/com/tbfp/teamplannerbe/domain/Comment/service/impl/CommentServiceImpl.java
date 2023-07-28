@@ -178,13 +178,25 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new ApplicationException(BOARD_NOT_FOUND));
         Optional<Comment> findParentComment = commentRepository.findById(commentToCommentCreateRequestDto.getParentCommentId());
 
-        boolean isAccessible = board.getMember().getUsername().equals(member.getUsername())
-                || (!findParentComment.get().isConfidential() || findParentComment.get().getMember().getUsername().equals(username));
-        if (!isAccessible){
-            throw new ApplicationException(ApplicationErrorType.UNAUTHORIZED);
+        // 비밀댓글이 아니여야하고
+
+        //isAccessible 변수는 다음 조건 중 하나를 만족할 때 true로 설정
+        //현재 사용자가 게시판을 작성한 사용자와 동일한 경우.
+        //댓글이 비밀 댓글이 아닌 경우.
+        //현재 사용자가 해당 댓글을 작성한 사용자와 동일한 경우.
+        if(board.getMember()==null){
+            boolean isAccessible=(!findParentComment.get().isConfidential() || findParentComment.get().getMember().getUsername().equals(username));
+            if (!isAccessible){
+                throw new ApplicationException(ApplicationErrorType.UNAUTHORIZED);
+            }
         }
-
-
+        if(board.getMember()!=null){
+            boolean isAccessible = board.getMember().getUsername().equals(member.getUsername())
+                    || (!findParentComment.get().isConfidential() || findParentComment.get().getMember().getUsername().equals(username));
+            if (!isAccessible){
+                throw new ApplicationException(ApplicationErrorType.UNAUTHORIZED);
+            }
+        }
 
         if (commentToCommentCreateRequestDto.getParentCommentId() != null) {
             Comment parentComment = commentRepository.findById(commentToCommentCreateRequestDto.getParentCommentId())

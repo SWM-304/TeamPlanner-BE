@@ -35,7 +35,6 @@ public class ProfileResponseDto {
         private String contactEmail;
         private Long isPublic;
         private Boolean evaluationPublic;
-        private CRUDType crudType;
         public BasicProfile toEntity() {
             return BasicProfile.builder()
                     .id(id)
@@ -65,7 +64,6 @@ public class ProfileResponseDto {
         private Integer experiencedMonth;
         private SkillLevel skillLevel;
         private TechStackItem techStackItem;
-        private CRUDType crudType;
 
         public TechStack toEntity(Member member){
             return TechStack.builder()
@@ -89,7 +87,6 @@ public class ProfileResponseDto {
         private String detail;
         private LocalDate startDate;
         private LocalDate endDate;
-        private CRUDType crudType;
 
         public Activity toEntity(Member member){
             return Activity.builder()
@@ -112,7 +109,6 @@ public class ProfileResponseDto {
         private String name;
         private double score;
         private LocalDate gainDate;
-        private CRUDType crudType;
 
         public Certification toEntity(Member member){
             return Certification.builder()
@@ -145,7 +141,6 @@ public class ProfileResponseDto {
         private Integer stat3;
         private Integer stat4;
         private Integer stat5;
-        private CRUDType crudType;
     }
 
 
@@ -171,7 +166,7 @@ public class ProfileResponseDto {
         private List<TechStackResponseDto> techStacks;
         private List<ActivityResponseDto> activities;
         private List<CertificationResponseDto> certifications;
-        private Boolean evaluationPublic;
+        private List<EvaluationResponseDto> evaluations;
     }
 
     @Getter

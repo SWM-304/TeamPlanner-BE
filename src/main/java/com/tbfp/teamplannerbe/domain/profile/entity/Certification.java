@@ -38,6 +38,7 @@ public class Certification extends BaseTimeEntity{
 
     public ProfileResponseDto.CertificationResponseDto toDto(){
         return ProfileResponseDto.CertificationResponseDto.builder()
+                .id(id)
                 .name(name)
                 .score(score)
                 .gainDate(gainDate)

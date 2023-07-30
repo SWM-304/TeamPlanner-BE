@@ -49,6 +49,7 @@ public class Evaluation extends BaseTimeEntity {
 
     public ProfileResponseDto.EvaluationResponseDto toDto(){
         return ProfileResponseDto.EvaluationResponseDto.builder()
+                .id(id)
                 .comment(comment)
                 .stat1(stat1)
                 .stat2(stat2)

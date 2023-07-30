@@ -35,6 +35,8 @@ public class CommentResponseDto {
         private String updatedAt;
         private boolean isConfidential;
 
+        private Long commentId;
+
 
         public BoardWithCommentListResponseDto(Comment comment) {
             this.username = comment.getMember().getUsername();
@@ -42,6 +44,7 @@ public class CommentResponseDto {
             this.updatedAt = String.valueOf(comment.getUpdatedAt());
             this.isConfidential=comment.isConfidential();
             this.parentId = comment.getParentComment()==null ? null : comment.getParentComment().getId();
+            this.commentId=comment.getId();
         }
     }
 

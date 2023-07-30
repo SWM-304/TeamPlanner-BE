@@ -207,12 +207,9 @@ public class TeamServiceImpl implements TeamService {
             throw new ApplicationException(USER_NOT_FOUND);
         }
         Long memberId = member.get().getId();
-        List<MemberTeam> memberTeams = memberTeamRepository.findAllByMemberId(memberId);
 
-        System.out.println(memberTeams);
-        List<Team> teams = memberTeams.stream()
-                .map(MemberTeam::getTeam)
-                .collect(Collectors.toList());
+        //fetchJoin된 쿼리로 N+1 문제 해결
+        List<Team> teams = memberTeamRepository.findAllTeamsByMemberId(memberId);
 
         List<TeamResponseDto.GetMyTeamResponseDto> getMyTeamResponseDtos = teams.stream()
                 .map(team -> TeamResponseDto.GetMyTeamResponseDto.toDto(team))

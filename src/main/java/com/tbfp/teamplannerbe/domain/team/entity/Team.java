@@ -1,25 +1,16 @@
 package com.tbfp.teamplannerbe.domain.team.entity;
 
-import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto;
 import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
-import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentRequestDto;
 import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
-import com.tbfp.teamplannerbe.domain.team.dto.TeamReqeustDto;
-import com.tbfp.teamplannerbe.domain.team.dto.TeamReqeustDto.CreatTeamRequestDto;
-import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto;
-import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto.createdTeamResponseDto;
-import com.tbfp.teamplannerbe.domain.team.repository.MemberTeamRepository;
+import com.tbfp.teamplannerbe.domain.team.dto.TeamRequestDto.CreatTeamRequestDto;
 import lombok.*;
 
 import javax.persistence.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType.*;

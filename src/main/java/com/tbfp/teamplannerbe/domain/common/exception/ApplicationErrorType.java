@@ -72,6 +72,10 @@ public enum ApplicationErrorType {
 
     PROFILE_DELETION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,-23004,"프로필 삭제중 문제가 발생했습니다."),
 
+    USER_NOT_IN_TEAM(HttpStatus.BAD_REQUEST,-24000,"사용자가 소속된 팀이 아닙니다."),
+
+    EVALUATION_SCORE_NOT_IN_SCOPE(HttpStatus.BAD_REQUEST,-24001,"평가 점수는 총합 0이상 30이하여야 합니다."),
+
     ALREADY_LIKE_BOARD(HttpStatus.BAD_REQUEST,-8,"이미 좋아요를 누르셨습니다"),
 
     COMMENT_NOT_FOUND(HttpStatus.BAD_REQUEST,-9,"댓글을 찾을 수 없습니다"),

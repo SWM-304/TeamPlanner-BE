@@ -1,12 +1,10 @@
 package com.tbfp.teamplannerbe.domain.team.service;
 
-import com.tbfp.teamplannerbe.domain.team.dto.TeamReqeustDto;
-import com.tbfp.teamplannerbe.domain.team.dto.TeamReqeustDto.CreatTeamRequestDto;
-import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto;
+import com.tbfp.teamplannerbe.domain.profile.dto.ProfileRequestDto;
+import com.tbfp.teamplannerbe.domain.profile.dto.ProfileResponseDto;
+import com.tbfp.teamplannerbe.domain.team.dto.TeamRequestDto;
+import com.tbfp.teamplannerbe.domain.team.dto.TeamRequestDto.CreatTeamRequestDto;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto.createdTeamResponseDto;
-import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto.deleteTeamMemberResponseDto;
-
-import java.text.ParseException;
 
 public interface TeamService {
     createdTeamResponseDto createTeam(String username, CreatTeamRequestDto creatTeamRequestDto);
@@ -14,4 +12,7 @@ public interface TeamService {
     void deleteTeamMember(String username,Long teamId,Long memberId);
 
     void deleteTeam(String username,Long teamId);
+
+    ProfileResponseDto.SubmitEvaluationResponseDto submitEvaluation(TeamRequestDto.SubmitEvaluationRequestDto submitEvaluationRequestDto, Long teamId, Long subjectMemberId, String username);
+
 }

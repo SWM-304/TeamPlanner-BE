@@ -130,23 +130,6 @@ public class ProfileRequestDto {
     @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static class EvaluationRequestDto {
-        private Long id;
-        private String comment;
-        private Integer stat1;
-        private Integer stat2;
-        private Integer stat3;
-        private Integer stat4;
-        private Integer stat5;
-        //작성자 정보 필요 없음(익명의 평가로 보이기 때문에)
-        //팀 정보를 보여줄 건지는 생각 필요
-        private CRUDType crudType;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    @AllArgsConstructor
     public static class CreateProfileRequestDto{
         private BasicProfileRequestDto basicProfile;
         private List<TechStackRequestDto> techStacks;

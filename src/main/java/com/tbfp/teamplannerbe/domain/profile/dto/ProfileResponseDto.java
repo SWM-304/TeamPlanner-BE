@@ -98,6 +98,7 @@ public class ProfileResponseDto {
                     .detail(detail)
                     .startDate(startDate)
                     .endDate(endDate)
+                    .member(member)
                     .build();
         }
     }
@@ -119,8 +120,17 @@ public class ProfileResponseDto {
                     .name(name)
                     .score(score)
                     .gainDate(gainDate)
+                    .member(member)
                     .build();
         }
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class SubmitEvaluationResponseDto {
+        private String message;
     }
 
     @Getter
@@ -135,8 +145,6 @@ public class ProfileResponseDto {
         private Integer stat3;
         private Integer stat4;
         private Integer stat5;
-        //작성자 정보 필요 없음(익명의 평가로 보이기 때문에)
-        //팀 정보를 보여줄 건지는 생각 필요
         private CRUDType crudType;
     }
 

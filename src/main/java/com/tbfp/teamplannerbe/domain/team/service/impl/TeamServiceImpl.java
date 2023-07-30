@@ -3,11 +3,14 @@ package com.tbfp.teamplannerbe.domain.team.service.impl;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
+import com.tbfp.teamplannerbe.domain.profile.dto.ProfileResponseDto;
+import com.tbfp.teamplannerbe.domain.profile.entity.Evaluation;
+import com.tbfp.teamplannerbe.domain.profile.repository.EvaluationRepository;
 import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
 import com.tbfp.teamplannerbe.domain.recruitment.repository.RecruitmentRepository;
 import com.tbfp.teamplannerbe.domain.recruitmentApply.entity.RecruitmentApply;
 import com.tbfp.teamplannerbe.domain.recruitmentApply.repository.RecruitmentApplyRepository;
-import com.tbfp.teamplannerbe.domain.team.dto.TeamReqeustDto;
+import com.tbfp.teamplannerbe.domain.team.dto.TeamRequestDto;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto.createdTeamResponseDto;
 import com.tbfp.teamplannerbe.domain.team.entity.MemberTeam;
@@ -38,6 +41,7 @@ public class TeamServiceImpl implements TeamService {
     private final MemberRepository memberRepository;
     private final MemberTeamRepository memberTeamRepository;
     private final RecruitmentApplyRepository recruitmentApplyRepository;
+    private final EvaluationRepository evaluationRepository;
 
 
 
@@ -45,7 +49,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Transactional
     @Override
-    public TeamResponseDto.createdTeamResponseDto createTeam(String username, TeamReqeustDto.CreatTeamRequestDto creatTeamRequestDto){
+    public TeamResponseDto.createdTeamResponseDto createTeam(String username, TeamRequestDto.CreatTeamRequestDto creatTeamRequestDto){
 
         createdTeamResponseDto result=null;
 
@@ -199,5 +203,26 @@ public class TeamServiceImpl implements TeamService {
 
     }
 
+    @Override
+    @Transactional
+    public ProfileResponseDto.SubmitEvaluationResponseDto submitEvaluation(TeamRequestDto.SubmitEvaluationRequestDto submitEvaluationRequestDto, Long givenTeamId, Long subjectMemberId, String username){
+        Member authorMember = memberRepository.findByUsername(username).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
+        Member subjectMember = memberRepository.findById(subjectMemberId).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
 
+        //평가자와 피평가자가 주어진 팀에 동시에 속해있지 않을 경우
+        List<Long> teamIds = memberTeamRepository.findTeamIdsByMembers(authorMember.getId(), subjectMemberId);
+        if(!teamIds.contains(givenTeamId)) throw new ApplicationException(USER_NOT_IN_TEAM);
+
+        Team givenTeam = teamRepository.findById(givenTeamId).orElseThrow(() -> new ApplicationException(TEAM_NOT_FOUND));
+        Integer sum = submitEvaluationRequestDto.getStat1() + submitEvaluationRequestDto.getStat2() + submitEvaluationRequestDto.getStat3() + submitEvaluationRequestDto.getStat4() + submitEvaluationRequestDto.getStat5();
+        if(sum < 0 || sum > 30) throw new ApplicationException(EVALUATION_SCORE_NOT_IN_SCOPE);
+
+        //save
+        Evaluation evaluation = submitEvaluationRequestDto.toEntity(authorMember,subjectMember,givenTeam);
+        evaluationRepository.save(evaluation);
+
+        return ProfileResponseDto.SubmitEvaluationResponseDto.builder()
+                .message("평가가 완료되었습니다.")
+                .build();
+    }
 }

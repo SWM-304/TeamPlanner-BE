@@ -12,4 +12,8 @@ public interface EvaluationRepository extends JpaRepository<Evaluation,Long> {
     Optional<Evaluation> findById(Long id);
 
     Optional<Evaluation> findByAuthorMemberIdAndSubjectMemberId(Long authorMemberId, Long subjectMemberId);
+
+    void deleteById(Long id);
+
+    Optional<List<Evaluation>> findAllByAuthorMemberId(Long authorMemberId);
 }

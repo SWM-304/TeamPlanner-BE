@@ -45,14 +45,11 @@ public class TeamServiceImpl implements TeamService {
     private final EvaluationRepository evaluationRepository;
 
 
-
-
-
     @Transactional
     @Override
-    public TeamResponseDto.createdTeamResponseDto createTeam(String username, TeamRequestDto.CreatTeamRequestDto creatTeamRequestDto){
+    public TeamResponseDto.createdTeamResponseDto createTeam(String username, TeamRequestDto.CreatTeamRequestDto creatTeamRequestDto) {
 
-        createdTeamResponseDto result=null;
+        createdTeamResponseDto result = null;
 
         //selected 한게 참여신청리스트에 해당 팀원모집글에 대해 신청한적이 있는지 확인 신청 한적이없다면 예외처리
         //병렬 스트림의 경우 여러 스레드에서 요소를 처리하므로, 첫 번째 요소를 찾는 것보다 임의의 요소를 찾는 것이 더 효율
@@ -104,7 +101,7 @@ public class TeamServiceImpl implements TeamService {
             Team savedTeam = teamRepository.save(team);
 
             //팀 member 저장
-            savedTeam.addTeamMembers(selectedMembers,username);
+            savedTeam.addTeamMembers(selectedMembers, username);
 
 
             // 저장된 멤버들을 순회하면서 recruitmentApply 상태값을 ACCEPT값으로 변경
@@ -124,8 +121,6 @@ public class TeamServiceImpl implements TeamService {
         }
 
 
-
-
         //이전에 팀을 생성한 적이 있으면 더티체킹
         if (findTeam != null) {
 
@@ -139,7 +134,7 @@ public class TeamServiceImpl implements TeamService {
 
 
             // team에 members 추가
-            chagedTeam.addTeamMembers(selectedMembers,username);
+            chagedTeam.addTeamMembers(selectedMembers, username);
 
             // 저장된 멤버들을 순회하면서 recruitmentApply 상태값을 ACCEPT값으로 변경
             selectedMembers.forEach(member -> {
@@ -174,8 +169,8 @@ public class TeamServiceImpl implements TeamService {
 
         //TeamMember테이블에서 삭제시킴
         //해당하는 테이블에 이게없는데 왜 예외가 안터지냐...?
-        memberTeamRepository.deleteByTeamIdAndMemberId(teamId,memberId).
-                orElseThrow(()->new ApplicationException(TEAM_NOT_FOUND));
+        memberTeamRepository.deleteByTeamIdAndMemberId(teamId, memberId).
+                orElseThrow(() -> new ApplicationException(TEAM_NOT_FOUND));
 
         team.decreaseTeamSize();
     }
@@ -196,94 +191,9 @@ public class TeamServiceImpl implements TeamService {
         //순회하면서 member하나씩 삭제
         memberTeamList.stream().forEach(
                 memberTeam -> memberTeamRepository.deleteByMemberId(memberTeam.getId())
-                        .orElseThrow(()->new ApplicationException(USER_NOT_FOUND))
+                        .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND))
         );
         //memberTeam 다 삭제 됐으면 해당 팀 삭제
         teamRepository.deleteById(teamId);
-
-
-    }
-
-    @Override
-    @Transactional
-    public TeamResponseDto.CreateEvaluationResponseDto createEvaluation(TeamRequestDto.CreateEvaluationRequestDto createEvaluationRequestDto, Long givenTeamId, Long subjectMemberId, String username){
-        Member authorMember = memberRepository.findByUsername(username).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
-        Member subjectMember = memberRepository.findById(subjectMemberId).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
-
-        Evaluation alreadyExistingEvaluation = evaluationRepository.findByAuthorMemberIdAndSubjectMemberId(authorMember.getId(), subjectMemberId).orElse(null);
-
-        //이미 해당 사용자에 대한 평가 작성 완료함
-        if(alreadyExistingEvaluation!=null){
-            throw new ApplicationException(EVALUATION_ALREADY_EXIST);
-        }
-
-
-
-
-        //자가 자신 평가 불가능
-        if(authorMember.equals(subjectMember)){
-            throw new ApplicationException(UNABLE_TO_EVALUATE_MYSELF);
-        }
-
-        //teamId에 해당하는 team 없을 경우
-        Team givenTeam = teamRepository.findById(givenTeamId).orElseThrow(() -> new ApplicationException(TEAM_NOT_FOUND));
-
-        //평가자와 피평가자가 주어진 팀에 동시에 속해있지 않을 경우
-        MemberTeam memberTeam = memberTeamRepository.findByMemberIdsAndTeamIds(authorMember.getId(), subjectMemberId, givenTeamId);
-        if(memberTeam==null) throw new ApplicationException(USER_NOT_IN_TEAM);
-
-        // 평가 점수 총합은 0~30 이어야 함
-        Integer sum = createEvaluationRequestDto.getStat1() + createEvaluationRequestDto.getStat2() + createEvaluationRequestDto.getStat3() + createEvaluationRequestDto.getStat4() + createEvaluationRequestDto.getStat5();
-        if(sum < 0 || sum > 30) throw new ApplicationException(EVALUATION_SCORE_NOT_IN_SCOPE);
-
-        //save
-        Evaluation evaluation = createEvaluationRequestDto.toEntity(authorMember,subjectMember,givenTeam);
-        evaluationRepository.save(evaluation);
-
-        return TeamResponseDto.CreateEvaluationResponseDto.builder()
-                .message("평가가 완료되었습니다.")
-                .build();
-    }
-
-    @Override
-    @Transactional
-    public TeamResponseDto.UpdateEvaluationResponseDto updateEvaluation(TeamRequestDto.UpdateEvaluationRequestDto updateEvaluationRequestDto, Long givenTeamId, Long subjectMemberId, String username){
-        Evaluation evaluationToUpdate = evaluationRepository.findById(updateEvaluationRequestDto.getId()).orElse(null);
-
-        //updateEvaluationDto.getId()를 id로 갖는 평가가 없으면 예외
-        if(evaluationToUpdate==null){
-            throw new ApplicationException(EVALUATION_NOT_EXIST);
-        }
-
-        //해당 평가의 작성자가 본인이 아니면 예외
-        if(!evaluationToUpdate.getAuthorMember().getUsername().equals(username)){
-            throw new ApplicationException(NOT_AUTHOR_OF_EVALUATION);
-        }
-
-        Member authorMember = memberRepository.findByUsername(username).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
-        Member subjectMember = memberRepository.findById(subjectMemberId).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
-
-        //자가 자신 평가 불가능
-        if(authorMember.equals(subjectMember)){
-            throw new ApplicationException(UNABLE_TO_EVALUATE_MYSELF);
-        }
-        //teamId에 해당하는 team 없을 경우
-        Team givenTeam = teamRepository.findById(givenTeamId).orElseThrow(() -> new ApplicationException(TEAM_NOT_FOUND));
-
-        //평가자와 피평가자가 주어진 팀에 동시에 속해있지 않을 경우
-        MemberTeam memberTeam = memberTeamRepository.findByMemberIdsAndTeamIds(authorMember.getId(), subjectMemberId, givenTeamId);
-        if(memberTeam==null) throw new ApplicationException(USER_NOT_IN_TEAM);
-
-        // 평가 점수 총합은 0~30 이어야 함
-        Integer sum = updateEvaluationRequestDto.getStat1() + updateEvaluationRequestDto.getStat2() + updateEvaluationRequestDto.getStat3() + updateEvaluationRequestDto.getStat4() + updateEvaluationRequestDto.getStat5();
-        if(sum < 0 || sum > 30) throw new ApplicationException(EVALUATION_SCORE_NOT_IN_SCOPE);
-
-        //save
-        Evaluation evaluation = updateEvaluationRequestDto.toEntity(authorMember,subjectMember,givenTeam);
-        evaluationRepository.save(evaluation);
-
-        return TeamResponseDto.UpdateEvaluationResponseDto.builder()
-                .message("평가가 수정되었습니다.")
-                .build();
     }
 }

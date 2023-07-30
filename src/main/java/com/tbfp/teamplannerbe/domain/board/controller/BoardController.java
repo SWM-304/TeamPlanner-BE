@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/board")
@@ -76,7 +77,13 @@ public class BoardController {
     public ResponseEntity<?> boardList(BoardSearchCondition boardSearchCondition,
                                  Pageable pageable){
 
-        return ResponseEntity.status(HttpStatus.OK).body(boardService.searchPageSimple(boardSearchCondition,pageable).map(BoardSimpleListResponseDto::toDTO));
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    boardService.searchPageSimple(boardSearchCondition,pageable)
+                            .stream()
+                            .map(BoardSimpleListResponseDto::toDTO)
+                            .filter(dto-> dto !=null)
+                            .collect(Collectors.toList())
+            );
     }
 
     @PutMapping("/{boardId}")

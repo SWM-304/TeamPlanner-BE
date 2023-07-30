@@ -125,14 +125,6 @@ public class ProfileResponseDto {
     @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static class SubmitEvaluationResponseDto {
-        private String message;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    @AllArgsConstructor
     public static class EvaluationResponseDto {
         private Long id;
         private String comment;

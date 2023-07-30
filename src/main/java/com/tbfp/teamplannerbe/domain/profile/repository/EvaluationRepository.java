@@ -8,4 +8,8 @@ import java.util.Optional;
 
 public interface EvaluationRepository extends JpaRepository<Evaluation,Long> {
     Optional<List<Evaluation>> findAllBySubjectMemberId(Long subjectMemberId);
+
+    Optional<Evaluation> findById(Long id);
+
+    Optional<Evaluation> findByAuthorMemberIdAndSubjectMemberId(Long authorMemberId, Long subjectMemberId);
 }

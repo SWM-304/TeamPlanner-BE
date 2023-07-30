@@ -40,8 +40,8 @@ public class MemberTeamRepositoryImpl extends Querydsl4RepositorySupport impleme
                 .fetch();
     }
 
-    public List<Long> findTeamIdsByMembers(Long memberId1, Long memberId2) {
-        return select(memberTeam.team.id)
+    public MemberTeam findByMemberIdsAndTeamIds(Long memberId1, Long memberId2, Long teamId) {
+        return select(memberTeam)
                 .from(memberTeam)
                 .where(memberTeam.member.id.eq(memberId1),
                         memberTeam.team.in(
@@ -50,6 +50,7 @@ public class MemberTeamRepositoryImpl extends Querydsl4RepositorySupport impleme
                                         .where(memberTeam.member.id.eq(memberId2))
                         )
                 )
-                .fetch();
+                .where(memberTeam.team.id.eq(teamId))
+                .fetchOne();
     }
 }

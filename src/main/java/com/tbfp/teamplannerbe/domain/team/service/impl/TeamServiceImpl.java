@@ -1,5 +1,6 @@
 package com.tbfp.teamplannerbe.domain.team.service.impl;
 
+import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
@@ -205,24 +206,84 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @Transactional
-    public ProfileResponseDto.SubmitEvaluationResponseDto submitEvaluation(TeamRequestDto.SubmitEvaluationRequestDto submitEvaluationRequestDto, Long givenTeamId, Long subjectMemberId, String username){
+    public TeamResponseDto.CreateEvaluationResponseDto createEvaluation(TeamRequestDto.CreateEvaluationRequestDto createEvaluationRequestDto, Long givenTeamId, Long subjectMemberId, String username){
         Member authorMember = memberRepository.findByUsername(username).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
         Member subjectMember = memberRepository.findById(subjectMemberId).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
 
-        //평가자와 피평가자가 주어진 팀에 동시에 속해있지 않을 경우
-        List<Long> teamIds = memberTeamRepository.findTeamIdsByMembers(authorMember.getId(), subjectMemberId);
-        if(!teamIds.contains(givenTeamId)) throw new ApplicationException(USER_NOT_IN_TEAM);
+        Evaluation alreadyExistingEvaluation = evaluationRepository.findByAuthorMemberIdAndSubjectMemberId(authorMember.getId(), subjectMemberId).orElse(null);
 
+        //이미 해당 사용자에 대한 평가 작성 완료함
+        if(alreadyExistingEvaluation!=null){
+            throw new ApplicationException(EVALUATION_ALREADY_EXIST);
+        }
+
+
+
+
+        //자가 자신 평가 불가능
+        if(authorMember.equals(subjectMember)){
+            throw new ApplicationException(UNABLE_TO_EVALUATE_MYSELF);
+        }
+
+        //teamId에 해당하는 team 없을 경우
         Team givenTeam = teamRepository.findById(givenTeamId).orElseThrow(() -> new ApplicationException(TEAM_NOT_FOUND));
-        Integer sum = submitEvaluationRequestDto.getStat1() + submitEvaluationRequestDto.getStat2() + submitEvaluationRequestDto.getStat3() + submitEvaluationRequestDto.getStat4() + submitEvaluationRequestDto.getStat5();
+
+        //평가자와 피평가자가 주어진 팀에 동시에 속해있지 않을 경우
+        MemberTeam memberTeam = memberTeamRepository.findByMemberIdsAndTeamIds(authorMember.getId(), subjectMemberId, givenTeamId);
+        if(memberTeam==null) throw new ApplicationException(USER_NOT_IN_TEAM);
+
+        // 평가 점수 총합은 0~30 이어야 함
+        Integer sum = createEvaluationRequestDto.getStat1() + createEvaluationRequestDto.getStat2() + createEvaluationRequestDto.getStat3() + createEvaluationRequestDto.getStat4() + createEvaluationRequestDto.getStat5();
         if(sum < 0 || sum > 30) throw new ApplicationException(EVALUATION_SCORE_NOT_IN_SCOPE);
 
         //save
-        Evaluation evaluation = submitEvaluationRequestDto.toEntity(authorMember,subjectMember,givenTeam);
+        Evaluation evaluation = createEvaluationRequestDto.toEntity(authorMember,subjectMember,givenTeam);
         evaluationRepository.save(evaluation);
 
-        return ProfileResponseDto.SubmitEvaluationResponseDto.builder()
+        return TeamResponseDto.CreateEvaluationResponseDto.builder()
                 .message("평가가 완료되었습니다.")
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public TeamResponseDto.UpdateEvaluationResponseDto updateEvaluation(TeamRequestDto.UpdateEvaluationRequestDto updateEvaluationRequestDto, Long givenTeamId, Long subjectMemberId, String username){
+        Evaluation evaluationToUpdate = evaluationRepository.findById(updateEvaluationRequestDto.getId()).orElse(null);
+
+        //updateEvaluationDto.getId()를 id로 갖는 평가가 없으면 예외
+        if(evaluationToUpdate==null){
+            throw new ApplicationException(EVALUATION_NOT_EXIST);
+        }
+
+        //해당 평가의 작성자가 본인이 아니면 예외
+        if(!evaluationToUpdate.getAuthorMember().getUsername().equals(username)){
+            throw new ApplicationException(NOT_AUTHOR_OF_EVALUATION);
+        }
+
+        Member authorMember = memberRepository.findByUsername(username).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
+        Member subjectMember = memberRepository.findById(subjectMemberId).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
+
+        //자가 자신 평가 불가능
+        if(authorMember.equals(subjectMember)){
+            throw new ApplicationException(UNABLE_TO_EVALUATE_MYSELF);
+        }
+        //teamId에 해당하는 team 없을 경우
+        Team givenTeam = teamRepository.findById(givenTeamId).orElseThrow(() -> new ApplicationException(TEAM_NOT_FOUND));
+
+        //평가자와 피평가자가 주어진 팀에 동시에 속해있지 않을 경우
+        MemberTeam memberTeam = memberTeamRepository.findByMemberIdsAndTeamIds(authorMember.getId(), subjectMemberId, givenTeamId);
+        if(memberTeam==null) throw new ApplicationException(USER_NOT_IN_TEAM);
+
+        // 평가 점수 총합은 0~30 이어야 함
+        Integer sum = updateEvaluationRequestDto.getStat1() + updateEvaluationRequestDto.getStat2() + updateEvaluationRequestDto.getStat3() + updateEvaluationRequestDto.getStat4() + updateEvaluationRequestDto.getStat5();
+        if(sum < 0 || sum > 30) throw new ApplicationException(EVALUATION_SCORE_NOT_IN_SCOPE);
+
+        //save
+        Evaluation evaluation = updateEvaluationRequestDto.toEntity(authorMember,subjectMember,givenTeam);
+        evaluationRepository.save(evaluation);
+
+        return TeamResponseDto.UpdateEvaluationResponseDto.builder()
+                .message("평가가 수정되었습니다.")
                 .build();
     }
 }

@@ -4,6 +4,7 @@ import com.tbfp.teamplannerbe.domain.profile.dto.ProfileResponseDto;
 import com.tbfp.teamplannerbe.domain.team.dto.CommonResponseDto;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamRequestDto;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamRequestDto.CreatTeamRequestDto;
+import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto;
 import com.tbfp.teamplannerbe.domain.team.service.TeamService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -52,7 +53,18 @@ public class TeamController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
             @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
     })
-    public ResponseEntity<ProfileResponseDto.SubmitEvaluationResponseDto> submitEvaluation(@Valid @RequestBody TeamRequestDto.SubmitEvaluationRequestDto submitEvaluationRequestDto,@PathVariable Long teamId, @PathVariable Long subjectMemberId, Principal principal){
-        return ResponseEntity.ok(teamService.submitEvaluation(submitEvaluationRequestDto,teamId,subjectMemberId,principal.getName()));
+    public ResponseEntity<TeamResponseDto.CreateEvaluationResponseDto> createEvaluation(@Valid @RequestBody TeamRequestDto.CreateEvaluationRequestDto createEvaluationRequestDto, @PathVariable Long teamId, @PathVariable Long subjectMemberId, Principal principal){
+        return ResponseEntity.ok(teamService.createEvaluation(createEvaluationRequestDto,teamId,subjectMemberId,principal.getName()));
+    }
+
+    @PutMapping("/evaluation/{teamId}/{subjectMemberId}")
+    @Operation(summary = "평가 수정", description = "활동이 끝난 팀의 멤버 평가를 수정한다")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
+    })
+    public ResponseEntity<TeamResponseDto.UpdateEvaluationResponseDto> updateEvaluation(@Valid @RequestBody TeamRequestDto.UpdateEvaluationRequestDto updateEvaluationRequestDto,@PathVariable Long teamId, @PathVariable Long subjectMemberId, Principal principal){
+        return ResponseEntity.ok(teamService.updateEvaluation(updateEvaluationRequestDto,teamId,subjectMemberId,principal.getName()));
     }
 }

@@ -76,6 +76,14 @@ public enum ApplicationErrorType {
 
     EVALUATION_SCORE_NOT_IN_SCOPE(HttpStatus.BAD_REQUEST,-24001,"평가 점수는 총합 0이상 30이하여야 합니다."),
 
+    EVALUATION_NOT_EXIST(HttpStatus.BAD_REQUEST,-24002,"평가가 존재하지 않습니다."),
+
+    NOT_AUTHOR_OF_EVALUATION(HttpStatus.BAD_REQUEST,-24003,"본 평가의 작성자가 아닙니다."),
+
+    UNABLE_TO_EVALUATE_MYSELF(HttpStatus.BAD_REQUEST,-24004,"자기 자신을 평가할 수 없습니다."),
+
+    EVALUATION_ALREADY_EXIST(HttpStatus.BAD_REQUEST,-24005,"해당 사용자에 대한 평가를 이미 마쳤습니다."),
+
     ALREADY_LIKE_BOARD(HttpStatus.BAD_REQUEST,-8,"이미 좋아요를 누르셨습니다"),
 
     COMMENT_NOT_FOUND(HttpStatus.BAD_REQUEST,-9,"댓글을 찾을 수 없습니다"),

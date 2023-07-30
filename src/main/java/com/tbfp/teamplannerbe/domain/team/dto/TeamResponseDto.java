@@ -42,4 +42,21 @@ public class TeamResponseDto {
     public static class deleteTeamMemberResponseDto {
         String deleteMessage;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class CreateEvaluationResponseDto {
+        private String message;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class UpdateEvaluationResponseDto {
+        private String message;
+    }
+
 }

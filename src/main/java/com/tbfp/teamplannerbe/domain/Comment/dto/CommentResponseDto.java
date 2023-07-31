@@ -92,6 +92,7 @@ public class CommentResponseDto {
         private LocalDateTime updatedAt;
         private boolean isConfidential;
         private Long commentId;
+        private Long parentId;
 
         public commentToCommentListResponseDto(Comment comment) {
             this.username = comment.getMember().getUsername();
@@ -99,6 +100,7 @@ public class CommentResponseDto {
             this.updatedAt = comment.getUpdatedAt();
             this.isConfidential = comment.isConfidential();
             this.commentId = comment.getId();
+            this.parentId = comment.getParentComment()==null ? null : comment.getParentComment().getId();
         }
     }
 }

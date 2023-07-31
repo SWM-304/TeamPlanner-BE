@@ -341,12 +341,13 @@ public class ProfileServiceImpl implements ProfileService {
 
     @Override
     @Transactional
-    public List<ProfileResponseDto.EvaluationResponseDto> getAllEvaluations(String username){
+    public List<ProfileResponseDto.EvaluationResponseDto> getAllEvaluations(String username) {
         Member authorMember = memberRepository.findByUsername(username).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
         List<Evaluation> evaluations = evaluationRepository.findAllByAuthorMemberId(authorMember.getId()).orElseThrow(() -> new ApplicationException(EVALUATION_NOT_EXIST));
         List<ProfileResponseDto.EvaluationResponseDto> evaluationResponseDtos = evaluations.stream().map(Evaluation::toDto).collect(Collectors.toList());
         return evaluationResponseDtos;
-      
+    }
+
     @Override
     @Transactional(readOnly = true)
     public BasicProfile getBasicProfile(String username) {

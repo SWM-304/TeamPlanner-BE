@@ -65,7 +65,6 @@ public class BoardQuerydslRepositoryImpl extends Querydsl4RepositorySupport impl
                 select(board)
                 .from(board)
                 .where(boardIdEq(boardId))
-                .where(comment.parentComment.isNull())
                 .leftJoin(board.comments, comment).fetchJoin()
                 .distinct() // 중복 결과 제거
                 .fetch();

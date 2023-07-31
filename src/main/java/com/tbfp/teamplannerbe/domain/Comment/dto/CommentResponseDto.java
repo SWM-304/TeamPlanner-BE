@@ -2,10 +2,16 @@ package com.tbfp.teamplannerbe.domain.comment.dto;
 
 
 import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
+import com.tbfp.teamplannerbe.domain.member.entity.Member;
+import com.tbfp.teamplannerbe.domain.team.entity.MemberTeam;
+import com.tbfp.teamplannerbe.domain.team.entity.Team;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class CommentResponseDto {
 
@@ -36,9 +42,12 @@ public class CommentResponseDto {
         private boolean isConfidential;
         private Long commentId;
         private Integer commentCount;
+        @Builder.Default
+        List<commentToCommentListResponseDto> childCommentList=new ArrayList<>();
 
 
-        public BoardWithCommentListResponseDto(Comment comment) {
+
+        public BoardWithCommentListResponseDto(Comment comment, List<Comment> childComments) {
             this.username = comment.getMember().getUsername();
             this.content = comment.getContent();
             this.updatedAt = String.valueOf(comment.getUpdatedAt());
@@ -46,6 +55,15 @@ public class CommentResponseDto {
             this.parentId = comment.getParentComment()==null ? null : comment.getParentComment().getId();
             this.commentId=comment.getId();
             this.commentCount=comment.getChildCommentCount();
+            if (childComments != null) {
+                this.childCommentList = childComments.stream()
+                        .map(BoardWithCommentListResponseDto::mapToCommentToCommentListResponseDto)
+                        .collect(Collectors.toList());
+            }
+        }
+
+        private static commentToCommentListResponseDto mapToCommentToCommentListResponseDto(Comment comment) {
+            return new commentToCommentListResponseDto(comment);
         }
     }
 

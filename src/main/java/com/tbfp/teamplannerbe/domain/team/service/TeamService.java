@@ -7,6 +7,7 @@ import com.tbfp.teamplannerbe.domain.team.dto.TeamRequestDto.CreatTeamRequestDto
 import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto.createdTeamResponseDto;
 
+import java.text.ParseException;
 import java.util.List;
 
 public interface TeamService {
@@ -15,4 +16,6 @@ public interface TeamService {
     void deleteTeamMember(String username,Long teamId,Long memberId);
 
     void deleteTeam(String username,Long teamId);
+
+    List<TeamResponseDto.GetMyTeamResponseDto> getMyTeam(String username);
 }

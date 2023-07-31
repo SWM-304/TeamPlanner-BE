@@ -2,20 +2,22 @@ package com.tbfp.teamplannerbe.domain.board.repository.impl;
 
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.PathBuilder;
+import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardSearchCondition;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
+import com.tbfp.teamplannerbe.domain.board.entity.QBoard;
 import com.tbfp.teamplannerbe.domain.board.repository.BoardQuerydslRepository;
-import com.tbfp.teamplannerbe.domain.comment.entity.QComment;
 import com.tbfp.teamplannerbe.domain.common.querydsl.support.Querydsl4RepositorySupport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static com.tbfp.teamplannerbe.domain.board.entity.QBoard.board;
@@ -34,8 +36,17 @@ public class BoardQuerydslRepositoryImpl extends Querydsl4RepositorySupport impl
     @Override
     public Page<Board> getBoardList(BoardSearchCondition condition, Pageable pageable) {
 
+
+        StringExpression recruitmentPeriodEndDate = Expressions.stringTemplate("STR_TO_DATE(SUBSTRING_INDEX({0}, '~', -1), '%Y.%m.%d')", board.recruitmentPeriod);
+        BooleanExpression recruitmentPeriodPredicate = recruitmentPeriodEndDate.goe(String.valueOf(LocalDate.now()));
+
+
+
+
         List<Board> content=selectFrom(board)
+                .leftJoin(board.comments,comment).fetchJoin()
                 .where(categoryEq(condition.getCategory()))
+                .where(recruitmentPeriodPredicate)
                 .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -44,8 +55,6 @@ public class BoardQuerydslRepositoryImpl extends Querydsl4RepositorySupport impl
         JPAQuery<Long> countQuery = select(board.count())
                 .from(board)
                 .where(categoryEq(condition.getCategory()));
-
-
 
         return PageableExecutionUtils.getPage(content,pageable,countQuery::fetchOne);
     }
@@ -90,6 +99,8 @@ public class BoardQuerydslRepositoryImpl extends Querydsl4RepositorySupport impl
     private BooleanExpression boardIdEq(Long boardId) {
         return hasText(String.valueOf(boardId)) ? board.id.eq(boardId) : null;
     }
+
+
 
 
 

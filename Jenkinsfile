@@ -9,7 +9,7 @@ pipeline {
         TIME_ZONE = 'Asia/Seoul'
 
         //github
-        TARGET_BRANCH = 'release'
+        TARGET_BRANCH = 'develop'
         REPOSITORY_URL= 'https://github.com/SWM-304/TeamPlanner-BE'
 
         //docker-hub
@@ -47,7 +47,7 @@ pipeline {
         stage('Prepare') {
             steps {
                 echo 'Cloning Repository'
-                git branch: 'release',
+                git branch: 'develop',
                     credentialsId: 'repo-and-hook-access-token-credentials',
                     url: 'https://github.com/SWM-304/TeamPlanner-BE'
             }

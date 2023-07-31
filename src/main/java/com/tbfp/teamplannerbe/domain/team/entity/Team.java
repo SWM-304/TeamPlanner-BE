@@ -1,11 +1,14 @@
 package com.tbfp.teamplannerbe.domain.team.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto;
 import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamRequestDto.CreatTeamRequestDto;
 import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -44,9 +47,10 @@ public class Team extends BaseTimeEntity {
 
     private LocalDateTime endDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "RECRUITMENT_ID")
     private Recruitment recruitment;
+
 
     @Builder.Default
     @OneToMany(mappedBy ="team", cascade = CascadeType.ALL)

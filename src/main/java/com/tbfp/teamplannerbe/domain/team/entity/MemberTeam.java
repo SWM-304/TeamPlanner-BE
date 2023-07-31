@@ -1,6 +1,7 @@
 package com.tbfp.teamplannerbe.domain.team.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.recruitmentApply.entity.RecruitmentApplyStateEnum;
 import lombok.*;

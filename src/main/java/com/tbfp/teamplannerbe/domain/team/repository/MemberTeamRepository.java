@@ -8,9 +8,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MemberTeamRepository extends JpaRepository<MemberTeam,Long>, MemberTeamQuerydslRepository {
+
     Optional<MemberTeam> deleteByTeamIdAndMemberId(Long teamId, Long memberId);
 
     Optional<MemberTeam> deleteByMemberId(Long memberId);
 
     List<MemberTeam> findAllByTeamId(Long teamId);
+
+    List<MemberTeam> findAllByMemberId(Long memberId);
 }

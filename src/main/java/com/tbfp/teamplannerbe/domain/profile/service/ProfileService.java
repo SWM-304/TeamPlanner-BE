@@ -6,6 +6,7 @@ import com.tbfp.teamplannerbe.domain.team.dto.TeamRequestDto;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto;
 
 import java.util.List;
+import com.tbfp.teamplannerbe.domain.profile.entity.BasicProfile;
 
 public interface ProfileService {
     ProfileResponseDto.ShowProfileResponseDto showProfile(String nickname);
@@ -25,4 +26,6 @@ public interface ProfileService {
     void deleteEvaluation(ProfileRequestDto.DeleteEvaluationRequestDto deleteEvaluationRequestDto, Long teamId, Long subjectMemberId, String username);
 
     List<ProfileResponseDto.EvaluationResponseDto> getAllEvaluations(String username);
+    
+    BasicProfile getBasicProfile(String username);
 }

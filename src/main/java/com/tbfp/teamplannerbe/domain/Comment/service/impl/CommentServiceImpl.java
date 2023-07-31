@@ -5,6 +5,7 @@ import com.tbfp.teamplannerbe.domain.board.repository.BoardRepository;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CreateCommentRequestDto;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.UpdateCommentRequestDto;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CommentToCommentCreateRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.CreatedCommentResponseDto;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.CreatedchildCommentResponseDto;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.UpdatedCommentResponseDto;
@@ -20,13 +21,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType.*;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class CommentServiceImpl implements CommentService {
 
     private final BoardRepository boardRepository;
@@ -178,13 +183,25 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new ApplicationException(BOARD_NOT_FOUND));
         Optional<Comment> findParentComment = commentRepository.findById(commentToCommentCreateRequestDto.getParentCommentId());
 
-        boolean isAccessible = board.getMember().getUsername().equals(member.getUsername())
-                || (!findParentComment.get().isConfidential() || findParentComment.get().getMember().getUsername().equals(username));
-        if (!isAccessible){
-            throw new ApplicationException(ApplicationErrorType.UNAUTHORIZED);
+        // 비밀댓글이 아니여야하고
+
+        //isAccessible 변수는 다음 조건 중 하나를 만족할 때 true로 설정
+        //현재 사용자가 게시판을 작성한 사용자와 동일한 경우.
+        //댓글이 비밀 댓글이 아닌 경우.
+        //현재 사용자가 해당 댓글을 작성한 사용자와 동일한 경우.
+        if(board.getMember()==null){
+            boolean isAccessible=(!findParentComment.get().isConfidential() || findParentComment.get().getMember().getUsername().equals(username));
+            if (!isAccessible){
+                throw new ApplicationException(ApplicationErrorType.UNAUTHORIZED);
+            }
         }
-
-
+        if(board.getMember()!=null){
+            boolean isAccessible = board.getMember().getUsername().equals(member.getUsername())
+                    || (!findParentComment.get().isConfidential() || findParentComment.get().getMember().getUsername().equals(username));
+            if (!isAccessible){
+                throw new ApplicationException(ApplicationErrorType.UNAUTHORIZED);
+            }
+        }
 
         if (commentToCommentCreateRequestDto.getParentCommentId() != null) {
             Comment parentComment = commentRepository.findById(commentToCommentCreateRequestDto.getParentCommentId())
@@ -202,9 +219,9 @@ public class CommentServiceImpl implements CommentService {
                     .isConfidential(commentToCommentCreateRequestDto.getIsConfidential())
                     .build();
 
-            if(parentComment.getId()!=childComment.getId()){
-                parentComment.setParentComment(childComment);
-            }
+//            if(parentComment.getId()!=childComment.getId()){
+//                parentComment.setParentComment(childComment);
+//            }
 
 //            System.out.println("=================");
 //            commentRepository.save(parentComment);  // 부모 댓글 저장
@@ -226,5 +243,15 @@ public class CommentServiceImpl implements CommentService {
 
 
         return commentToComment;
+    }
+
+    @Override
+    public List<CommentResponseDto.commentToCommentListResponseDto> getCommentToCommentList(Long boardId, Long commentId) {
+        List<Comment> childCommentList = commentRepository.findAllByBoard_IdAndParentCommentId(boardId, commentId);
+
+        List<CommentResponseDto.commentToCommentListResponseDto> result = childCommentList.stream().map(comment -> new CommentResponseDto.commentToCommentListResponseDto(comment))
+                .collect(Collectors.toList());
+
+        return result;
     }
 }

@@ -346,5 +346,17 @@ public class ProfileServiceImpl implements ProfileService {
         List<Evaluation> evaluations = evaluationRepository.findAllByAuthorMemberId(authorMember.getId()).orElseThrow(() -> new ApplicationException(EVALUATION_NOT_EXIST));
         List<ProfileResponseDto.EvaluationResponseDto> evaluationResponseDtos = evaluations.stream().map(Evaluation::toDto).collect(Collectors.toList());
         return evaluationResponseDtos;
+      
+    @Override
+    @Transactional(readOnly = true)
+    public BasicProfile getBasicProfile(String username) {
+
+        return basicProfileRepository.findByMemberId(
+                memberRepository.findMemberByUsername(username).orElseThrow(
+                        () -> new ApplicationException(ApplicationErrorType.USER_NOT_FOUND)
+                ).getId()
+        ).orElseThrow(
+            () -> new ApplicationException(ApplicationErrorType.NOT_FOUND)
+        );
     }
 }

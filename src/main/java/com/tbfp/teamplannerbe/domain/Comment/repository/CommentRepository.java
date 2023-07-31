@@ -12,6 +12,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long>,CommentQ
 
     Comment findByIdAndStateIsTrue(Long commentId);
 
+    List<Comment> findAllByBoard_IdAndParentCommentId(Long boardId,Long commentId);
+
 
 
 

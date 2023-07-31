@@ -3,10 +3,9 @@ package com.tbfp.teamplannerbe.domain.team.controller;
 import com.tbfp.teamplannerbe.domain.profile.dto.ProfileRequestDto;
 import com.tbfp.teamplannerbe.domain.profile.dto.ProfileResponseDto;
 import com.tbfp.teamplannerbe.domain.profile.service.ProfileService;
-import com.tbfp.teamplannerbe.domain.team.dto.CommonResponseDto
+import com.tbfp.teamplannerbe.domain.team.dto.CommonResponseDto;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamRequestDto;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamRequestDto.CreatTeamRequestDto;
-import com.tbfp.teamplannerbe.domain.team.dto.TeamReqeustDto.CreatTeamRequestDto;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto;
 import com.tbfp.teamplannerbe.domain.team.service.TeamService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -92,9 +91,10 @@ public class TeamController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
             @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
     })
-    public ResponseEntity<List<ProfileResponseDto.EvaluationResponseDto>> getAllEvaluations(Principal principal){
+    public ResponseEntity<List<ProfileResponseDto.EvaluationResponseDto>> getAllEvaluations(Principal principal) {
         return ResponseEntity.ok(profileService.getAllEvaluations(principal.getName()));
-      
+    }
+
     @GetMapping("/my-team")
     public ResponseEntity<List<TeamResponseDto.GetMyTeamResponseDto>> getMyTeam(Principal principal){
         return ResponseEntity.ok(teamService.getMyTeam(principal.getName()));

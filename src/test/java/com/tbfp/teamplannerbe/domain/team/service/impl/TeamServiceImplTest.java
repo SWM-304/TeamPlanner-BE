@@ -18,21 +18,24 @@ import com.tbfp.teamplannerbe.domain.recruitmentApply.entity.RecruitmentApply;
 import com.tbfp.teamplannerbe.domain.recruitmentApply.repository.RecruitmentApplyRepository;
 import com.tbfp.teamplannerbe.domain.recruitmentApply.service.RecruitmentApplyService;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamReqeustDto.CreatTeamRequestDto;
+import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto.createdTeamResponseDto;
 import com.tbfp.teamplannerbe.domain.team.entity.Team;
 import com.tbfp.teamplannerbe.domain.team.repository.MemberTeamRepository;
 import com.tbfp.teamplannerbe.domain.team.repository.TeamRepository;
 import com.tbfp.teamplannerbe.domain.team.service.TeamService;
 import org.assertj.core.api.Assertions;
+import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.stream.Collectors;
 
 
 @SpringBootTest
@@ -284,6 +287,72 @@ class TeamServiceImplTest {
 
         Assertions.assertThat(result).isNotNull();
 
+
+    }
+
+    @Test
+    public void 내가속한_팀조회(){
+        //given
+        셋업멤버();
+        Long boardId = 공모전생성();
+
+        RecruitmentCreateRequestDto recruitment = RecruitmentCreateRequestDto.builder()
+                .title("모집글 제목입니다.")
+                .content("저랑 같이 팀하실분 구합니다")
+                .currentMemberSize(0)
+                .maxMemberSize(5)
+                .boardId(boardId)
+                .build();
+
+        CreateApplyRequest applyDto = CreateApplyRequest.builder()
+                .content("저 팀에 참여하고싶습니다 받아주세요 ")
+                .build();
+        //모집글 작성
+        RecruitmentCreateResponseDto recruitmentCreateResponseDto = recruitmentService.createRecruitment("test0", recruitment);
+
+        List<Member> member = memberRepository.findAll();
+        List<Long> array=new ArrayList<>();
+        //모집글에 참가신청
+        for (Member member1 : member) {
+            if(!member1.getUsername().equals("test0")){
+                recruitmentApplyService.apply(member1.getUsername(), recruitmentCreateResponseDto.getId(), applyDto);
+                array.add(member1.getId());
+            }
+        }
+
+        //when
+
+        CreatTeamRequestDto createTeamDto = CreatTeamRequestDto.builder()
+                .endDate("2023-08-18 21:46:50")
+                .startDate("2023-07-18 21:46:50")
+                .teamName("삼백사점")
+                .maxTeamSize(5L)
+                .recruitId(recruitmentCreateResponseDto.getId())
+                .selectedUserIds(array)
+                .build();
+        createdTeamResponseDto result = teamService.createTeam("test0", createTeamDto);
+
+
+
+        List<TeamResponseDto.GetMyTeamResponseDto> getMyTeamResponseDtos = teamService.getMyTeam("test0");
+        //Assertion
+
+        // 조회한 팀 리스트가 비어있지 않은지 확인
+        Assert.assertFalse(getMyTeamResponseDtos.isEmpty());
+
+        // 조회한 팀 정보와 기대하는 팀 정보를 비교하여 검증
+        for (TeamResponseDto.GetMyTeamResponseDto team : getMyTeamResponseDtos) {
+            Assert.assertEquals(LocalDateTime.of(2023,8,18,21,46,50), team.getEndDate());
+            Assert.assertEquals(LocalDateTime.of(2023,7,18,21,46,50), team.getStartDate());
+            Assert.assertEquals("삼백사점", team.getTeamName());
+            Assert.assertEquals(boardId,team.getBoardId());
+
+            // 팀 멤버 리스트가 기대하는 멤버 리스트와 동일한지 확인
+            List<Long> expectedMemberIds = member.stream().map(Member::getId).collect(Collectors.toList());
+            List<Long> actualMemberIds = team.getMemberIds();
+            System.out.println(actualMemberIds);
+            Assert.assertEquals(expectedMemberIds,actualMemberIds);
+        }
 
     }
 

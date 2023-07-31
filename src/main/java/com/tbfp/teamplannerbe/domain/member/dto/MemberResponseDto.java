@@ -124,6 +124,7 @@ public class MemberResponseDto {
     @AllArgsConstructor
     public static class getMemberInfoDto {
         private String username;
+        private String nickname;
         private String profileImg;
     }
 }

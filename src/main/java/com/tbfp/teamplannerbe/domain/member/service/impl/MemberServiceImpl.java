@@ -340,8 +340,10 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public getMemberInfoDto getMemberInfo(String username) {
         BasicProfile basicProfile = profileService.getBasicProfile(username);
+        Member member = memberRepository.findMemberByUsername(username).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
         return getMemberInfoDto.builder()
                 .username(username)
+                .nickname(member.getNickname())
                 .profileImg(basicProfile.getProfileImage())
                 .build();
     }

@@ -10,9 +10,10 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
+@Builder
 public class Comment extends BaseTimeEntity {
 
     @Id
@@ -45,9 +46,19 @@ public class Comment extends BaseTimeEntity {
     @Column(nullable = false)
     private boolean isConfidential; // true면 익명댓글 false이면 default 댓글
 
+    @Builder.Default
+    private Integer childCommentCount = 0;
+
+
+
+
     public void setParentComment(Comment parentComment) {
         this.parentComment = parentComment;
         this.depth = parentComment.getDepth() + 1;  // 깊이 설정
+    }
+
+    public void incrementchildCommentCount() {
+        this.childCommentCount++;
     }
 
     public void changeState(boolean state){

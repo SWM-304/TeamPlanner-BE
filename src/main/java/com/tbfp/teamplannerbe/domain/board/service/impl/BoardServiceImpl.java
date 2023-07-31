@@ -8,6 +8,7 @@ import com.tbfp.teamplannerbe.domain.board.dto.BoardSearchCondition;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.board.repository.BoardRepository;
 import com.tbfp.teamplannerbe.domain.board.service.BoardService;
+import com.tbfp.teamplannerbe.domain.comment.repository.CommentRepository;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
@@ -69,6 +70,8 @@ public class BoardServiceImpl implements BoardService {
         boardRepository.save(findBoard);
 
         List<Board> board = boardRepository.getBoardAndComment(boardId);
+
+
 
         List<BoardDetailResponseDto> result = board.stream().map(i -> new BoardDetailResponseDto(i))
                 .collect(Collectors.toList());

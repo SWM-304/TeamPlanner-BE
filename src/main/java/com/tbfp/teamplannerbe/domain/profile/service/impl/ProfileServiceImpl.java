@@ -10,6 +10,12 @@ import com.tbfp.teamplannerbe.domain.member.repository.*;
 import com.tbfp.teamplannerbe.domain.profile.entity.*;
 import com.tbfp.teamplannerbe.domain.profile.repository.*;
 import com.tbfp.teamplannerbe.domain.profile.service.ProfileService;
+import com.tbfp.teamplannerbe.domain.team.dto.TeamRequestDto;
+import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto;
+import com.tbfp.teamplannerbe.domain.team.entity.MemberTeam;
+import com.tbfp.teamplannerbe.domain.team.entity.Team;
+import com.tbfp.teamplannerbe.domain.team.repository.MemberTeamRepository;
+import com.tbfp.teamplannerbe.domain.team.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType.*;
 
 
 @Service
@@ -31,6 +39,8 @@ public class ProfileServiceImpl implements ProfileService {
     private final CertificationRepository certificationRepository;
     private final EvaluationRepository evaluationRepository;
     private final BasicProfileRepository basicProfileRepository;
+    private final TeamRepository teamRepository;
+    private final MemberTeamRepository memberTeamRepository;
 
     @Override
     @Transactional
@@ -69,12 +79,13 @@ public class ProfileServiceImpl implements ProfileService {
         List<ProfileResponseDto.TechStackResponseDto> techStackResponseDtos = techStackRepository.findAllByMemberId(memberId).orElse(null).stream().map(TechStack::toDto).collect(Collectors.toList());
         List<ProfileResponseDto.ActivityResponseDto> activityResponseDtos = activityRepository.findAllByMemberId(memberId).orElse(null).stream().map(Activity::toDto).collect(Collectors.toList());
         List<ProfileResponseDto.CertificationResponseDto> certificationResponseDtos = certificationRepository.findAllByMemberId(memberId).orElse(null).stream().map(Certification::toDto).collect(Collectors.toList());
-
+        List<ProfileResponseDto.EvaluationResponseDto> evaluationResponseDtos = evaluationRepository.findAllBySubjectMemberId(memberId).orElse(null).stream().map(Evaluation::toDto).collect(Collectors.toList());
         return ProfileResponseDto.GetProfileResponseDto.builder()
                 .basicProfile(basicProfileResponseDto)
                 .techStacks(techStackResponseDtos)
                 .activities(activityResponseDtos)
                 .certifications(certificationResponseDtos)
+                .evaluations(evaluationResponseDtos)
                 .build();
     }
 
@@ -219,6 +230,123 @@ public class ProfileServiceImpl implements ProfileService {
         }
     }
 
+    @Override
+    @Transactional
+    public ProfileResponseDto.CreateEvaluationResponseDto createEvaluation(ProfileRequestDto.CreateEvaluationRequestDto createEvaluationRequestDto, Long givenTeamId, Long subjectMemberId, String username) {
+        Member authorMember = memberRepository.findByUsername(username).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
+        Member subjectMember = memberRepository.findById(subjectMemberId).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
+
+        Evaluation alreadyExistingEvaluation = evaluationRepository.findByAuthorMemberIdAndSubjectMemberId(authorMember.getId(), subjectMemberId).orElse(null);
+
+        //이미 해당 사용자에 대한 평가 작성 완료함
+        if (alreadyExistingEvaluation != null) {
+            throw new ApplicationException(EVALUATION_ALREADY_EXIST);
+        }
+
+        //자가 자신 평가 불가능
+        if (authorMember.equals(subjectMember)) {
+            throw new ApplicationException(UNABLE_TO_EVALUATE_MYSELF);
+        }
+
+        //teamId에 해당하는 team 없을 경우
+        Team givenTeam = teamRepository.findById(givenTeamId).orElseThrow(() -> new ApplicationException(TEAM_NOT_FOUND));
+
+        //평가자와 피평가자가 주어진 팀에 동시에 속해있지 않을 경우
+        MemberTeam memberTeam = memberTeamRepository.findByMemberIdsAndTeamIds(authorMember.getId(), subjectMemberId, givenTeamId);
+        if (memberTeam == null) throw new ApplicationException(USER_NOT_IN_TEAM);
+
+        // 평가 점수 총합은 0~30 이어야 함
+        Integer sum = createEvaluationRequestDto.getStat1() + createEvaluationRequestDto.getStat2() + createEvaluationRequestDto.getStat3() + createEvaluationRequestDto.getStat4() + createEvaluationRequestDto.getStat5();
+        if (sum < 0 || sum > 30) throw new ApplicationException(EVALUATION_SCORE_NOT_IN_SCOPE);
+
+        //save
+        Evaluation evaluation = createEvaluationRequestDto.toEntity(authorMember, subjectMember, givenTeam);
+        evaluationRepository.save(evaluation);
+
+        return ProfileResponseDto.CreateEvaluationResponseDto.builder()
+                .message("평가가 완료되었습니다.")
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public ProfileResponseDto.UpdateEvaluationResponseDto updateEvaluation(ProfileRequestDto.UpdateEvaluationRequestDto updateEvaluationRequestDto, Long givenTeamId, Long subjectMemberId, String username) {
+        Evaluation evaluationToUpdate = evaluationRepository.findById(updateEvaluationRequestDto.getId()).orElse(null);
+
+        //updateEvaluationDto.getId()를 id로 갖는 평가가 없으면 예외
+        if (evaluationToUpdate == null) {
+            throw new ApplicationException(EVALUATION_NOT_EXIST);
+        }
+
+        //해당 평가의 작성자가 본인이 아니면 예외
+        if (!evaluationToUpdate.getAuthorMember().getUsername().equals(username)) {
+            throw new ApplicationException(NOT_AUTHOR_OF_EVALUATION);
+        }
+
+        Member authorMember = memberRepository.findByUsername(username).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
+        Member subjectMember = memberRepository.findById(subjectMemberId).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
+
+        //자가 자신 평가 불가능
+        if (authorMember.equals(subjectMember)) {
+            throw new ApplicationException(UNABLE_TO_EVALUATE_MYSELF);
+        }
+        //teamId에 해당하는 team 없을 경우
+        Team givenTeam = teamRepository.findById(givenTeamId).orElseThrow(() -> new ApplicationException(TEAM_NOT_FOUND));
+
+        //평가자와 피평가자가 주어진 팀에 동시에 속해있지 않을 경우
+        MemberTeam memberTeam = memberTeamRepository.findByMemberIdsAndTeamIds(authorMember.getId(), subjectMemberId, givenTeamId);
+        if (memberTeam == null) throw new ApplicationException(USER_NOT_IN_TEAM);
+
+        // 평가 점수 총합은 0~30 이어야 함
+        Integer sum = updateEvaluationRequestDto.getStat1() + updateEvaluationRequestDto.getStat2() + updateEvaluationRequestDto.getStat3() + updateEvaluationRequestDto.getStat4() + updateEvaluationRequestDto.getStat5();
+        if (sum < 0 || sum > 30) throw new ApplicationException(EVALUATION_SCORE_NOT_IN_SCOPE);
+
+        //save
+        Evaluation evaluation = updateEvaluationRequestDto.toEntity(authorMember, subjectMember, givenTeam);
+        evaluationRepository.save(evaluation);
+
+        return ProfileResponseDto.UpdateEvaluationResponseDto.builder()
+                .message("평가가 수정되었습니다.")
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public void deleteEvaluation(ProfileRequestDto.DeleteEvaluationRequestDto deleteEvaluationRequestDto, Long givenTeamId, Long subjectMemberId, String username) {
+        Long evaluationId = deleteEvaluationRequestDto.getId();
+
+        //평가 존재 x
+        Evaluation evaluationToDelete = evaluationRepository.findById(evaluationId).orElse(null);
+        if (evaluationToDelete == null) {
+            throw new ApplicationException(EVALUATION_NOT_EXIST);
+        }
+
+        Member authorMember = memberRepository.findByUsername(username).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
+        Member subjectMember = memberRepository.findById(subjectMemberId).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
+
+        //자가 자신 평가 불가능
+        if (authorMember.equals(subjectMember)) {
+            throw new ApplicationException(UNABLE_TO_EVALUATE_MYSELF);
+        }
+        //teamId에 해당하는 team 없을 경우
+        Team givenTeam = teamRepository.findById(givenTeamId).orElseThrow(() -> new ApplicationException(TEAM_NOT_FOUND));
+
+        //평가자와 피평가자가 주어진 팀에 동시에 속해있지 않을 경우
+        MemberTeam memberTeam = memberTeamRepository.findByMemberIdsAndTeamIds(authorMember.getId(), subjectMemberId, givenTeamId);
+        if (memberTeam == null) throw new ApplicationException(USER_NOT_IN_TEAM);
+
+
+        evaluationRepository.deleteById(evaluationId);
+    }
+
+    @Override
+    @Transactional
+    public List<ProfileResponseDto.EvaluationResponseDto> getAllEvaluations(String username){
+        Member authorMember = memberRepository.findByUsername(username).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
+        List<Evaluation> evaluations = evaluationRepository.findAllByAuthorMemberId(authorMember.getId()).orElseThrow(() -> new ApplicationException(EVALUATION_NOT_EXIST));
+        List<ProfileResponseDto.EvaluationResponseDto> evaluationResponseDtos = evaluations.stream().map(Evaluation::toDto).collect(Collectors.toList());
+        return evaluationResponseDtos;
+      
     @Override
     @Transactional(readOnly = true)
     public BasicProfile getBasicProfile(String username) {

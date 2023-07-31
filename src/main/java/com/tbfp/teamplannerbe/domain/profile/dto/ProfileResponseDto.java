@@ -35,7 +35,6 @@ public class ProfileResponseDto {
         private String contactEmail;
         private Long isPublic;
         private Boolean evaluationPublic;
-        private CRUDType crudType;
         public BasicProfile toEntity() {
             return BasicProfile.builder()
                     .id(id)
@@ -65,7 +64,6 @@ public class ProfileResponseDto {
         private Integer experiencedMonth;
         private SkillLevel skillLevel;
         private TechStackItem techStackItem;
-        private CRUDType crudType;
 
         public TechStack toEntity(Member member){
             return TechStack.builder()
@@ -89,7 +87,6 @@ public class ProfileResponseDto {
         private String detail;
         private LocalDate startDate;
         private LocalDate endDate;
-        private CRUDType crudType;
 
         public Activity toEntity(Member member){
             return Activity.builder()
@@ -98,6 +95,7 @@ public class ProfileResponseDto {
                     .detail(detail)
                     .startDate(startDate)
                     .endDate(endDate)
+                    .member(member)
                     .build();
         }
     }
@@ -111,7 +109,6 @@ public class ProfileResponseDto {
         private String name;
         private double score;
         private LocalDate gainDate;
-        private CRUDType crudType;
 
         public Certification toEntity(Member member){
             return Certification.builder()
@@ -119,6 +116,7 @@ public class ProfileResponseDto {
                     .name(name)
                     .score(score)
                     .gainDate(gainDate)
+                    .member(member)
                     .build();
         }
     }
@@ -135,9 +133,6 @@ public class ProfileResponseDto {
         private Integer stat3;
         private Integer stat4;
         private Integer stat5;
-        //작성자 정보 필요 없음(익명의 평가로 보이기 때문에)
-        //팀 정보를 보여줄 건지는 생각 필요
-        private CRUDType crudType;
     }
 
 
@@ -163,7 +158,7 @@ public class ProfileResponseDto {
         private List<TechStackResponseDto> techStacks;
         private List<ActivityResponseDto> activities;
         private List<CertificationResponseDto> certifications;
-        private Boolean evaluationPublic;
+        private List<EvaluationResponseDto> evaluations;
     }
 
     @Getter
@@ -188,5 +183,29 @@ public class ProfileResponseDto {
     @AllArgsConstructor
     public static class DeleteProfileResponseDto {
         String message;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class CreateEvaluationResponseDto {
+        private String message;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class UpdateEvaluationResponseDto {
+        private String message;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class DeleteEvaluationResponseDto {
+        private String message;
     }
 }

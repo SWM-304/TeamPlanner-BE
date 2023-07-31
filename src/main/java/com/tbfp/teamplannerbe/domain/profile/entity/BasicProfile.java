@@ -58,6 +58,7 @@ public class BasicProfile extends BaseTimeEntity {
 
     public ProfileResponseDto.BasicProfileResponseDto toDto(){
         return ProfileResponseDto.BasicProfileResponseDto.builder()
+                .id(id)
                 .profileIntro(profileIntro)
                 .profileImage(profileImage)
                 .job(job)

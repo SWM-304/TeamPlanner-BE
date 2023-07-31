@@ -8,5 +8,9 @@ import java.util.List;
 public interface MemberTeamQuerydslRepository {
     List<MemberTeam> basicSelect();
 
+    List<MemberTeam> findDistinctTeamsByMemberId(Long memberId);
+
+    MemberTeam findByMemberIdsAndTeamIds(Long memberId1, Long memberId2, Long teamId);
+
     List<Team> findAllTeamsByMemberId(Long memberId);
 }

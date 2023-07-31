@@ -1,13 +1,17 @@
 package com.tbfp.teamplannerbe.domain.team.service.impl;
 
+import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
+import com.tbfp.teamplannerbe.domain.profile.dto.ProfileResponseDto;
+import com.tbfp.teamplannerbe.domain.profile.entity.Evaluation;
+import com.tbfp.teamplannerbe.domain.profile.repository.EvaluationRepository;
 import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
 import com.tbfp.teamplannerbe.domain.recruitment.repository.RecruitmentRepository;
 import com.tbfp.teamplannerbe.domain.recruitmentApply.entity.RecruitmentApply;
 import com.tbfp.teamplannerbe.domain.recruitmentApply.repository.RecruitmentApplyRepository;
-import com.tbfp.teamplannerbe.domain.team.dto.TeamReqeustDto;
+import com.tbfp.teamplannerbe.domain.team.dto.TeamRequestDto;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto.createdTeamResponseDto;
 import com.tbfp.teamplannerbe.domain.team.entity.MemberTeam;
@@ -39,16 +43,14 @@ public class TeamServiceImpl implements TeamService {
     private final MemberRepository memberRepository;
     private final MemberTeamRepository memberTeamRepository;
     private final RecruitmentApplyRepository recruitmentApplyRepository;
-
-
-
+    private final EvaluationRepository evaluationRepository;
 
 
     @Transactional
     @Override
-    public TeamResponseDto.createdTeamResponseDto createTeam(String username, TeamReqeustDto.CreatTeamRequestDto creatTeamRequestDto){
+    public TeamResponseDto.createdTeamResponseDto createTeam(String username, TeamRequestDto.CreatTeamRequestDto creatTeamRequestDto) {
 
-        createdTeamResponseDto result=null;
+        createdTeamResponseDto result = null;
 
         //selected 한게 참여신청리스트에 해당 팀원모집글에 대해 신청한적이 있는지 확인 신청 한적이없다면 예외처리
         //병렬 스트림의 경우 여러 스레드에서 요소를 처리하므로, 첫 번째 요소를 찾는 것보다 임의의 요소를 찾는 것이 더 효율
@@ -100,7 +102,7 @@ public class TeamServiceImpl implements TeamService {
             Team savedTeam = teamRepository.save(team);
 
             //팀 member 저장
-            savedTeam.addTeamMembers(selectedMembers,username);
+            savedTeam.addTeamMembers(selectedMembers, username);
 
 
             // 저장된 멤버들을 순회하면서 recruitmentApply 상태값을 ACCEPT값으로 변경
@@ -120,8 +122,6 @@ public class TeamServiceImpl implements TeamService {
         }
 
 
-
-
         //이전에 팀을 생성한 적이 있으면 더티체킹
         if (findTeam != null) {
 
@@ -135,7 +135,7 @@ public class TeamServiceImpl implements TeamService {
 
 
             // team에 members 추가
-            chagedTeam.addTeamMembers(selectedMembers,username);
+            chagedTeam.addTeamMembers(selectedMembers, username);
 
             // 저장된 멤버들을 순회하면서 recruitmentApply 상태값을 ACCEPT값으로 변경
             selectedMembers.forEach(member -> {
@@ -170,8 +170,8 @@ public class TeamServiceImpl implements TeamService {
 
         //TeamMember테이블에서 삭제시킴
         //해당하는 테이블에 이게없는데 왜 예외가 안터지냐...?
-        memberTeamRepository.deleteByTeamIdAndMemberId(teamId,memberId).
-                orElseThrow(()->new ApplicationException(TEAM_NOT_FOUND));
+        memberTeamRepository.deleteByTeamIdAndMemberId(teamId, memberId).
+                orElseThrow(() -> new ApplicationException(TEAM_NOT_FOUND));
 
         team.decreaseTeamSize();
     }
@@ -192,14 +192,12 @@ public class TeamServiceImpl implements TeamService {
         //순회하면서 member하나씩 삭제
         memberTeamList.stream().forEach(
                 memberTeam -> memberTeamRepository.deleteByMemberId(memberTeam.getId())
-                        .orElseThrow(()->new ApplicationException(USER_NOT_FOUND))
+                        .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND))
         );
         //memberTeam 다 삭제 됐으면 해당 팀 삭제
         teamRepository.deleteById(teamId);
-
-
     }
-
+  
     @Override
     public List<TeamResponseDto.GetMyTeamResponseDto> getMyTeam(String username){
         Optional<Member> member = memberRepository.findByUsername(username);
@@ -217,5 +215,4 @@ public class TeamServiceImpl implements TeamService {
 
         return getMyTeamResponseDtos;
     }
-
 }

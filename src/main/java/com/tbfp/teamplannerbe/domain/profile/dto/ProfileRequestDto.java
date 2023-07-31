@@ -7,8 +7,11 @@ import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.profile.CRUDType;
 import com.tbfp.teamplannerbe.domain.profile.SkillLevel;
 import com.tbfp.teamplannerbe.domain.profile.entity.*;
+import com.tbfp.teamplannerbe.domain.team.entity.Team;
 import lombok.*;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
 import java.util.List;
@@ -130,23 +133,6 @@ public class ProfileRequestDto {
     @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
     @AllArgsConstructor
-    public static class EvaluationRequestDto {
-        private Long id;
-        private String comment;
-        private Integer stat1;
-        private Integer stat2;
-        private Integer stat3;
-        private Integer stat4;
-        private Integer stat5;
-        //작성자 정보 필요 없음(익명의 평가로 보이기 때문에)
-        //팀 정보를 보여줄 건지는 생각 필요
-        private CRUDType crudType;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    @AllArgsConstructor
     public static class CreateProfileRequestDto{
         private BasicProfileRequestDto basicProfile;
         private List<TechStackRequestDto> techStacks;
@@ -163,5 +149,101 @@ public class ProfileRequestDto {
         private List<TechStackRequestDto> techStacks;
         private List<ActivityRequestDto> activities;
         private List<CertificationRequestDto> certifications;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class CreateEvaluationRequestDto {
+        private String comment;
+
+        @Min(value = 1,message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        @Max(value = 10, message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        private Integer stat1;
+
+        @Min(value = 1,message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        @Max(value = 10, message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        private Integer stat2;
+
+        @Min(value = 1,message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        @Max(value = 10, message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        private Integer stat3;
+
+        @Min(value = 1,message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        @Max(value = 10, message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        private Integer stat4;
+
+        @Min(value = 1,message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        @Max(value = 10, message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        private Integer stat5;
+
+
+        public Evaluation toEntity(Member authorMember, Member subjectMember, Team team){
+            return Evaluation.builder()
+                    .comment(comment)
+                    .stat1(stat1)
+                    .stat2(stat2)
+                    .stat3(stat3)
+                    .stat4(stat4)
+                    .stat5(stat5)
+                    .authorMember(authorMember)
+                    .subjectMember(subjectMember)
+                    .team(team)
+                    .build();
+        }
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class UpdateEvaluationRequestDto {
+        private Long id;
+
+        private String comment;
+
+        @Min(value = 1,message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        @Max(value = 10, message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        private Integer stat1;
+
+        @Min(value = 1,message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        @Max(value = 10, message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        private Integer stat2;
+
+        @Min(value = 1,message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        @Max(value = 10, message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        private Integer stat3;
+
+        @Min(value = 1,message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        @Max(value = 10, message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        private Integer stat4;
+
+        @Min(value = 1,message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        @Max(value = 10, message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        private Integer stat5;
+
+        public Evaluation toEntity(Member authorMember, Member subjectMember, Team team){
+            return Evaluation.builder()
+                    .id(id)
+                    .comment(comment)
+                    .stat1(stat1)
+                    .stat2(stat2)
+                    .stat3(stat3)
+                    .stat4(stat4)
+                    .stat5(stat5)
+                    .authorMember(authorMember)
+                    .subjectMember(subjectMember)
+                    .team(team)
+                    .build();
+        }
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class DeleteEvaluationRequestDto {
+        private Long id;
     }
 }

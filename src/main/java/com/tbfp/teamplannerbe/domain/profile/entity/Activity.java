@@ -38,6 +38,7 @@ public class Activity extends BaseTimeEntity {
 
     public ProfileResponseDto.ActivityResponseDto toDto(){
         return ProfileResponseDto.ActivityResponseDto.builder()
+                .id(id)
                 .subject(subject)
                 .detail(detail)
                 .startDate(startDate)

@@ -3,6 +3,8 @@ package com.tbfp.teamplannerbe.domain.auth.oauth;
 import com.tbfp.teamplannerbe.domain.auth.ProviderType;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
+import com.tbfp.teamplannerbe.domain.profile.entity.BasicProfile;
+import com.tbfp.teamplannerbe.domain.profile.repository.BasicProfileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -23,6 +25,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CustomOAuth2MemberService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     private final MemberRepository memberRepository;
+    private final BasicProfileRepository basicProfileRepository;
 
     private static final String KAKAO = "kakao";
 
@@ -91,10 +94,17 @@ public class CustomOAuth2MemberService implements OAuth2UserService<OAuth2UserRe
      * OAuthAttributes의 toEntity() 메소드를 통해 빌더로 Member 객체 생성 후 반환
      * 생성된 Member 객체를 DB에 저장 : providerType, socialId, email, role 값만 있는 상태
      */
+    @Transactional
     private Member saveUser(OAuthAttributes attributes, ProviderType providerType) {
         log.info("CustomOAuth2MemberService.saveUser");
         Member createdMember = attributes.toEntity(providerType, attributes.getOauth2MemberInfo());
         log.info("createdMember = " + createdMember);
+        basicProfileRepository.save(
+                BasicProfile.builder()
+                        .member(createdMember)
+                        .profileImage(attributes.getOauth2MemberInfo().getImageUrl())
+                        .build()
+        );
         return memberRepository.save(createdMember);
     }
 }

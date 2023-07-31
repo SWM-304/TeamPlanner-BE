@@ -118,4 +118,13 @@ public class MemberResponseDto {
 
 
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class getMemberInfoDto {
+        private String username;
+        private String nickname;
+        private String profileImg;
+    }
 }

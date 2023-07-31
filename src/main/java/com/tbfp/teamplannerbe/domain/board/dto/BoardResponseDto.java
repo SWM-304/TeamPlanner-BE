@@ -43,6 +43,8 @@ public class BoardResponseDto {
         private Long likeCount;
         private List<BoardWithCommentListResponseDto> comments=new ArrayList<>();
 
+
+
         public BoardDetailResponseDto(Board board) {
             this.activitiyName = board.getActivityName();
             this.activityUrl = board.getActivityUrl();

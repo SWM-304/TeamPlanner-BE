@@ -129,7 +129,7 @@ pipeline {
 
                         sh "ssh -o StrictHostKeyChecking=no ubuntu@10.1.3.222 'sudo chmod 666 /var/run/docker.sock'"
 
-                        sh "ssh -o StrictHostKeyChecking=no ubuntu@10.1.3.222 'aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com'"
+                        // sh "ssh -o StrictHostKeyChecking=no ubuntu@10.1.3.222 'aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com'"
 
                         sh "ssh -o StrictHostKeyChecking=no ubuntu@10.1.3.222 'docker compose down'"
                         // Delete existing Docker image

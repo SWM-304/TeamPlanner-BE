@@ -6,6 +6,7 @@ import com.tbfp.teamplannerbe.domain.auth.service.RefreshTokenService;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto.MemberLoginRequestDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -44,7 +45,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         } catch (Exception e) {
             // no login request dto
             log.info("no login request dto");
-            return null;
+            throw new ApplicationException(ApplicationErrorType.UNSUCCESSFUL_AUTHENTICATION);
         }
 
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(memberLoginRequestDto.getUsername(), memberLoginRequestDto.getPassword());
@@ -67,18 +68,18 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_OK);
-        CookieUtil.addCookie(response, "accessToken", accessToken, jwtProvider.ACCESS_TOKEN_EXPIRATION_TIME);
-        CookieUtil.addCookie(response, "refreshToken", refreshToken, jwtProvider.REFRESH_TOKEN_EXPIRATION_TIME);
+//        CookieUtil.addCookie(response, "accessToken", accessToken, jwtProvider.ACCESS_TOKEN_EXPIRATION_TIME);
+//        CookieUtil.addCookie(response, "refreshToken", refreshToken, jwtProvider.REFRESH_TOKEN_EXPIRATION_TIME);
 
         // token body comment
-//        response.getWriter().write(
-//                new ObjectMapper().writeValueAsString(
-//                        MemberResponseDto.MemberLoginResponseDto.builder()
-//                                .accessToken(accessToken)
-//                                .refreshToken(refreshToken)
-//                                .build()
-//                )
-//        );
+        response.getWriter().write(
+                new ObjectMapper().writeValueAsString(
+                        MemberResponseDto.MemberLoginResponseDto.builder()
+                                .accessToken(accessToken)
+                                .refreshToken(refreshToken)
+                                .build()
+                )
+        );
     }
 
     @Override

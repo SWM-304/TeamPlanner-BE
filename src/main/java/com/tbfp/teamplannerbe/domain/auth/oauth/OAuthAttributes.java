@@ -67,6 +67,7 @@ public class OAuthAttributes {
                 .state(true)
                 .password("" + UUID.randomUUID())
                 .phone("")
+                .nickname("nickname")
 //                .nickname(oauth2MemberInfo.getNickname())
 //                .imageUrl(oauth2MemberInfo.getImageUrl())
                 .memberRole(MemberRole.MEMBER)

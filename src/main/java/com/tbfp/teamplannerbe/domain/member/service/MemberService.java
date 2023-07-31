@@ -39,4 +39,6 @@ public interface MemberService {
 
 
     List<RecruitmentApplicantResponseDto> findApplicantList(String name);
+
+    MemberResponseDto.getMemberInfoDto getMemberInfo(String username);
 }

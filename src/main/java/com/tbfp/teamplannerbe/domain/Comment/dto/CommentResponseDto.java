@@ -34,7 +34,6 @@ public class CommentResponseDto {
         private String content;
         private String updatedAt;
         private boolean isConfidential;
-
         private Long commentId;
 
 
@@ -78,5 +77,26 @@ public class CommentResponseDto {
         private Long commentId;
         private Long parentId;
 
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class commentToCommentListResponseDto {
+
+        private String username;
+        private String content;
+        private LocalDateTime updatedAt;
+        private boolean isConfidential;
+        private Long commentId;
+
+        public commentToCommentListResponseDto(Comment comment) {
+            this.username = comment.getMember().getUsername();
+            this.content = comment.getContent();
+            this.updatedAt = comment.getUpdatedAt();
+            this.isConfidential = comment.isConfidential();
+            this.commentId = comment.getId();
+        }
     }
 }

@@ -5,6 +5,7 @@ import com.tbfp.teamplannerbe.domain.board.repository.BoardRepository;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CreateCommentRequestDto;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.UpdateCommentRequestDto;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CommentToCommentCreateRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.CreatedCommentResponseDto;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.CreatedchildCommentResponseDto;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.UpdatedCommentResponseDto;
@@ -20,13 +21,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType.*;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class CommentServiceImpl implements CommentService {
 
     private final BoardRepository boardRepository;
@@ -214,9 +219,9 @@ public class CommentServiceImpl implements CommentService {
                     .isConfidential(commentToCommentCreateRequestDto.getIsConfidential())
                     .build();
 
-            if(parentComment.getId()!=childComment.getId()){
-                parentComment.setParentComment(childComment);
-            }
+//            if(parentComment.getId()!=childComment.getId()){
+//                parentComment.setParentComment(childComment);
+//            }
 
 //            System.out.println("=================");
 //            commentRepository.save(parentComment);  // 부모 댓글 저장
@@ -238,5 +243,15 @@ public class CommentServiceImpl implements CommentService {
 
 
         return commentToComment;
+    }
+
+    @Override
+    public List<CommentResponseDto.commentToCommentListResponseDto> getCommentToCommentList(Long boardId, Long commentId) {
+        List<Comment> childCommentList = commentRepository.findAllByBoard_IdAndParentCommentId(boardId, commentId);
+
+        List<CommentResponseDto.commentToCommentListResponseDto> result = childCommentList.stream().map(comment -> new CommentResponseDto.commentToCommentListResponseDto(comment))
+                .collect(Collectors.toList());
+
+        return result;
     }
 }

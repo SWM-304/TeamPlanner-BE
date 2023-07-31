@@ -33,13 +33,6 @@ public class MemberTeamRepositoryImpl extends Querydsl4RepositorySupport impleme
                 .fetch();
     }
 
-    public List<Long> findMemberIdsByTeamIds(List<Long> teamIds) {
-        return select(member.id)
-                .from(memberTeam)
-                .where(team.id.eq(1L))
-                .fetch();
-    }
-
     public MemberTeam findByMemberIdsAndTeamIds(Long memberId1, Long memberId2, Long teamId) {
         return select(memberTeam)
                 .from(memberTeam)

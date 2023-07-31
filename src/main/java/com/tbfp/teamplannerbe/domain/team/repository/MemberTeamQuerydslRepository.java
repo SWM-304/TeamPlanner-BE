@@ -10,6 +10,5 @@ public interface MemberTeamQuerydslRepository {
 
     List<MemberTeam> findDistinctTeamsByMemberId(Long memberId);
 
-    List<Long> findMemberIdsByTeamIds(List<Long> teamIds);
     MemberTeam findByMemberIdsAndTeamIds(Long memberId1, Long memberId2, Long teamId);
 }

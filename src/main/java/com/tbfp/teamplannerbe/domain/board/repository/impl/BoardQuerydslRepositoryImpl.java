@@ -10,6 +10,7 @@ import com.tbfp.teamplannerbe.domain.board.entity.QBoard;
 import com.tbfp.teamplannerbe.domain.board.repository.BoardQuerydslRepository;
 import com.tbfp.teamplannerbe.domain.common.querydsl.support.Querydsl4RepositorySupport;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
@@ -40,23 +41,23 @@ public class BoardQuerydslRepositoryImpl extends Querydsl4RepositorySupport impl
         StringExpression recruitmentPeriodEndDate = Expressions.stringTemplate("STR_TO_DATE(SUBSTRING_INDEX({0}, '~', -1), '%Y.%m.%d')", board.recruitmentPeriod);
         BooleanExpression recruitmentPeriodPredicate = recruitmentPeriodEndDate.goe(String.valueOf(LocalDate.now()));
 
-
-
-
-        List<Board> content=selectFrom(board)
-                .leftJoin(board.comments,comment).fetchJoin()
+        JPAQuery<Board> contentQuery = selectFrom(board)
+                .leftJoin(board.comments, comment).fetchJoin()
                 .where(categoryEq(condition.getCategory()))
                 .where(recruitmentPeriodPredicate)
                 .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+                .limit(pageable.getPageSize());
+
+        List<Board> content = contentQuery.fetch();
 
         JPAQuery<Long> countQuery = select(board.count())
                 .from(board)
-                .where(categoryEq(condition.getCategory()));
+                .where(categoryEq(condition.getCategory()))
+                .where(recruitmentPeriodPredicate);
 
-        return PageableExecutionUtils.getPage(content,pageable,countQuery::fetchOne);
+        long totalCount = countQuery.fetchOne();
+        return new PageImpl<>(content, pageable, totalCount);
     }
 
     @Override

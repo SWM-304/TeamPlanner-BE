@@ -20,7 +20,7 @@ public class BasicProfile extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "PROFILE_ID")
+    @Column(name = "BASIC_PROFILE_ID")
     private Long id;
 
     @Column(length = 1000)

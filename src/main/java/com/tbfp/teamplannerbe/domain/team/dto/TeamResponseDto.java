@@ -62,7 +62,7 @@ public class TeamResponseDto {
         private Long recruitmentId;
         private Long boardId;
         @Builder.Default
-        private List<Long> memberIds = new ArrayList<>();
+        private List<MemberInfoDto> memberInfos = new ArrayList<>();
 
 
         public static GetMyTeamResponseDto toDto(Team team) {
@@ -76,14 +76,38 @@ public class TeamResponseDto {
                     .endDate(team.getEndDate())
                     .recruitmentId(team.getRecruitment().getId())
                     .boardId(team.getRecruitment().getBoard().getId())
-                    .memberIds(getMemberIdsFromMemberTeams(team))
+                    .memberInfos(getMemberInfoFromMemberTeam(team))
                     .build();
         }
 
-        public static List<Long> getMemberIdsFromMemberTeams(Team team){
-            return team.getMemberTeams()
-                    .stream().map(MemberTeam::getMember).collect(Collectors.toList())
-                    .stream().map(Member::getId).collect(Collectors.toList());
+        public static List<MemberInfoDto> getMemberInfoFromMemberTeam(Team team){
+//            List<MemberTeam> memberTeams = team.getMemberTeams();
+//            System.out.println(memberTeams.size());
+//            for(int i=0;i<memberTeams.size();i++){
+//                System.out.println(memberTeams.get(0).getMember().getId());
+//            }
+            List<Member> members = team.getMemberTeams()
+                    .stream().map(MemberTeam::getMember).collect(Collectors.toList());
+            return members.stream().map(MemberInfoDto::toDto).collect(Collectors.toList());
         }
+
+        @Getter
+        @NoArgsConstructor(access = AccessLevel.PROTECTED)
+        @AllArgsConstructor
+        @Builder
+        public static class MemberInfoDto{
+            private Long memberId;
+            private String nickname;
+            private String profileImage;
+
+            public static MemberInfoDto toDto(Member member){
+                return MemberInfoDto.builder()
+                        .memberId(member.getId())
+                        .nickname(member.getNickname())
+                        .profileImage(member.getBasicProfile().getProfileImage())
+                        .build();
+            }
+        }
+
     }
 }

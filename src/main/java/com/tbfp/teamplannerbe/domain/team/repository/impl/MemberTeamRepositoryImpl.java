@@ -47,13 +47,5 @@ public class MemberTeamRepositoryImpl extends Querydsl4RepositorySupport impleme
                 .where(memberTeam.team.id.eq(teamId))
                 .fetchOne();
     }
-  
-    public List<Team> findAllTeamsByMemberId(Long memberId){
-        return select(team)
-                .from(memberTeam)
-                .join(memberTeam.team, team)
-                .where(memberTeam.member.id.eq(memberId))
-                .fetchJoin()
-                .fetch();
-    }
+
 }

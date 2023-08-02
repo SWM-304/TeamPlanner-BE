@@ -37,14 +37,16 @@ public class BoardQuerydslRepositoryImpl extends Querydsl4RepositorySupport impl
     @Override
     public Page<Board> getBoardList(BoardSearchCondition condition, Pageable pageable) {
 
+        String[] word = (condition.getActivityField()!=null) ? condition.getActivityField().split("/") : null;
+
+        BooleanExpression activityFieldExpression = (word != null) ? activityFieldContains(word) : null;
+
 
         StringExpression recruitmentPeriodEndDate = Expressions.stringTemplate("STR_TO_DATE(SUBSTRING_INDEX({0}, '~', -1), '%Y.%m.%d')", board.recruitmentPeriod);
         BooleanExpression recruitmentPeriodPredicate = recruitmentPeriodEndDate.goe(String.valueOf(LocalDate.now()));
 
         JPAQuery<Board> contentQuery = selectFrom(board)
-                .leftJoin(board.comments, comment).fetchJoin()
-                .where(categoryEq(condition.getCategory()))
-                .where(recruitmentPeriodPredicate)
+                .where(categoryEq(condition.getCategory()),recruitmentPeriodPredicate,activityFieldExpression)
                 .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
@@ -53,12 +55,12 @@ public class BoardQuerydslRepositoryImpl extends Querydsl4RepositorySupport impl
 
         JPAQuery<Long> countQuery = select(board.count())
                 .from(board)
-                .where(categoryEq(condition.getCategory()))
-                .where(recruitmentPeriodPredicate);
+                .where(categoryEq(condition.getCategory()),recruitmentPeriodPredicate,activityFieldExpression);
 
         long totalCount = countQuery.fetchOne();
         return new PageImpl<>(content, pageable, totalCount);
     }
+
 
     @Override
     public List<Board> getBoardAndComment(Long boardId) {
@@ -97,6 +99,19 @@ public class BoardQuerydslRepositoryImpl extends Querydsl4RepositorySupport impl
     private BooleanExpression categoryEq(String category) {
         return hasText(category) ? board.category.eq(category) : null;
     }
+    private BooleanExpression activityFieldContains(String[] activityFields) {
+        BooleanExpression result = null;
+        for (String field : activityFields) {
+            if (hasText(field)) {
+                BooleanExpression fieldExpression = board.activityField.like("%" + field + "%");
+                // or 을 처리하여 split 한 word 가 포함되어 있는지 확인해서 넣어줌
+                // 예 문학/시나리오  (board.activityField.like("%문학%").or(board.activityField.like("%시나리오%")))
+                result = (result == null) ? fieldExpression : result.or(fieldExpression);
+            }
+        }
+        return result;
+    }
+
     private BooleanExpression boardIdEq(Long boardId) {
         return hasText(String.valueOf(boardId)) ? board.id.eq(boardId) : null;
     }

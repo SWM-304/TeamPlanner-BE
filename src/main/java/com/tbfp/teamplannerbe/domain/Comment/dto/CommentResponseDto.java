@@ -23,6 +23,7 @@ public class CommentResponseDto {
     public static class CreatedCommentResponseDto {
         private String content;
         private Long boardId;
+        private String nickname;
         private String username;
         private LocalDateTime createdDate;
         private Boolean isConfidential;

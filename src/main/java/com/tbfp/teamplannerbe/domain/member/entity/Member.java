@@ -5,8 +5,10 @@ import com.tbfp.teamplannerbe.domain.auth.ProviderType;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
 import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
+import com.tbfp.teamplannerbe.domain.profile.entity.BasicProfile;
 import com.tbfp.teamplannerbe.domain.team.entity.MemberTeam;
 import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 
 
 import javax.persistence.*;
@@ -57,11 +59,15 @@ public class Member extends BaseTimeEntity {
     private List<Board> boardList = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy ="member")
+    @OneToMany(mappedBy ="member", cascade = CascadeType.ALL)
     private List<MemberTeam> memberTeams=new ArrayList<>();
 
-}
+    @JsonIgnore
+    @OneToOne(mappedBy = "member")
+    @JoinColumn(name = "BASIC_PROFILE_ID")
+    private BasicProfile basicProfile;
 
+}
 
 
 

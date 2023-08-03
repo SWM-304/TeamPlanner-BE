@@ -43,6 +43,8 @@ public class CommentResponseDto {
         private boolean isConfidential;
         private Long commentId;
         private Integer commentCount;
+        private String nickName;
+        private String profileImage;
         @Builder.Default
         List<commentToCommentListResponseDto> childCommentList=new ArrayList<>();
 
@@ -56,6 +58,8 @@ public class CommentResponseDto {
             this.parentId = comment.getParentComment()==null ? null : comment.getParentComment().getId();
             this.commentId=comment.getId();
             this.commentCount=comment.getChildCommentCount();
+            this.nickName=comment.getMember().getNickname();
+            this.profileImage=comment.getMember().getBasicProfile()==null ? null : comment.getMember().getBasicProfile().getProfileImage();
             if (childComments != null) {
                 this.childCommentList = childComments.stream()
                         .map(BoardWithCommentListResponseDto::mapToCommentToCommentListResponseDto)
@@ -112,6 +116,8 @@ public class CommentResponseDto {
         private boolean isConfidential;
         private Long commentId;
         private Long parentId;
+        private String nickName;
+        private String profileImage;
 
         public commentToCommentListResponseDto(Comment comment) {
             this.username = comment.getMember().getUsername();
@@ -120,6 +126,8 @@ public class CommentResponseDto {
             this.isConfidential = comment.isConfidential();
             this.commentId = comment.getId();
             this.parentId = comment.getParentComment()==null ? null : comment.getParentComment().getId();
+            this.nickName=comment.getMember().getNickname();
+            this.profileImage=comment.getMember().getBasicProfile()==null ? null : comment.getMember().getBasicProfile().getProfileImage();
         }
     }
 }

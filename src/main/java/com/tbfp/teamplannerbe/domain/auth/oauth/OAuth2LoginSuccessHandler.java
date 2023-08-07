@@ -50,7 +50,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         if (serverName.equals("localhost")) {
             currentDomain = scheme + "://" + serverName + ":" + 3000;
         } else {
-            currentDomain = scheme + "://" + serverName + ":" + 80;
+            currentDomain = scheme + "://" + "teamplanner-frontend.s3-website.ap-northeast-2.amazonaws.com" + ":" + 80;
         }
 
         return currentDomain;

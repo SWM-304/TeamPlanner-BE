@@ -35,12 +35,31 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         if(oAuth2Member.getMemberRole() == MemberRole.GUEST) {
             throw new ApplicationException(ApplicationErrorType.GUEST_USER);
         } else {
-            loginSuccess(response, oAuth2Member); // 로그인에 성공한 경우 access, refresh 토큰 생성
+            loginSuccess(response, oAuth2Member,getCurrentDomain(request)); // 로그인에 성공한 경우 access, refresh 토큰 생성
         }
     }
 
-    private void loginSuccess(HttpServletResponse response, CustomOAuth2Member oAuth2Member) {
+    // 현재 도메인 정보를 가져오는 메서드
+    private String getCurrentDomain(HttpServletRequest request) {
+        String scheme = request.getScheme();
+        String serverName = request.getServerName();
+        String currentDomain="";
+
+        // 예: http://localhost:8080/myapp
+
+        if (serverName.equals("localhost")) {
+            currentDomain = scheme + "://" + serverName + ":" + 3000;
+        } else {
+            currentDomain = scheme + "://" + serverName + ":" + 80;
+        }
+
+        return currentDomain;
+    }
+
+
+    private void loginSuccess(HttpServletResponse response, CustomOAuth2Member oAuth2Member,String domain) {
         log.info("OAuth2LoginSuccessHandler.loginSuccess");
+        log.info("살려줘"+domain);
         String accessToken = jwtProvider.generateAccessToken(oAuth2Member.getUsername());
         String refreshToken = jwtProvider.generateRefreshToken(oAuth2Member.getUsername());
 
@@ -60,8 +79,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 //                                    .build()
 //                    )
 //            );
-
-            response.sendRedirect("http://localhost:3000/oauth2/redirect?accessToken=" + accessToken + "&refreshToken=" + refreshToken);
+            response.sendRedirect(domain+"/oauth2/redirect?accessToken=" + accessToken + "&refreshToken=" + refreshToken);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

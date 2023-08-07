@@ -7,6 +7,7 @@ import com.tbfp.teamplannerbe.domain.member.Education;
 import com.tbfp.teamplannerbe.domain.member.Gender;
 import com.tbfp.teamplannerbe.domain.member.Job;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
@@ -349,8 +350,8 @@ class TeamServiceImplTest {
             Assert.assertEquals(boardId,team.getBoardId());
 
             // 팀 멤버 리스트가 기대하는 멤버 리스트와 동일한지 확인
-            List<TeamResponseDto.GetMyTeamResponseDto.MemberInfoDto> expectedMemberInfos = member.stream().map(TeamResponseDto.GetMyTeamResponseDto.MemberInfoDto::toDto).collect(Collectors.toList());
-            List<TeamResponseDto.GetMyTeamResponseDto.MemberInfoDto> actualMemberInfos = team.getMemberInfos();
+            List<MemberResponseDto.MemberInfoDto> expectedMemberInfos = member.stream().map(MemberResponseDto.MemberInfoDto::toDto).collect(Collectors.toList());
+            List<MemberResponseDto.MemberInfoDto> actualMemberInfos = team.getMemberInfos();
             System.out.println(actualMemberInfos);
             Assert.assertEquals(expectedMemberInfos,actualMemberInfos);
         }

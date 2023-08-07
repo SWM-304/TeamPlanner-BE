@@ -1,5 +1,6 @@
 package com.tbfp.teamplannerbe.domain.team.dto;
 
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.team.entity.MemberTeam;
 import com.tbfp.teamplannerbe.domain.team.entity.Team;
@@ -62,7 +63,7 @@ public class TeamResponseDto {
         private Long recruitmentId;
         private Long boardId;
         @Builder.Default
-        private List<MemberInfoDto> memberInfos = new ArrayList<>();
+        private List<MemberResponseDto.MemberInfoDto> memberInfos = new ArrayList<>();
 
 
         public static GetMyTeamResponseDto toDto(Team team) {
@@ -80,34 +81,10 @@ public class TeamResponseDto {
                     .build();
         }
 
-        public static List<MemberInfoDto> getMemberInfoFromMemberTeam(Team team){
-//            List<MemberTeam> memberTeams = team.getMemberTeams();
-//            System.out.println(memberTeams.size());
-//            for(int i=0;i<memberTeams.size();i++){
-//                System.out.println(memberTeams.get(0).getMember().getId());
-//            }
+        public static List<MemberResponseDto.MemberInfoDto> getMemberInfoFromMemberTeam(Team team){
             List<Member> members = team.getMemberTeams()
                     .stream().map(MemberTeam::getMember).collect(Collectors.toList());
-            return members.stream().map(MemberInfoDto::toDto).collect(Collectors.toList());
+            return members.stream().map(MemberResponseDto.MemberInfoDto::toDto).collect(Collectors.toList());
         }
-
-        @Getter
-        @NoArgsConstructor(access = AccessLevel.PROTECTED)
-        @AllArgsConstructor
-        @Builder
-        public static class MemberInfoDto{
-            private Long memberId;
-            private String nickname;
-            private String profileImage;
-
-            public static MemberInfoDto toDto(Member member){
-                return MemberInfoDto.builder()
-                        .memberId(member.getId())
-                        .nickname(member.getNickname())
-                        .profileImage(member.getBasicProfile().getProfileImage())
-                        .build();
-            }
-        }
-
     }
 }

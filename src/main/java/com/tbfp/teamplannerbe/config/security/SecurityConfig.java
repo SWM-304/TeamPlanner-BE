@@ -12,6 +12,7 @@ import com.tbfp.teamplannerbe.domain.common.exception.GlobalExceptionHandlerFilt
 import com.tbfp.teamplannerbe.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -54,6 +55,8 @@ public class SecurityConfig {
                         "/", "/api/v1/member/login", "/api/v1/member/renew-access-token"
                         , "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**" // swagger
                 ).permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/board/**","/api/v1/recruitment/**","/api/v1/member/signup/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/v1/signup/**","/api/v1/forgot-username","/api/v1/forgot-password").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .oauth2Login()

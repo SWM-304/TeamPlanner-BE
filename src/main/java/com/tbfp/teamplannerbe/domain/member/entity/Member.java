@@ -9,7 +9,6 @@ import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
 import com.tbfp.teamplannerbe.domain.profile.entity.BasicProfile;
 import com.tbfp.teamplannerbe.domain.team.entity.MemberTeam;
 import lombok.*;
-import net.minidev.json.annotate.JsonIgnore;
 
 
 import javax.persistence.*;
@@ -67,8 +66,6 @@ public class Member extends BaseTimeEntity {
     @OneToOne(mappedBy = "member")
     @JoinColumn(name = "BASIC_PROFILE_ID")
     private BasicProfile basicProfile;
-}
-
 }
 
 

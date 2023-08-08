@@ -108,10 +108,9 @@ public class CrawlingTest {
 
                 if(element.getText().equals("공모전")){
                     System.out.println("공모전 글 입니다");
-                    Document doc = Jsoup.connect(url).get();
 
-                    Element 접수기간 = doc.select("h3.jss67").get(3);
-                    String[] split = 접수기간.text().split("~");
+                    WebElement recruitmentPeriod = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[4]/h3"));
+                    String[] split = recruitmentPeriod.getText().split("~");
                     String startDateString=split[0];
                     String endDateString=split[1];
 
@@ -124,18 +123,19 @@ public class CrawlingTest {
                         if (currentDateObj.compareTo(startDate) >= 0 && currentDateObj.compareTo(endDate) <= 0) {
                             System.out.println("현재 날짜는 접수 기간에 포함됩니다.");
 
-                            String activityName = doc.selectFirst("h1.TrickyH1Tag__StyledWrapper-sc-a1b54afc-0.cbgYCI").text();
-                            Element activityImg = doc.selectFirst("figure.jss51 > img.jss52");
+                            String activityName = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/h1")).getText();
+                            String activityImg = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[1]/div[1]/div/figure/img")).getAttribute("src");
 
 
-                            String companyType = doc.select("h3.jss67").get(0).text();
-                            String target = doc.select("h3.jss67").get(1).text();
-                            String prizeScale = doc.select("h3.jss67").get(2).text();
+                            String companyType = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[1]/h3")).getText(); //기업형태
+                            String target = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[2]/h3")).getText(); //참여대상
+                            String prizeScale = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[3]/h3")).getText(); //참여대상
 
-                            String activityUrl = doc.select("h3.jss67").get(4).text();
-                            String activityBenefits = doc.select("h3.jss67").get(5).text();
-                            String activity_field = doc.select("h3.jss67").get(6).text();
-                            Element 추가혜택 = doc.select("h3.jss67").get(7);
+                            String activityUrl = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[3]/h3")).getText(); // 홈페이지
+
+                            String activityBenefits = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[6]/h3")).getText(); //활동혜택
+
+                            String activity_field = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[7]/h3/div")).getText(); //공모분야
 
 
 
@@ -143,7 +143,7 @@ public class CrawlingTest {
 
                             // 상세내용 jsoup으로 못가져오게 막아놔서  동적크롤링으로 변환
 //                            String activitiyDetail = doc.select(".ActivityDetailTabContent__StyledWrapper-sc-b973f285-0.juIUdj > div").html();
-                            WebElement activityDetailElement = driver.findElement(By.cssSelector("#DETAIL > div.ActivityDetailTabContent__StyledWrapper-sc-b973f285-0.juIUdj > div"));
+                            WebElement activityDetailElement = driver.findElement(By.xpath("//*[@id=\"DETAIL\"]/div[1]/div"));;//상세내용
 
                             // detailluterHTML 가져오기
                             String activitiyDetail = activityDetailElement.getAttribute("outerHTML");
@@ -152,7 +152,7 @@ public class CrawlingTest {
                                     .activityKey(activitiyKey)
                                     .activityName(activityName)
                                     .activityUrl(activityUrl)
-                                    .activityImg(activityImg.attr("src"))
+                                    .activityImg(activityImg)
                                     .activityDetail(activitiyDetail)
                                     .category("공모전")
                                     .companyType(companyType)
@@ -182,9 +182,10 @@ public class CrawlingTest {
                 if(element.getText().equals("대외활동")){
                     System.out.println("대외활동글 입니다");
 
-                    Document doc = Jsoup.connect(url).get();
-                    Element recruitmentPeriod = doc.select("h3.jss67").get(2);
-                    String[] split = recruitmentPeriod.text().split("~");
+
+                    WebElement recruitmentPeriod = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[3]/h3"));
+
+                    String[] split = recruitmentPeriod.getText().split("~");
                     String startDateString=split[0];
                     String endDateString=split[1];
 
@@ -196,21 +197,22 @@ public class CrawlingTest {
                         if (currentDateObj.compareTo(startDate) >= 0 && currentDateObj.compareTo(endDate) <= 0) {
                             System.out.println("현재 날짜는 접수 기간에 포함됩니다.");
 
-                            String activityName = doc.selectFirst("h1.TrickyH1Tag__StyledWrapper-sc-a1b54afc-0.cbgYCI").text();
-                            Element activityImg = doc.selectFirst("figure.jss51 > img.jss52");
 
-                            String companyType = doc.select("h3.jss67").get(0).text(); //기업형태
-                            String target = doc.select("h3.jss67").get(1).text(); //참여대상
-                                                                                            //접수기간  recruitmentPeriod
 
-                            String activityPeriod = doc.select("h3.jss67").get(3).text(); //활동기간
-                            String recruitmentCount = doc.select("h3.jss67").get(4).text(); //모집인원
-                            String activityArea = doc.select("h3.jss67").get(5).text();//활동지역
-                            String preferredSkills = doc.select("h3.jss67").get(6).text();//우대역량
-                            String activityUrl = doc.select("h3.jss67").get(7).text();//홈페이지
-                            String activityBenefits = doc.select("h3.jss67").get(8).text();//활동혜택
-                            String interestArea = doc.select("h3.jss67").get(9).text();//관심분야
-                            String activityField = doc.select("h3.jss67").get(10).text();//활동분야
+                            String activityName = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/h1")).getText();
+
+                            String activityImg = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[1]/div[1]/div/figure/img")).getAttribute("src");
+
+                            String companyType = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[1]/h3")).getText(); //기업형태
+                            String target = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[2]/h3")).getText(); //참여대상
+                            String activityPeriod = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[4]/h3")).getText(); //활동기간
+                            String recruitmentCount = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[5]/h3")).getText();; //모집인원
+                            String activityArea =driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[6]/h3/div")).getText();;//활동지역
+                            String preferredSkills = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[7]/h3")).getText();;//우대역량
+                            String activityUrl = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[8]/h3/div")).getText();;//홈페이지
+                            String activityBenefits = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[9]/h3")).getText();;//활동혜택
+                            String interestArea = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[10]/h3/div")).getText();;//관심분야
+                            String activityField = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[11]/h3/div")).getText();;//활동분야
 
 
                             String activitiyKey=link;
@@ -219,7 +221,8 @@ public class CrawlingTest {
 //
 //                            // 상세내용 jsoup으로 못가져오게 막아놔서  동적크롤링으로 변환
 //                            String activitiyDetail = doc.select(".ActivityDetailTabContent__StyledWrapper-sc-b973f285-0.juIUdj > div").html();
-                            WebElement activityDetailElement = driver.findElement(By.cssSelector("#DETAIL > div.ActivityDetailTabContent__StyledWrapper-sc-b973f285-0.juIUdj > div"));
+                            WebElement activityDetailElement = driver.findElement(By.xpath("//*[@id=\"DETAIL\"]/div[1]/div"));;//상세내용
+
 
                             // detailluterHTML 가져오기
                             String activitiyDetail = activityDetailElement.getAttribute("outerHTML");
@@ -228,7 +231,7 @@ public class CrawlingTest {
                                     .activityKey(activitiyKey)
                                     .activityName(activityName)
                                     .activityUrl(activityUrl)
-                                    .activityImg(activityImg.attr("src"))
+                                    .activityImg(activityImg)
                                     .activityDetail(activitiyDetail)
                                     .category("대외활동")
                                     .companyType(companyType)
@@ -258,13 +261,11 @@ public class CrawlingTest {
                 if(element.getText().equals("동아리")){
                     System.out.println("동아리글 입니다");
 
-                    Document doc = Jsoup.connect(url).get();
+                    WebElement recruitmentPeriod = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[4]/h3"));
 
-                    Element recruitmentPeriod = doc.select("h3.jss67").get(3);
-                    String[] split = recruitmentPeriod.text().split("~");
+                    String[] split = recruitmentPeriod.getText().split("~");
                     String startDateString=split[0];
                     String endDateString=split[1];
-
 
                     try {
                         Date startDate = format.parse(startDateString);
@@ -274,28 +275,28 @@ public class CrawlingTest {
                         if (currentDateObj.compareTo(startDate) >= 0 && currentDateObj.compareTo(endDate) <= 0) {
                             System.out.println("현재 날짜는 접수 기간에 포함됩니다.");
 
-                            String activityName = doc.selectFirst("h1.TrickyH1Tag__StyledWrapper-sc-a1b54afc-0.cbgYCI").text();
-                            Element activityImg = doc.selectFirst("figure.jss51 > img.jss52");
+                            String activityName = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/h1")).getText();
+
+                            String activityImg = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[1]/div[1]/div/figure/img")).getAttribute("src");
 
 
-                            String companyType = doc.select("h3.jss67").get(0).text(); //기업형태
-                            String target = doc.select("h3.jss67").get(1).text(); //참여대상
-                            //접수기간  recruitmentPeriod
+                            String companyType = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[1]/h3")).getText();//기업형태
+                            String target = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[2]/h3")).getText();//참여대상
 
-                            String activitiyArea = doc.select("h3.jss67").get(2).text(); //활동지역
-                            String recruitmentCount = doc.select("h3.jss67").get(4).text(); //모집인원
-                            String meetingTime = doc.select("h3.jss67").get(5).text();//모임시간
-                            String activityUrl = doc.select("h3.jss67").get(6).text();//홈페이지
-                            String activityBenefits = doc.select("h3.jss67").get(7).text();//활동혜택
-                            String interestArea = doc.select("h3.jss67").get(8).text();//관심분야
-                            String activityField = doc.select("h3.jss67").get(9).text();//활동분야
+                            String activitiyArea = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[3]/h3/div")).getText();//활동지역
+                            String recruitmentCount = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[5]/h3")).getText();//모집인원
+                            String meetingTime = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[6]/h3")).getText();//모임시간
+                            String activityUrl = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[7]/h3/div")).getText();//홈페이지
+                            String activityBenefits = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[8]/h3")).getText();//활동혜택
+                            String interestArea = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[9]/h3/div")).getText();//관심분야
+                            String activityField = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[10]/h3/div")).getText();//활동분야
 
                             String activitiyKey=link;
 
 
                             // 상세내용 jsoup으로 못가져오게 막아놔서  동적크롤링으로 변환
 //                            String activitiyDetail = doc.select(".ActivityDetailTabContent__StyledWrapper-sc-b973f285-0.juIUdj > div").html();
-                            WebElement activityDetailElement = driver.findElement(By.cssSelector("#DETAIL > div.ActivityDetailTabContent__StyledWrapper-sc-b973f285-0.juIUdj > div"));
+                            WebElement activityDetailElement = driver.findElement(By.xpath("//*[@id=\"DETAIL\"]/div[1]/div"));;//상세내용
 
                             // detailluterHTML 가져오기
                             String activitiyDetail = activityDetailElement.getAttribute("outerHTML");
@@ -304,7 +305,7 @@ public class CrawlingTest {
                                     .activityKey(activitiyKey)
                                     .activityName(activityName)
                                     .activityUrl(activityUrl)
-                                    .activityImg(activityImg.attr("src"))
+                                    .activityImg(activityImg)
                                     .activityDetail(activitiyDetail)
                                     .category("동아리")
                                     .companyType(companyType)

@@ -1,7 +1,6 @@
 package com.tbfp.teamplannerbe.domain.common.exception;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -26,7 +25,7 @@ public enum ApplicationErrorType {
 
     COMMNET_NOT_FINE(HttpStatus.NO_CONTENT,-6,"댓글을 찾을 수 없습니다"),
 
-    REFRESH_TOKEN_FOR_USER_NOT_FOUND(HttpStatus.NO_CONTENT, -7, "리프레시 토큰을 찾을 수 없습니다."),
+    REFRESH_TOKEN_FOR_USER_NOT_FOUND(HttpStatus.BAD_REQUEST, -7, "리프레시 토큰을 찾을 수 없습니다."),
 
 
     MEMBER_REGISTER_FAIL(HttpStatus.BAD_REQUEST, -20000, "회원 생성에 실패했습니다."),

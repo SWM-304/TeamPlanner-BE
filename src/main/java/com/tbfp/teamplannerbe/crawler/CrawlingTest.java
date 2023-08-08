@@ -10,6 +10,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -109,7 +110,7 @@ public class CrawlingTest {
                     System.out.println("공모전 글 입니다");
                     Document doc = Jsoup.connect(url).get();
 
-                    Element 접수기간 = doc.select("h3.jss76").get(3);
+                    Element 접수기간 = doc.select("h3.jss67").get(3);
                     String[] split = 접수기간.text().split("~");
                     String startDateString=split[0];
                     String endDateString=split[1];
@@ -123,27 +124,29 @@ public class CrawlingTest {
                         if (currentDateObj.compareTo(startDate) >= 0 && currentDateObj.compareTo(endDate) <= 0) {
                             System.out.println("현재 날짜는 접수 기간에 포함됩니다.");
 
-                            String activityName = doc.selectFirst("h1.TrickyH1Tag__StyledWrapper-sc-501a6070-0.eHFQjd").text();
-                            Element activityImg = doc.selectFirst("figure.jss60 > img.jss61");
+                            String activityName = doc.selectFirst("h1.TrickyH1Tag__StyledWrapper-sc-a1b54afc-0.cbgYCI").text();
+                            Element activityImg = doc.selectFirst("figure.jss51 > img.jss52");
 
 
-                            String companyType = doc.select("h3.jss76").get(0).text();
-                            String target = doc.select("h3.jss76").get(1).text();
-                            String prizeScale = doc.select("h3.jss76").get(2).text();
+                            String companyType = doc.select("h3.jss67").get(0).text();
+                            String target = doc.select("h3.jss67").get(1).text();
+                            String prizeScale = doc.select("h3.jss67").get(2).text();
 
-                            String activityUrl = doc.select("h3.jss76").get(4).text();
-                            String activityBenefits = doc.select("h3.jss76").get(5).text();
-                            String activity_field = doc.select("h3.jss76").get(6).text();
-                            Element 추가혜택 = doc.select("h3.jss76").get(7);
+                            String activityUrl = doc.select("h3.jss67").get(4).text();
+                            String activityBenefits = doc.select("h3.jss67").get(5).text();
+                            String activity_field = doc.select("h3.jss67").get(6).text();
+                            Element 추가혜택 = doc.select("h3.jss67").get(7);
 
 
 
                             String activitiyKey=link;
 
+                            // 상세내용 jsoup으로 못가져오게 막아놔서  동적크롤링으로 변환
+//                            String activitiyDetail = doc.select(".ActivityDetailTabContent__StyledWrapper-sc-b973f285-0.juIUdj > div").html();
+                            WebElement activityDetailElement = driver.findElement(By.cssSelector("#DETAIL > div.ActivityDetailTabContent__StyledWrapper-sc-b973f285-0.juIUdj > div"));
 
-                            //상세내용
-                            String activitiyDetail = doc.select("div.jss143").html();
-                            System.out.println(activitiyDetail);
+                            // detailluterHTML 가져오기
+                            String activitiyDetail = activityDetailElement.getAttribute("outerHTML");
 
                             Board board = Board.builder()
                                     .activityKey(activitiyKey)
@@ -180,12 +183,10 @@ public class CrawlingTest {
                     System.out.println("대외활동글 입니다");
 
                     Document doc = Jsoup.connect(url).get();
-
-                    Element recruitmentPeriod = doc.select("h3.jss76").get(2);
+                    Element recruitmentPeriod = doc.select("h3.jss67").get(2);
                     String[] split = recruitmentPeriod.text().split("~");
                     String startDateString=split[0];
                     String endDateString=split[1];
-
 
                     try {
                         Date startDate = format.parse(startDateString);
@@ -195,30 +196,33 @@ public class CrawlingTest {
                         if (currentDateObj.compareTo(startDate) >= 0 && currentDateObj.compareTo(endDate) <= 0) {
                             System.out.println("현재 날짜는 접수 기간에 포함됩니다.");
 
-                            String activityName = doc.selectFirst("h1.TrickyH1Tag__StyledWrapper-sc-501a6070-0.eHFQjd").text();
-                            Element activityImg = doc.selectFirst("figure.jss60 > img.jss61");
+                            String activityName = doc.selectFirst("h1.TrickyH1Tag__StyledWrapper-sc-a1b54afc-0.cbgYCI").text();
+                            Element activityImg = doc.selectFirst("figure.jss51 > img.jss52");
 
-
-                            String companyType = doc.select("h3.jss76").get(0).text(); //기업형태
-                            String target = doc.select("h3.jss76").get(1).text(); //참여대상
+                            String companyType = doc.select("h3.jss67").get(0).text(); //기업형태
+                            String target = doc.select("h3.jss67").get(1).text(); //참여대상
                                                                                             //접수기간  recruitmentPeriod
 
-                            String activityPeriod = doc.select("h3.jss76").get(3).text(); //활동기간
-                            String recruitmentCount = doc.select("h3.jss76").get(4).text(); //모집인원
-                            String activityArea = doc.select("h3.jss76").get(5).text();//활동지역
-                            String preferredSkills = doc.select("h3.jss76").get(6).text();//우대역량
-                            String activityUrl = doc.select("h3.jss76").get(7).text();//홈페이지
-                            String activityBenefits = doc.select("h3.jss76").get(8).text();//활동혜택
-                            String interestArea = doc.select("h3.jss76").get(9).text();//관심분야
-                            String activityField = doc.select("h3.jss76").get(10).text();//활동분야
+                            String activityPeriod = doc.select("h3.jss67").get(3).text(); //활동기간
+                            String recruitmentCount = doc.select("h3.jss67").get(4).text(); //모집인원
+                            String activityArea = doc.select("h3.jss67").get(5).text();//활동지역
+                            String preferredSkills = doc.select("h3.jss67").get(6).text();//우대역량
+                            String activityUrl = doc.select("h3.jss67").get(7).text();//홈페이지
+                            String activityBenefits = doc.select("h3.jss67").get(8).text();//활동혜택
+                            String interestArea = doc.select("h3.jss67").get(9).text();//관심분야
+                            String activityField = doc.select("h3.jss67").get(10).text();//활동분야
 
 
                             String activitiyKey=link;
 
 
-                            //상세내용
-                            String activitiyDetail = doc.select("div.jss147").html();
-                            System.out.println(activitiyDetail);
+//
+//                            // 상세내용 jsoup으로 못가져오게 막아놔서  동적크롤링으로 변환
+//                            String activitiyDetail = doc.select(".ActivityDetailTabContent__StyledWrapper-sc-b973f285-0.juIUdj > div").html();
+                            WebElement activityDetailElement = driver.findElement(By.cssSelector("#DETAIL > div.ActivityDetailTabContent__StyledWrapper-sc-b973f285-0.juIUdj > div"));
+
+                            // detailluterHTML 가져오기
+                            String activitiyDetail = activityDetailElement.getAttribute("outerHTML");
 
                             Board board = Board.builder()
                                     .activityKey(activitiyKey)
@@ -235,7 +239,7 @@ public class CrawlingTest {
                                     .meetingTime("")
                                     .activityBenefits(activityBenefits)
                                     .interestArea(interestArea)
-                                    .homepage("")
+                                    .homepage(activityUrl)
                                     .activityField(activityField)
                                     .prizeScale("")
                                     .competitionCategory("")
@@ -256,7 +260,7 @@ public class CrawlingTest {
 
                     Document doc = Jsoup.connect(url).get();
 
-                    Element recruitmentPeriod = doc.select("h3.jss76").get(3);
+                    Element recruitmentPeriod = doc.select("h3.jss67").get(3);
                     String[] split = recruitmentPeriod.text().split("~");
                     String startDateString=split[0];
                     String endDateString=split[1];
@@ -270,28 +274,31 @@ public class CrawlingTest {
                         if (currentDateObj.compareTo(startDate) >= 0 && currentDateObj.compareTo(endDate) <= 0) {
                             System.out.println("현재 날짜는 접수 기간에 포함됩니다.");
 
-                            String activityName = doc.selectFirst("h1.TrickyH1Tag__StyledWrapper-sc-501a6070-0.eHFQjd").text();
-                            Element activityImg = doc.selectFirst("figure.jss60 > img.jss61");
+                            String activityName = doc.selectFirst("h1.TrickyH1Tag__StyledWrapper-sc-a1b54afc-0.cbgYCI").text();
+                            Element activityImg = doc.selectFirst("figure.jss51 > img.jss52");
 
 
-                            String companyType = doc.select("h3.jss76").get(0).text(); //기업형태
-                            String target = doc.select("h3.jss76").get(1).text(); //참여대상
+                            String companyType = doc.select("h3.jss67").get(0).text(); //기업형태
+                            String target = doc.select("h3.jss67").get(1).text(); //참여대상
                             //접수기간  recruitmentPeriod
 
-                            String activitiyArea = doc.select("h3.jss76").get(2).text(); //활동지역
-                            String recruitmentCount = doc.select("h3.jss76").get(4).text(); //모집인원
-                            String meetingTime = doc.select("h3.jss76").get(5).text();//모임시간
-                            String activityUrl = doc.select("h3.jss76").get(6).text();//홈페이지
-                            String activityBenefits = doc.select("h3.jss76").get(7).text();//활동혜택
-                            String interestArea = doc.select("h3.jss76").get(8).text();//관심분야
-                            String activityField = doc.select("h3.jss76").get(9).text();//활동분야
+                            String activitiyArea = doc.select("h3.jss67").get(2).text(); //활동지역
+                            String recruitmentCount = doc.select("h3.jss67").get(4).text(); //모집인원
+                            String meetingTime = doc.select("h3.jss67").get(5).text();//모임시간
+                            String activityUrl = doc.select("h3.jss67").get(6).text();//홈페이지
+                            String activityBenefits = doc.select("h3.jss67").get(7).text();//활동혜택
+                            String interestArea = doc.select("h3.jss67").get(8).text();//관심분야
+                            String activityField = doc.select("h3.jss67").get(9).text();//활동분야
 
                             String activitiyKey=link;
 
 
-                            //상세내용
-                            String activitiyDetail = doc.select("div.jss147").html();
-                            System.out.println(activitiyDetail);
+                            // 상세내용 jsoup으로 못가져오게 막아놔서  동적크롤링으로 변환
+//                            String activitiyDetail = doc.select(".ActivityDetailTabContent__StyledWrapper-sc-b973f285-0.juIUdj > div").html();
+                            WebElement activityDetailElement = driver.findElement(By.cssSelector("#DETAIL > div.ActivityDetailTabContent__StyledWrapper-sc-b973f285-0.juIUdj > div"));
+
+                            // detailluterHTML 가져오기
+                            String activitiyDetail = activityDetailElement.getAttribute("outerHTML");
 
                             Board board = Board.builder()
                                     .activityKey(activitiyKey)

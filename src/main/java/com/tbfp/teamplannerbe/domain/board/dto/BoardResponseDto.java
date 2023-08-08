@@ -1,7 +1,10 @@
 package com.tbfp.teamplannerbe.domain.board.dto;
 
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.BoardWithCommentListResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.commentToCommentListResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -10,6 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class BoardResponseDto {
@@ -43,6 +47,8 @@ public class BoardResponseDto {
         private Long likeCount;
         private List<BoardWithCommentListResponseDto> comments=new ArrayList<>();
 
+
+
         public BoardDetailResponseDto(Board board) {
             this.activitiyName = board.getActivityName();
             this.activityUrl = board.getActivityUrl();
@@ -65,13 +71,31 @@ public class BoardResponseDto {
             this.activityPeriod = board.getActivityPeriod();
             this.viewCount=board.getView();
             this.likeCount=board.getLikeCount();
-            if(board.getComments()!=null){
-                this.comments=board.getComments().stream().
-                        map(i-> new BoardWithCommentListResponseDto(i))
+            // 현재 null인 값만 가져오고 있음
+            if (board.getComments() != null) {
+                this.comments = board.getComments().stream()
+                        .filter(comment -> comment.getParentComment() == null) // comment 는 부모
+                        .map(comment -> {
+                            List<Comment> childComments = board.getComments().stream()
+                                    .filter(c -> {  // c는 자식으로
+                                        Comment parentComment = c.getParentComment();
+                                        return parentComment != null && Objects.equals(parentComment.getId(), comment.getId());
+                                    })
+                                    .collect(Collectors.toList());
+                            return new BoardWithCommentListResponseDto(comment, childComments);
+                        })
                         .collect(Collectors.toList());
             }
 
+
+//            if(board.getComments()!=null){
+//                this.comments=board.getComments().stream().
+//                        map(i-> new BoardWithCommentListResponseDto(i))
+//                        .collect(Collectors.toList());
+//            }
+
         }
+
     }
 
 

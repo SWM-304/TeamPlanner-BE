@@ -1,5 +1,6 @@
 package com.tbfp.teamplannerbe.domain.recruitment.repository.impl;
 
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.tbfp.teamplannerbe.domain.common.querydsl.support.Querydsl4RepositorySupport;
 import com.tbfp.teamplannerbe.domain.recruitment.condition.RecruitmentSearchCondition;
@@ -27,9 +28,15 @@ public class RecruitmentQuerydslRepositoryImpl extends Querydsl4RepositorySuppor
                         .select(new QRecruitmentResponseDto_RecruitmentSearchDto(
                                 recruitment.id,
                                 recruitment.title,
+                                recruitment.content,
                                 recruitment.viewCount,
                                 recruitment.likeCount,
-                                recruitment.createdAt
+                                recruitment.currentMemberSize,
+                                recruitment.maxMemberSize,
+                                recruitment.createdAt,
+                                recruitment.author.nickname,
+                                recruitment.author.basicProfile.profileImage,
+                                recruitment.commentList.size()
                                 ))
                         .from(recruitment)
                         .leftJoin(recruitment.board, board)
@@ -38,9 +45,14 @@ public class RecruitmentQuerydslRepositoryImpl extends Querydsl4RepositorySuppor
                                 titleContain(recruitmentSearchCondition.getTitleContain()),
                                 contentContain(recruitmentSearchCondition.getContentContain()),
                                 authorNameContain(recruitmentSearchCondition.getAuthorNameContain()),
-                                boardTitleContain(recruitmentSearchCondition.getBoardTitleContain())
+                                boardTitleContain(recruitmentSearchCondition.getBoardTitleContain()),
+                                boardIdContain(recruitmentSearchCondition.getBoardIdContain())
                         )
         );
+    }
+
+    private BooleanExpression boardIdContain(Long boardIdContain) {
+        return (boardIdContain != null) ? recruitment.board.id.eq(boardIdContain) : null;
     }
 
     private BooleanExpression titleContain(String titleContain) {

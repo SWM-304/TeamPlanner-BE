@@ -227,8 +227,11 @@ public class CommentServiceImpl implements CommentService {
 //            commentRepository.save(parentComment);  // 부모 댓글 저장
 //            System.out.println("=================");
             childComment.setParentComment(parentComment);
+            //부모댓글 카운트 동기화
+            parentComment.incrementchildCommentCount();
 
             commentRepository.save(childComment);  // 대댓글 저장
+
 
         }
         CreatedchildCommentResponseDto commentToComment = CreatedchildCommentResponseDto.builder()

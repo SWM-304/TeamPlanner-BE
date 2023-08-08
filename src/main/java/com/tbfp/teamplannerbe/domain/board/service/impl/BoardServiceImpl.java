@@ -8,6 +8,10 @@ import com.tbfp.teamplannerbe.domain.board.dto.BoardSearchCondition;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.board.repository.BoardRepository;
 import com.tbfp.teamplannerbe.domain.board.service.BoardService;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.BoardWithCommentListResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
+import com.tbfp.teamplannerbe.domain.comment.repository.CommentRepository;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
@@ -29,6 +33,7 @@ public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
     private final MemberRepository memberRepository;
+    private final CommentRepository commentRepository;
 
 
     /**
@@ -70,7 +75,9 @@ public class BoardServiceImpl implements BoardService {
 
         List<Board> board = boardRepository.getBoardAndComment(boardId);
 
-        List<BoardDetailResponseDto> result = board.stream().map(i -> new BoardDetailResponseDto(i))
+
+
+        List<BoardDetailResponseDto> result = board.stream().map(b -> new BoardDetailResponseDto(b))
                 .collect(Collectors.toList());
         return result;
     }

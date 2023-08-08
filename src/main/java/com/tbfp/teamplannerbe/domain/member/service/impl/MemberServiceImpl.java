@@ -9,12 +9,14 @@ import com.tbfp.teamplannerbe.domain.member.*;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.RecruitmentApplicantResponseDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.getMemberInfoDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.profile.entity.BasicProfile;
 import com.tbfp.teamplannerbe.domain.profile.repository.BasicProfileRepository;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
 import com.tbfp.teamplannerbe.domain.member.service.MailSenderService;
 import com.tbfp.teamplannerbe.domain.member.service.MemberService;
+import com.tbfp.teamplannerbe.domain.profile.service.ProfileService;
 import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +48,7 @@ public class MemberServiceImpl implements MemberService {
     private final JwtProvider jwtProvider;
     private final MailSenderService mailSenderService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final ProfileService profileService;
 
     @Override
     public Optional<Member> findMemberByUsername(String username) {
@@ -332,5 +335,16 @@ public class MemberServiceImpl implements MemberService {
 
         List<RecruitmentApplicantResponseDto> result = applicantList.stream().map(i -> new RecruitmentApplicantResponseDto(i)).collect(Collectors.toList());
         return result;
+    }
+
+    @Override
+    public getMemberInfoDto getMemberInfo(String username) {
+        BasicProfile basicProfile = profileService.getBasicProfile(username);
+        Member member = memberRepository.findMemberByUsername(username).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
+        return getMemberInfoDto.builder()
+                .username(username)
+                .nickname(member.getNickname())
+                .profileImg(basicProfile.getProfileImage())
+                .build();
     }
 }

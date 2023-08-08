@@ -1,5 +1,6 @@
 package com.tbfp.teamplannerbe.domain.member.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tbfp.teamplannerbe.domain.auth.MemberRole;
 import com.tbfp.teamplannerbe.domain.auth.ProviderType;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
@@ -66,9 +67,9 @@ public class Member extends BaseTimeEntity {
     @OneToOne(mappedBy = "member")
     @JoinColumn(name = "BASIC_PROFILE_ID")
     private BasicProfile basicProfile;
-
 }
 
+}
 
 
 

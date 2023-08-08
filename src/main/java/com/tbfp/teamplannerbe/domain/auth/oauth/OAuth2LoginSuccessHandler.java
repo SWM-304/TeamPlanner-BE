@@ -1,11 +1,13 @@
 package com.tbfp.teamplannerbe.domain.auth.oauth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tbfp.teamplannerbe.domain.auth.JwtProvider;
 import com.tbfp.teamplannerbe.domain.auth.MemberRole;
 import com.tbfp.teamplannerbe.domain.auth.cookie.CookieUtil;
 import com.tbfp.teamplannerbe.domain.auth.service.RefreshTokenService;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
@@ -32,12 +35,31 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         if(oAuth2Member.getMemberRole() == MemberRole.GUEST) {
             throw new ApplicationException(ApplicationErrorType.GUEST_USER);
         } else {
-            loginSuccess(response, oAuth2Member); // 로그인에 성공한 경우 access, refresh 토큰 생성
+            loginSuccess(response, oAuth2Member,getCurrentDomain(request)); // 로그인에 성공한 경우 access, refresh 토큰 생성
         }
     }
 
-    private void loginSuccess(HttpServletResponse response, CustomOAuth2Member oAuth2Member) {
+    // 현재 도메인 정보를 가져오는 메서드
+    private String getCurrentDomain(HttpServletRequest request) {
+        String scheme = request.getScheme();
+        String serverName = request.getServerName();
+        String currentDomain="";
+
+        // 예: http://localhost:8080/myapp
+
+        if (serverName.equals("localhost")) {
+            currentDomain = scheme + "://" + serverName + ":" + 3000;
+        } else {
+            currentDomain = scheme + "://" + "teamplanner-frontend.s3-website.ap-northeast-2.amazonaws.com" + ":" + 80;
+        }
+
+        return currentDomain;
+    }
+
+
+    private void loginSuccess(HttpServletResponse response, CustomOAuth2Member oAuth2Member,String domain) {
         log.info("OAuth2LoginSuccessHandler.loginSuccess");
+        log.info("살려줘"+domain);
         String accessToken = jwtProvider.generateAccessToken(oAuth2Member.getUsername());
         String refreshToken = jwtProvider.generateRefreshToken(oAuth2Member.getUsername());
 
@@ -45,18 +67,23 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_OK);
-        CookieUtil.addCookie(response, "accessToken", accessToken, jwtProvider.ACCESS_TOKEN_EXPIRATION_TIME);
-        CookieUtil.addCookie(response, "refreshToken", refreshToken, jwtProvider.REFRESH_TOKEN_EXPIRATION_TIME);
+//        CookieUtil.addCookie(response, "accessToken", accessToken, jwtProvider.ACCESS_TOKEN_EXPIRATION_TIME);
+//        CookieUtil.addCookie(response, "refreshToken", refreshToken, jwtProvider.REFRESH_TOKEN_EXPIRATION_TIME);
+        try {
+            // token body comment
+//            response.getWriter().write(
+//                    new ObjectMapper().writeValueAsString(
+//                            MemberResponseDto.MemberLoginResponseDto.builder()
+//                                    .accessToken(accessToken)
+//                                    .refreshToken(refreshToken)
+//                                    .build()
+//                    )
+//            );
+            response.sendRedirect(domain+"/oauth2/redirect?accessToken=" + accessToken + "&refreshToken=" + refreshToken);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-        // token body comment
-//        response.getWriter().write(
-//                new ObjectMapper().writeValueAsString(
-//                        MemberResponseDto.MemberLoginResponseDto.builder()
-//                                .accessToken(accessToken)
-//                                .refreshToken(refreshToken)
-//                                .build()
-//                )
-//        );
 
     }
 }

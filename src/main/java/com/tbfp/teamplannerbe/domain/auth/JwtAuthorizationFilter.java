@@ -1,5 +1,6 @@
 package com.tbfp.teamplannerbe.domain.auth;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
@@ -31,15 +32,23 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         log.info("JwtAuthorizationFilter.doFilterInternal");
+        String path = request.getServletPath();
+        System.out.println("path = " + path);
 //        String header = request.getHeader(JwtProperties.HEADER_STRING);
         String header = jwtProvider.getHeader(request);
         if (header == null) {
             log.info("header = null");
-            chain.doFilter(request, response);
+//            throw new ApplicationException(ApplicationErrorType.EXPIRED_ACCESS_TOKEN);
+//            chain.doFilter(request, response);
             return;
         }
 
-        String username = jwtProvider.getUsername(request);
+        String username = null;
+        try {
+            username = jwtProvider.getUsername(request);
+        } catch (TokenExpiredException e) {
+            throw new ApplicationException(ApplicationErrorType.EXPIRED_ACCESS_TOKEN);
+        }
 
         if (username != null) {
             log.info("username = " + username);

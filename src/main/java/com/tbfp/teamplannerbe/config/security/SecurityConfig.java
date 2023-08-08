@@ -12,6 +12,7 @@ import com.tbfp.teamplannerbe.domain.common.exception.GlobalExceptionHandlerFilt
 import com.tbfp.teamplannerbe.domain.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -54,6 +55,8 @@ public class SecurityConfig {
                         "/", "/api/v1/member/login", "/api/v1/member/renew-access-token"
                         , "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**" // swagger
                 ).permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/board/**","/api/v1/recruitment/**","/api/v1/member/signup/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/v1/signup/**","/api/v1/forgot-username","/api/v1/forgot-password").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .oauth2Login()
@@ -68,6 +71,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
+        configuration.addAllowedOrigin("http://teamplanner-frontend.s3-website.ap-northeast-2.amazonaws.com");
+        configuration.addAllowedOrigin("https://teamplanner.co.kr");
         configuration.addAllowedOriginPattern("*localhost*"); // A list of origins for which cross-origin requests are allowed. ex) http://localhost:8080
         configuration.addAllowedHeader("*"); // Set the HTTP methods to allow ,ex) "GET", "POST", "PUT";
         configuration.addAllowedMethod("*"); // Set the list of headers that a pre-flight request can list as allowed for use during an actual request. ex) "Authorization", "Cache-Control", "Content-Type"

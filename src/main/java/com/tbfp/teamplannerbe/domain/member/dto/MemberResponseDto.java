@@ -1,6 +1,7 @@
 package com.tbfp.teamplannerbe.domain.member.dto;
 
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto;
+import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentResponseDto;
 import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentResponseDto.RecruitmentWithMemberWithApply;
 import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
@@ -115,8 +116,23 @@ public class MemberResponseDto {
 
         }
     }
+    @Getter
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    @Builder
+    public static class MemberInfoDto{
+        private Long memberId;
+        private String nickname;
+        private String profileImage;
 
-
+        public static MemberInfoDto toDto(Member member){
+            return MemberInfoDto.builder()
+                    .memberId(member.getId())
+                    .nickname(member.getNickname())
+                    .profileImage(member.getBasicProfile().getProfileImage())
+                    .build();
+        }
+    }
 
     @Getter
     @Builder

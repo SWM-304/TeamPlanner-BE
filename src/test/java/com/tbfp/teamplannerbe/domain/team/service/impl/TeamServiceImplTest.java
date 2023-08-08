@@ -7,6 +7,8 @@ import com.tbfp.teamplannerbe.domain.member.Education;
 import com.tbfp.teamplannerbe.domain.member.Gender;
 import com.tbfp.teamplannerbe.domain.member.Job;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto;
+import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
 import com.tbfp.teamplannerbe.domain.member.service.MemberService;
@@ -18,8 +20,7 @@ import com.tbfp.teamplannerbe.domain.recruitmentApply.entity.RecruitmentApply;
 import com.tbfp.teamplannerbe.domain.recruitmentApply.repository.RecruitmentApplyRepository;
 import com.tbfp.teamplannerbe.domain.recruitmentApply.service.RecruitmentApplyService;
 
-import com.tbfp.teamplannerbe.domain.team.dto.TeamReqeustDto.CreatTeamRequestDto;
-import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto;
+import com.tbfp.teamplannerbe.domain.team.dto.TeamRequestDto.CreatTeamRequestDto;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto.createdTeamResponseDto;
 import com.tbfp.teamplannerbe.domain.team.entity.Team;
 import com.tbfp.teamplannerbe.domain.team.repository.MemberTeamRepository;
@@ -349,10 +350,10 @@ class TeamServiceImplTest {
             Assert.assertEquals(boardId,team.getBoardId());
 
             // 팀 멤버 리스트가 기대하는 멤버 리스트와 동일한지 확인
-            List<Long> expectedMemberIds = member.stream().map(Member::getId).collect(Collectors.toList());
-            List<Long> actualMemberIds = team.getMemberIds();
-            System.out.println(actualMemberIds);
-            Assert.assertEquals(expectedMemberIds,actualMemberIds);
+            List<MemberResponseDto.MemberInfoDto> expectedMemberInfos = member.stream().map(MemberResponseDto.MemberInfoDto::toDto).collect(Collectors.toList());
+            List<MemberResponseDto.MemberInfoDto> actualMemberInfos = team.getMemberInfos();
+            System.out.println(actualMemberInfos);
+            Assert.assertEquals(expectedMemberInfos,actualMemberInfos);
         }
 
     }

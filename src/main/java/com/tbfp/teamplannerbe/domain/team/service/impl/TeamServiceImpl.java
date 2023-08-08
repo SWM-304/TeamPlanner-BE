@@ -207,7 +207,7 @@ public class TeamServiceImpl implements TeamService {
         Long memberId = member.get().getId();
 
         //fetchJoin된 쿼리로 N+1 문제 해결
-        List<Team> teams = memberTeamRepository.findAllTeamsByMemberId(memberId);
+        List<Team> teams = teamRepository.findAllTeamsByMemberId(memberId);
 
         List<TeamResponseDto.GetMyTeamResponseDto> getMyTeamResponseDtos = teams.stream()
                 .map(team -> TeamResponseDto.GetMyTeamResponseDto.toDto(team))

@@ -1,5 +1,6 @@
 package com.tbfp.teamplannerbe.domain.team.dto;
 
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.team.entity.MemberTeam;
 import com.tbfp.teamplannerbe.domain.team.entity.Team;
@@ -62,7 +63,7 @@ public class TeamResponseDto {
         private Long recruitmentId;
         private Long boardId;
         @Builder.Default
-        private List<Long> memberIds = new ArrayList<>();
+        private List<MemberResponseDto.MemberInfoDto> memberInfos = new ArrayList<>();
 
 
         public static GetMyTeamResponseDto toDto(Team team) {
@@ -76,14 +77,14 @@ public class TeamResponseDto {
                     .endDate(team.getEndDate())
                     .recruitmentId(team.getRecruitment().getId())
                     .boardId(team.getRecruitment().getBoard().getId())
-                    .memberIds(getMemberIdsFromMemberTeams(team))
+                    .memberInfos(getMemberInfoFromMemberTeam(team))
                     .build();
         }
 
-        public static List<Long> getMemberIdsFromMemberTeams(Team team){
-            return team.getMemberTeams()
-                    .stream().map(MemberTeam::getMember).collect(Collectors.toList())
-                    .stream().map(Member::getId).collect(Collectors.toList());
+        public static List<MemberResponseDto.MemberInfoDto> getMemberInfoFromMemberTeam(Team team){
+            List<Member> members = team.getMemberTeams()
+                    .stream().map(MemberTeam::getMember).collect(Collectors.toList());
+            return members.stream().map(MemberResponseDto.MemberInfoDto::toDto).collect(Collectors.toList());
         }
     }
 }

@@ -1,5 +1,5 @@
 ALTER TABLE basic_profile
-    CHANGE COLUMN profile_id basic_profile_id BIGINT AUTO_INCREMENT PRIMARY KEY;
+    CHANGE COLUMN profile_id basic_profile_id BIGINT AUTO_INCREMENT;
 
 ALTER TABLE member
     ADD COLUMN basic_profile_id BIGINT;

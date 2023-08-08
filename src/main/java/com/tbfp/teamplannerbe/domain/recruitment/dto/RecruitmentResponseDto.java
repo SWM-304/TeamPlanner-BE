@@ -121,7 +121,7 @@ public class RecruitmentResponseDto {
                             recruitment.getCommentList().stream().map(c -> RecruitmentCommentDto.toDto(isAuthorOfRecruitment, username, c)).collect(Collectors.toList())
                     )
                     .boardActivityName(recruitment.getBoard().getActivityName())
-                    .boardEndDate(LocalDate.parse(recruitment.getBoard().getActivityPeriod().split("~")[1].trim(), DateTimeFormatter.ofPattern("yy.M.d")).atStartOfDay())
+                    .boardEndDate(LocalDate.parse(recruitment.getBoard().getRecruitmentPeriod().split("~")[1].trim(), DateTimeFormatter.ofPattern("yy.M.d")).atStartOfDay())
                     .authorNickname(recruitment.getAuthor().getNickname())
                     .authorProfileImg(recruitment.getAuthor().getBasicProfile().getProfileImage())
                     .build();

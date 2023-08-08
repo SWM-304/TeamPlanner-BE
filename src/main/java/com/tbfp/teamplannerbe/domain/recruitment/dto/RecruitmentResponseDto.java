@@ -162,7 +162,7 @@ public class RecruitmentResponseDto {
     public static class RecruitmentWithMemberWithApply{
 
         private RecruitmentApplyStateEnum state; // 승인여부상태
-        private String userName; //유저아이디
+        private String userNickName; //유저아이디
         private String userProfile; //유저 프로필
         private String recruitmentTitle; // 모집글 제목
         private String content; // 지원할 때 쓰는 content
@@ -170,8 +170,8 @@ public class RecruitmentResponseDto {
         @Builder
         public RecruitmentWithMemberWithApply(RecruitmentApply apply) {
             this.state=apply.getState();
-            this.userName = apply.getApplicant().getUsername();
-            this.userProfile = apply.getApplicant().getPhone(); //프로필 없어서 userPhone 로함
+            this.userNickName = apply.getApplicant().getNickname();
+            this.userProfile = apply.getApplicant().getBasicProfile().getProfileImage(); //프로필 없어서 userPhone 로함
             this.recruitmentTitle = apply.getRecruitment().getTitle();
             this.content = apply.getContent();
         }

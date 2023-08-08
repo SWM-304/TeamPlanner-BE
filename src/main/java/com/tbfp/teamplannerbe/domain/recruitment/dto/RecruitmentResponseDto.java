@@ -20,17 +20,35 @@ public class RecruitmentResponseDto {
     public static class RecruitmentSearchDto {
         private Long id;
         private String title;
+        private String content;
         private Integer viewCount;
         private Integer likeCount;
+        private Integer currentMemberSize;
+        private Integer maxMemberSize;
         private LocalDateTime createdAt;
 
+        private String authorNickname;
+        private String authorProfileImg;
+
+        private Integer commentCount;
+
         @QueryProjection
-        public RecruitmentSearchDto(Long id, String title, Integer viewCount, Integer likeCount, LocalDateTime createdAt) {
+        public RecruitmentSearchDto(Long id, String title, String content, Integer viewCount, Integer likeCount, Integer currentMemberSize, Integer maxMemberSize, LocalDateTime createdAt
+                                    , String authorNickname
+                                    , String authorProfileImg
+                                    , Integer commentCount
+        ) {
             this.id = id;
             this.title = title;
+            this.content = content;
             this.viewCount = viewCount;
             this.likeCount = likeCount;
+            this.currentMemberSize = currentMemberSize;
+            this.maxMemberSize = maxMemberSize;
             this.createdAt = createdAt;
+            this.authorNickname = authorNickname;
+            this.authorProfileImg = authorProfileImg;
+            this.commentCount = commentCount;
         }
     }
     @Getter

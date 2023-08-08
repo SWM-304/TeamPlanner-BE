@@ -1,13 +1,10 @@
 package com.tbfp.teamplannerbe.domain.auth.oauth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tbfp.teamplannerbe.domain.auth.JwtProvider;
 import com.tbfp.teamplannerbe.domain.auth.MemberRole;
-import com.tbfp.teamplannerbe.domain.auth.cookie.CookieUtil;
 import com.tbfp.teamplannerbe.domain.auth.service.RefreshTokenService;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
-import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -42,17 +39,12 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     // 현재 도메인 정보를 가져오는 메서드
     private String getCurrentDomain(HttpServletRequest request) {
         String scheme = request.getScheme();
-        String serverName = request.getServerName();
+//        String serverName = request.getServerName();
+        String referer = request.getHeader("referer");
+        log.info("referer = " + referer);
         String currentDomain="";
 
-        // 예: http://localhost:8080/myapp
-
-        if (serverName.equals("localhost")) {
-            currentDomain = scheme + "://" + serverName + ":" + 3000;
-        } else {
-            currentDomain = scheme + "://" + "teamplanner-frontend.s3-website.ap-northeast-2.amazonaws.com" + ":" + 80;
-        }
-
+        currentDomain = referer;
         return currentDomain;
     }
 
@@ -79,7 +71,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 //                                    .build()
 //                    )
 //            );
-            response.sendRedirect(domain+"/oauth2/redirect?accessToken=" + accessToken + "&refreshToken=" + refreshToken);
+            response.sendRedirect(domain+"oauth2/redirect?accessToken=" + accessToken + "&refreshToken=" + refreshToken);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

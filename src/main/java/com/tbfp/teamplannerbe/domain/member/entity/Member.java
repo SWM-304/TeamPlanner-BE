@@ -9,6 +9,7 @@ import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
 import com.tbfp.teamplannerbe.domain.profile.entity.BasicProfile;
 import com.tbfp.teamplannerbe.domain.team.entity.MemberTeam;
 import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 
 
 import javax.persistence.*;
@@ -59,7 +60,7 @@ public class Member extends BaseTimeEntity {
     private List<Board> boardList = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy ="member")
+    @OneToMany(mappedBy ="member", cascade = CascadeType.ALL)
     private List<MemberTeam> memberTeams=new ArrayList<>();
 
     @JsonIgnore
@@ -68,6 +69,7 @@ public class Member extends BaseTimeEntity {
     private BasicProfile basicProfile;
 }
 
+}
 
 
 

@@ -33,7 +33,9 @@ public class MemberController {
 
     @GetMapping("/info")
     public ResponseEntity info(Principal principal) {
-        return ResponseEntity.ok(principal);
+        return ResponseEntity.ok(
+                memberService.getMemberInfo(principal.getName())
+        );
     }
 
 
@@ -50,13 +52,13 @@ public class MemberController {
         CookieUtil.addCookie(response, "accessToken", accessToken, jwtProvider.ACCESS_TOKEN_EXPIRATION_TIME);
 
         // token body comment
-//        return ResponseEntity.ok(MemberRenewAccessTokenResponseDto.builder()
-//                                                                .accessToken(
-//                                                                        accessToken
-//        ).build()
-//        );
+        return ResponseEntity.ok(MemberResponseDto.MemberRenewAccessTokenResponseDto.builder()
+                                                                .accessToken(
+                                                                        accessToken
+        ).build()
+        );
 
-        return ResponseEntity.ok("");
+//        return ResponseEntity.ok("");
     }
 
     @PostMapping("/signup")

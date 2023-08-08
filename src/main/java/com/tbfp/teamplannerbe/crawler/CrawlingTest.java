@@ -136,17 +136,7 @@ public class CrawlingTest {
                             String activity_field = doc.select("h3.jss76").get(6).text();
                             Element 추가혜택 = doc.select("h3.jss76").get(7);
 
-                            System.out.println("activityKey : "+"https://linkareer.com/activity/13900");
-                            System.out.println("제목 : "+activityName);
-                            System.out.println("이미지 : "+activityImg.attr("src"));
-                            System.out.println(companyType);
-                            System.out.println(target);
-                            System.out.println(prizeScale);
-                            System.out.println(접수기간.text());
-                            System.out.println(activityUrl);
-                            System.out.println(activityBenefits);
-                            System.out.println(activity_field);
-                            System.out.println(추가혜택.text());
+
 
                             String activitiyKey=link;
 
@@ -220,6 +210,7 @@ public class CrawlingTest {
                             String activityUrl = doc.select("h3.jss76").get(7).text();//홈페이지
                             String activityBenefits = doc.select("h3.jss76").get(8).text();//활동혜택
                             String interestArea = doc.select("h3.jss76").get(9).text();//관심분야
+                            String activityField = doc.select("h3.jss76").get(10).text();//활동분야
 
 
                             String activitiyKey=link;
@@ -245,7 +236,7 @@ public class CrawlingTest {
                                     .activityBenefits(activityBenefits)
                                     .interestArea(interestArea)
                                     .homepage("")
-                                    .activityField("")
+                                    .activityField(activityField)
                                     .prizeScale("")
                                     .competitionCategory("")
                                     .preferredSkills(preferredSkills)
@@ -318,11 +309,11 @@ public class CrawlingTest {
                                     .activityBenefits(activityBenefits)
                                     .interestArea(interestArea)
                                     .homepage("")
-                                    .activityField("")
+                                    .activityField(activityField)
                                     .prizeScale("")
                                     .competitionCategory("")
                                     .preferredSkills("")
-                                    .activityPeriod(activityField)
+                                    .activityPeriod("")
                                     .build();
                             boardService.upsert(board);
                         } else {

@@ -26,6 +26,20 @@ public class CommentController {
 
     private final CommentService commentService;
 
+    @Operation(summary = "공고에 대한 대댓글 조회", description = "boardId 와 commentId 를 통해 조회를 한다")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
+    })
+    @GetMapping("/{commentId}")
+    public ResponseEntity<?> getCommentToCommentList(@PathVariable Long boardId,@PathVariable Long commentId){
+
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.getCommentToCommentList(boardId,commentId));
+    }
+
+
+
 
     @Operation(summary = "공고에 대한 댓글작성", description = "userId와 boardId를 통해서 댓글을 작성한다")
     @ApiResponses({

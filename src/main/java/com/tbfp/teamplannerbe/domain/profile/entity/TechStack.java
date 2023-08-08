@@ -39,6 +39,7 @@ public class TechStack extends BaseTimeEntity{
 
     public ProfileResponseDto.TechStackResponseDto toDto(){
         return ProfileResponseDto.TechStackResponseDto.builder()
+                .id(id)
                 .experiencedYear(experiencedYear)
                 .experiencedMonth(experiencedMonth)
                 .skillLevel(skillLevel)

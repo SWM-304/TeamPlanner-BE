@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.NotNull;
 import java.security.Principal;
 
 @RestController
@@ -76,7 +77,9 @@ public class BoardController {
     public ResponseEntity<?> boardList(BoardSearchCondition boardSearchCondition,
                                  Pageable pageable){
 
-        return ResponseEntity.status(HttpStatus.OK).body(boardService.searchPageSimple(boardSearchCondition,pageable).map(BoardSimpleListResponseDto::toDTO));
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    boardService.searchPageSimple(boardSearchCondition,pageable).map(BoardSimpleListResponseDto::toDTO)
+            );
     }
 
     @PutMapping("/{boardId}")

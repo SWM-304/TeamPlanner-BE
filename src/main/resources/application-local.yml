@@ -15,6 +15,7 @@ spring:
         show_sql: true
         format_sql: true
         use_sql_comments: true
+        default_batch_fetch_size: 100
   mail:
     host: smtp.gmail.com
     port: 587
@@ -68,10 +69,10 @@ spring:
     user: root
     password:
 
-logging.level:
-
-  org.hibernate.SQL: debug
-  org.hibernate.type: trace
+#logging.level:
+#
+#  org.hibernate.SQL: debug
+#  org.hibernate.type: trace
 
 jwt:
   secret_key: ENC(mmf+mUwEemm7lqzn7MyjYaYVlRpGN25Xpvmo4jQ4ctx7tNdCrjBXR2JdWIZjh6LAupCdrOSI44WtK+dUp4tym1fIiEfdYbNpNudokWdOtKf1JnRMMB8PasGfLDAPofA0uNViAU3SZeK0hd9oeTBo3P+LawaOOimGe4G7FZqQIA0x4B0IIkJx9WGN+O3zam1UZdtcTd4WA0Ojnal1JcjcwDRJ1XcmsDyGHVQ5LSWMN0PydTg0hCd4COYUz5ORRKAE2ytwgmhPF0A=)

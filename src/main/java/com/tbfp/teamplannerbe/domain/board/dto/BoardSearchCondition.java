@@ -10,4 +10,5 @@ import lombok.*;
 public class BoardSearchCondition {
 
     private String category;
+    private String activityField;
 }

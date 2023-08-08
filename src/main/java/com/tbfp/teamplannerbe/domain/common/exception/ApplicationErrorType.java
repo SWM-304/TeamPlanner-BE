@@ -72,6 +72,18 @@ public enum ApplicationErrorType {
 
     PROFILE_DELETION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,-23004,"프로필 삭제중 문제가 발생했습니다."),
 
+    USER_NOT_IN_TEAM(HttpStatus.BAD_REQUEST,-24000,"사용자가 소속된 팀이 아닙니다."),
+
+    EVALUATION_SCORE_NOT_IN_SCOPE(HttpStatus.BAD_REQUEST,-24001,"평가 점수는 총합 0이상 30이하여야 합니다."),
+
+    EVALUATION_NOT_EXIST(HttpStatus.BAD_REQUEST,-24002,"평가가 존재하지 않습니다."),
+
+    NOT_AUTHOR_OF_EVALUATION(HttpStatus.BAD_REQUEST,-24003,"본 평가의 작성자가 아닙니다."),
+
+    UNABLE_TO_EVALUATE_MYSELF(HttpStatus.BAD_REQUEST,-24004,"자기 자신을 평가할 수 없습니다."),
+
+    EVALUATION_ALREADY_EXIST(HttpStatus.BAD_REQUEST,-24005,"해당 사용자에 대한 평가를 이미 마쳤습니다."),
+
     ALREADY_LIKE_BOARD(HttpStatus.BAD_REQUEST,-8,"이미 좋아요를 누르셨습니다"),
 
     COMMENT_NOT_FOUND(HttpStatus.BAD_REQUEST,-9,"댓글을 찾을 수 없습니다"),
@@ -84,7 +96,8 @@ public enum ApplicationErrorType {
     TEAM_CAPACITY_EXCEEDED(HttpStatus.BAD_REQUEST, -62000, "팀 최대인원 수를 초과하였습니다."),
     ALREADY_TEAM_ACCEPT(HttpStatus.BAD_REQUEST,-62001,"이미 승인된 사람이 포함되어 있습니다"),
     AUTHOR_CANNOT_PARTICIPATE(HttpStatus.BAD_REQUEST,-62002,"작성자는 참여신청을 할 수 없습니다"),
-    TEAM_NOT_FOUND(HttpStatus.BAD_REQUEST,-62003,"팀을 찾을 수 없습니다");
+    TEAM_NOT_FOUND(HttpStatus.BAD_REQUEST,-62003,"팀을 찾을 수 없습니다"),
+    EXPIRED_ACCESS_TOKEN(HttpStatus.BAD_REQUEST, -70000, "만료된 엑세스 토큰입니다.");
 
 
 

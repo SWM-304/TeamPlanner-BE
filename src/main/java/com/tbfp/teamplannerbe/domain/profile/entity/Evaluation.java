@@ -3,6 +3,7 @@ package com.tbfp.teamplannerbe.domain.profile.entity;
 import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.profile.dto.ProfileResponseDto;
+import com.tbfp.teamplannerbe.domain.team.entity.Team;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,9 +43,13 @@ public class Evaluation extends BaseTimeEntity {
     private Member subjectMember;
 
     //팀 추가 필요(마구현)
+    @OneToOne
+    @JoinColumn(name = "TEAM_ID")
+    private Team team;
 
     public ProfileResponseDto.EvaluationResponseDto toDto(){
         return ProfileResponseDto.EvaluationResponseDto.builder()
+                .id(id)
                 .comment(comment)
                 .stat1(stat1)
                 .stat2(stat2)

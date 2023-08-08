@@ -32,11 +32,14 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         log.info("JwtAuthorizationFilter.doFilterInternal");
+        String path = request.getServletPath();
+        System.out.println("path = " + path);
 //        String header = request.getHeader(JwtProperties.HEADER_STRING);
         String header = jwtProvider.getHeader(request);
         if (header == null) {
             log.info("header = null");
-            chain.doFilter(request, response);
+//            throw new ApplicationException(ApplicationErrorType.EXPIRED_ACCESS_TOKEN);
+//            chain.doFilter(request, response);
             return;
         }
 

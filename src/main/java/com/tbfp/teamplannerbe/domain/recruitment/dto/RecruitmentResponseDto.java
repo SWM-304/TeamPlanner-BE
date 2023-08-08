@@ -177,6 +177,7 @@ public class RecruitmentResponseDto {
         private String userProfile; //유저 프로필
         private String recruitmentTitle; // 모집글 제목
         private String content; // 지원할 때 쓰는 content
+        private Long memberId;
 
         @Builder
         public RecruitmentWithMemberWithApply(RecruitmentApply apply) {
@@ -185,6 +186,7 @@ public class RecruitmentResponseDto {
             this.userProfile = apply.getApplicant().getBasicProfile().getProfileImage(); //프로필 없어서 userPhone 로함
             this.recruitmentTitle = apply.getRecruitment().getTitle();
             this.content = apply.getContent();
+            this.memberId=apply.getApplicant().getId();
         }
     }
 

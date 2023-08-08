@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.util.Optional;
 
 @Service
@@ -94,14 +95,18 @@ public class RecruitmentService {
         return recruitmentRepository.findById(recruitmentId).orElseThrow(() -> new ApplicationException(ApplicationErrorType.RECRUITMENT_NOT_FOUND));
     }
 
-    public RecruitmentWithCommentResponseDto getOneWithComment(String username, Long recruitmentId) {
+    @Transactional
+    public RecruitmentWithCommentResponseDto getOneWithComment(Principal principal, Long recruitmentId) {
         Recruitment recruitment = recruitmentRepository.findByIdFetchComment(recruitmentId).orElseThrow(() -> new ApplicationException(ApplicationErrorType.RECRUITMENT_NOT_FOUND));
-        Member member = memberService.findMemberByUsernameOrElseThrowApplicationException(username);
-        String profileImage = profileService.getBasicProfile(username).getProfileImage();
+//        Member member = memberService.findMemberByUsernameOrElseThrowApplicationException(username);
+//        String profileImage = profileService.getBasicProfile(username).getProfileImage();
 
-        boolean isAuthorOfRecruitment = recruitment.getAuthor().getUsername().equals(member.getUsername());
+//        boolean isAuthorOfRecruitment = recruitment.getAuthor().getUsername().equals(member.getUsername());
+        String username = principal == null ? null : principal.getName();
+        boolean isAuthorOfRecruitment = recruitment.getAuthor().getUsername().equals(username);
+        recruitment.incrementViewCount();
 
-        return RecruitmentWithCommentResponseDto.toDto(isAuthorOfRecruitment, username, recruitment, profileImage);
+        return RecruitmentWithCommentResponseDto.toDto(isAuthorOfRecruitment, username, recruitment);
     }
 
     // pessimistic_write lock

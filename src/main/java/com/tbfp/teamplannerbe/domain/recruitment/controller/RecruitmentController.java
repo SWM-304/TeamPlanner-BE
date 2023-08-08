@@ -91,7 +91,7 @@ public class RecruitmentController {
     })
     public ResponseEntity getOne(Principal principal, @PathVariable Long recruitmentId) {
         return ResponseEntity.ok().body(
-                recruitmentService.getOneWithComment(principal.getName(),recruitmentId)
+                recruitmentService.getOneWithComment(principal, recruitmentId)
         );
     }
 

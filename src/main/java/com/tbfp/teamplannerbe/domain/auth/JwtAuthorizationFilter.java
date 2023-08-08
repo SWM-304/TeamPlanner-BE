@@ -18,10 +18,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Slf4j
-
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     private final MemberService memberService;
     private final JwtProvider jwtProvider;
+
 
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager, MemberService memberService, JwtProvider jwtProvider) {
         super(authenticationManager);
@@ -34,12 +34,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         log.info("JwtAuthorizationFilter.doFilterInternal");
         String path = request.getServletPath();
         System.out.println("path = " + path);
-//        String header = request.getHeader(JwtProperties.HEADER_STRING);
         String header = jwtProvider.getHeader(request);
         if (header == null) {
-            log.info("header = null");
-//            throw new ApplicationException(ApplicationErrorType.EXPIRED_ACCESS_TOKEN);
-//            chain.doFilter(request, response);
+            chain.doFilter(request, response);
             return;
         }
 

@@ -7,7 +7,9 @@ import com.tbfp.teamplannerbe.domain.recruitmentApply.entity.RecruitmentApplySta
 import com.tbfp.teamplannerbe.domain.recruitmentComment.entity.RecruitmentComment;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -98,10 +100,15 @@ public class RecruitmentResponseDto {
         private Integer currentMemberSize;
         private Integer viewCount;
         private Integer likeCount;
+        private String boardActivityName;
+        private LocalDateTime boardEndDate;
+        private String authorNickname;
+        private String authorProfileImg;
+
         @Builder.Default
         private List<RecruitmentCommentDto> commentList = new ArrayList<>();
 
-        public static RecruitmentWithCommentResponseDto toDto(boolean isAuthorOfRecruitment, String username, Recruitment recruitment, String profileImage) {
+        public static RecruitmentWithCommentResponseDto toDto(boolean isAuthorOfRecruitment, String username, Recruitment recruitment) {
             return builder()
                     .id(recruitment.getId())
                     .title(recruitment.getTitle())
@@ -111,8 +118,12 @@ public class RecruitmentResponseDto {
                     .viewCount(recruitment.getViewCount())
                     .likeCount(recruitment.getLikeCount())
                     .commentList(
-                            recruitment.getCommentList().stream().map(c -> RecruitmentCommentDto.toDto(isAuthorOfRecruitment, username, c, profileImage)).collect(Collectors.toList())
+                            recruitment.getCommentList().stream().map(c -> RecruitmentCommentDto.toDto(isAuthorOfRecruitment, username, c)).collect(Collectors.toList())
                     )
+                    .boardActivityName(recruitment.getBoard().getActivityName())
+                    .boardEndDate(LocalDate.parse(recruitment.getBoard().getActivityPeriod().split("~")[1].trim(), DateTimeFormatter.ofPattern("yy.M.d")).atStartOfDay())
+                    .authorNickname(recruitment.getAuthor().getNickname())
+                    .authorProfileImg(recruitment.getAuthor().getBasicProfile().getProfileImage())
                     .build();
         }
 
@@ -128,7 +139,7 @@ public class RecruitmentResponseDto {
             private String memberUsername;
             private String memberProfileImg;
 
-            public static RecruitmentCommentDto toDto(boolean isAuthorOfRecruitment, String username, RecruitmentComment recruitmentComment, String profileImage) {
+            public static RecruitmentCommentDto toDto(boolean isAuthorOfRecruitment, String username, RecruitmentComment recruitmentComment) {
                 String dtoUsername;
                 String dtoContent;
 
@@ -136,13 +147,13 @@ public class RecruitmentResponseDto {
                     dtoUsername = "알수없음";
                     dtoContent = "삭제된 댓글입니다";
                 } else if (recruitmentComment.isConfidential() && !(
-                        isAuthorOfRecruitment || recruitmentComment.getMember().getUsername().equals(username)
+                        isAuthorOfRecruitment || recruitmentComment.getMember().getNickname().equals(username)
                         )) {
                     dtoUsername = "알수없음";
                     dtoContent = "익명 댓글입니다";
                 } else {
                     dtoContent = recruitmentComment.getContent();
-                    dtoUsername = recruitmentComment.getMember().getUsername();
+                    dtoUsername = recruitmentComment.getMember().getNickname();
                 }
                 return builder()
                         .id(recruitmentComment.getId())
@@ -150,7 +161,7 @@ public class RecruitmentResponseDto {
                         .createdAt(recruitmentComment.getCreatedAt())
                         .memberUsername(dtoUsername)
                         .parentCommentId(recruitmentComment.getParentComment() == null ? null : recruitmentComment.getParentComment().getId())
-                        .memberProfileImg(profileImage)
+                        .memberProfileImg(recruitmentComment.getMember().getBasicProfile().getProfileImage())
                         .build();
             }
         }

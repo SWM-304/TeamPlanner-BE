@@ -39,11 +39,23 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     // 현재 도메인 정보를 가져오는 메서드
     private String getCurrentDomain(HttpServletRequest request) {
         String scheme = request.getScheme();
-//        String serverName = request.getServerName();
+        log.info("scheme = " + scheme);
+        String serverName = request.getServerName();
+        log.info("serverName = " + serverName);
+
+        log.info("request.getLocalPort() = " + request.getLocalPort());
+        log.info("request.getRemotePort() = " + request.getRemotePort());
+        log.info("request.getServerPort() = " + request.getServerPort());
+
         String referer = request.getHeader("referer");
         log.info("referer = " + referer);
         String currentDomain="";
 
+        if (referer == null) {
+            // 소셜로그인 처음 성공하면 이럼 , 두번째 부터는 null 아님 프론트 주소 가져옴
+            // TODO: 나중에 수정, 임시로 localhost:3000
+            referer = "http://localhost:3000/";
+        }
         currentDomain = referer;
         return currentDomain;
     }

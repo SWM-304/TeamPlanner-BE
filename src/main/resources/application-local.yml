@@ -88,3 +88,11 @@ amazon:
     secretKey: ENC(o2AZZVhzY12A7m7Vk8ZorqVENHq1OJO36xmTQk4MZAz0vHbsOwPIiLFpFFikkQdKntNxEE2Bxb0=)
     region: ENC(gGm9/hJVzdCVEEmIdsfDPAnanlIsxaJl)
     bucket: ENC(DY8KvVk0IQLZUQvhbosqcCuw9yOzwVd5ouVEybAZtFk=)
+
+permitUrls:
+  all: /, /api/v1/member/login, /api/v1/member/renew-access-token, /swagger-ui.html, /swagger-ui/**, /v3/api-docs/**, /api/v1/board
+  get: /api/v1/board/**, /api/v1/recruitment/**, /api/v1/member/signup/**
+  post: /api/v1/signup/**, /api/v1/forgot-username, /api/v1/forgot-password
+  delete:
+  put:
+  patch:

@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -30,7 +31,7 @@ public class TeamController {
 
     //team create
     @PostMapping("")
-    public ResponseEntity<?> createTeam(Principal principal, @RequestBody CreatTeamRequestDto creatTeamRequestDto) {
+    public ResponseEntity<?> createTeam(Principal principal, @Valid @RequestBody CreatTeamRequestDto creatTeamRequestDto, BindingResult bindingResult) {
 
 
         return ResponseEntity.ok().body(teamService.createTeam(principal.getName(),creatTeamRequestDto));

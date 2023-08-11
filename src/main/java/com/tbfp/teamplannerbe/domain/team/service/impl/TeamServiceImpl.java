@@ -50,6 +50,11 @@ public class TeamServiceImpl implements TeamService {
     @Override
     public TeamResponseDto.createdTeamResponseDto createTeam(String username, TeamRequestDto.CreatTeamRequestDto creatTeamRequestDto) {
 
+        System.out.println(creatTeamRequestDto.getSelectedUserIds().size());
+        if(creatTeamRequestDto.getSelectedUserIds().size()==0){
+            throw new ApplicationException(USER_NOT_FOUND);
+        }
+
         createdTeamResponseDto result = null;
 
         //selected 한게 참여신청리스트에 해당 팀원모집글에 대해 신청한적이 있는지 확인 신청 한적이없다면 예외처리

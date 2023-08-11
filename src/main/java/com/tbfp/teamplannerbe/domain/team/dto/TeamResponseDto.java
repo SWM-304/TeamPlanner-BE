@@ -54,6 +54,8 @@ public class TeamResponseDto {
     @Builder
     public static class GetMyTeamResponseDto {
         private Long id;
+        private String leaderProfileImage;
+        private String activityName;
         private String teamName;
         private Long teamSize;
         private Long teamCapacity;
@@ -69,6 +71,7 @@ public class TeamResponseDto {
         public static GetMyTeamResponseDto toDto(Team team) {
             return builder()
                     .id(team.getId())
+                    .leaderProfileImage(team.getRecruitment().getAuthor().getBasicProfile().getProfileImage())
                     .teamName(team.getTeamName())
                     .teamSize(team.getTeamSize())
                     .teamCapacity(team.getTeamCapacity())
@@ -76,6 +79,7 @@ public class TeamResponseDto {
                     .startDate(team.getStartDate())
                     .endDate(team.getEndDate())
                     .recruitmentId(team.getRecruitment().getId())
+                    .activityName(team.getRecruitment().getBoard().getActivityName())
                     .boardId(team.getRecruitment().getBoard().getId())
                     .memberInfos(getMemberInfoFromMemberTeam(team))
                     .build();

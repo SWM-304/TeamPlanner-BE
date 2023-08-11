@@ -102,6 +102,7 @@ public enum ApplicationErrorType {
 
 
 
+
     private final HttpStatus httpStatus;
     private final Integer code;
     private final String message;

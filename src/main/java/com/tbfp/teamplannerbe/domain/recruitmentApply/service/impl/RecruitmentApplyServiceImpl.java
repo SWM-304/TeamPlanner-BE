@@ -17,6 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -75,5 +78,11 @@ public class RecruitmentApplyServiceImpl implements RecruitmentApplyService {
         RecruitmentApply recruitmentApply = recruitmentApplyRepository.findRecruitmentApplyByRecruitment_IdAndApplicant_Username(recruitmentId, username)
                 .orElseThrow(() -> new ApplicationException(ApplicationErrorType.RECRUITMENT_APPLY_NOT_APPLIED));
         recruitmentApplyRepository.deleteById(recruitmentApply.getId());
+    }
+
+    @Override
+    public List<GetApplyResponse> getApplyList(String username) {
+        List<RecruitmentApply> ra = recruitmentApplyRepository.findAllRecruitmentApplyByApplicant_Username(username);
+        return ra.stream().map(GetApplyResponse::toDto).collect(Collectors.toList());
     }
 }

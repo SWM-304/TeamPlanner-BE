@@ -3,6 +3,8 @@ package com.tbfp.teamplannerbe.domain.recruitmentApply.repository;
 
 import com.tbfp.teamplannerbe.domain.recruitmentApply.entity.RecruitmentApply;
 import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 import java.util.Optional;
 
 public interface RecruitmentApplyRepository extends JpaRepository<RecruitmentApply, Long> {
@@ -19,4 +21,7 @@ public interface RecruitmentApplyRepository extends JpaRepository<RecruitmentApp
     Optional<RecruitmentApply> findRecruitmentApplyByRecruitment_IdAndApplicant_Username(Long recruitmentId, String username);
 
     Optional<RecruitmentApply> findRecruitmentApplyByRecruitment_IdAndApplicant_Id(Long recruitmentId,Long applicantId);
+
+    List<RecruitmentApply> findAllRecruitmentApplyByApplicant_Nickname(String userNickname);
+    List<RecruitmentApply> findAllRecruitmentApplyByApplicant_Username(String username);
 }

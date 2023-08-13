@@ -171,6 +171,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework:spring-context:5.3.19'
 
+    //actuator
+    implementation "org.springframework.boot:spring-boot-starter-actuator"
+
     //aws
     implementation 'com.amazonaws:aws-java-sdk:1.11.64'
 

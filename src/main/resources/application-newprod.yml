@@ -1,9 +1,9 @@
 spring:
   config:
     activate:
-      on-profile: prod
+      on-profile: newprod
   server:
-    port: 8080
+    port: 8081
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${SPRING_DATASOURCE_URL}

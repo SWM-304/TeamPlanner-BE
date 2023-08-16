@@ -45,6 +45,8 @@ public class CommentResponseDto {
         private Integer commentCount;
         private String nickName;
         private String profileImage;
+
+        private Boolean state;
         @Builder.Default
         List<commentToCommentListResponseDto> childCommentList=new ArrayList<>();
 
@@ -60,6 +62,7 @@ public class CommentResponseDto {
             this.commentCount=comment.getChildCommentCount();
             this.nickName=comment.getMember().getNickname();
             this.profileImage=comment.getMember().getBasicProfile()==null ? null : comment.getMember().getBasicProfile().getProfileImage();
+            this.state=comment.isState();
             if (childComments != null) {
                 this.childCommentList = childComments.stream()
                         .map(BoardWithCommentListResponseDto::mapToCommentToCommentListResponseDto)

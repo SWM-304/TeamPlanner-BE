@@ -3,7 +3,9 @@ package com.tbfp.teamplannerbe.domain.board.controller;
 
 import com.tbfp.teamplannerbe.domain.board.dto.BoardRequestDto.createBoardResquestDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardRequestDto.updateBoardReqeustDto;
+import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto.BoardSimpleListResponseDto;
+import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto.boardSearchListResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardSearchCondition;
 import com.tbfp.teamplannerbe.domain.board.service.BoardService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -13,6 +15,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -74,8 +78,9 @@ public class BoardController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
             @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
     })
-    public ResponseEntity<?> boardList(BoardSearchCondition boardSearchCondition,
-                                 Pageable pageable){
+    public ResponseEntity<?> boardList(
+                                       BoardSearchCondition boardSearchCondition,
+                                       @PageableDefault(size=10, sort="view",direction = Sort.Direction.DESC) Pageable pageable){
 
             return ResponseEntity.status(HttpStatus.OK).body(
                     boardService.searchPageSimple(boardSearchCondition,pageable).map(BoardSimpleListResponseDto::toDTO)
@@ -108,6 +113,23 @@ public class BoardController {
         boardService.deleteBoard(boardId,principal.getName());
         return ResponseEntity.status(HttpStatus.OK).body("삭제가 완료 되었습니다");
     }
+
+    @GetMapping("/search")
+    @Operation(summary = "공고리스트 검색 및 페이징 동적쿼리를 활용해 마감된공모전,대외활동,진행중,모집글을 가져온다.", description = "localhost:8080/api/v1/board?s='searchword'")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
+    })
+    public ResponseEntity<?> boardSearchList(@RequestParam(required = false) String searchWord,
+                                             @PageableDefault(size=10, sort="view",direction = Sort.Direction.ASC) Pageable pageable,
+                                             BoardSearchCondition boardSearchCondition){
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                boardService.searcBoardList(searchWord,pageable,boardSearchCondition).map(boardSearchListResponseDto::toDTO)
+        );
+    }
+
 
 
 

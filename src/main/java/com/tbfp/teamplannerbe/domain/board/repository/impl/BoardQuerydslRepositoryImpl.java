@@ -6,20 +6,17 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardSearchCondition;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
-import com.tbfp.teamplannerbe.domain.board.entity.QBoard;
+import com.tbfp.teamplannerbe.domain.board.entity.BoardStateEnum;
 import com.tbfp.teamplannerbe.domain.board.repository.BoardQuerydslRepository;
 import com.tbfp.teamplannerbe.domain.common.querydsl.support.Querydsl4RepositorySupport;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Stream;
 
 import static com.tbfp.teamplannerbe.domain.board.entity.QBoard.board;
 import static com.tbfp.teamplannerbe.domain.comment.entity.QComment.comment;
@@ -38,27 +35,21 @@ public class BoardQuerydslRepositoryImpl extends Querydsl4RepositorySupport impl
     public Page<Board> getBoardList(BoardSearchCondition condition, Pageable pageable) {
 
         String[] word = (condition.getActivityField()!=null) ? condition.getActivityField().split("/") : null;
-
         BooleanExpression activityFieldExpression = (word != null) ? activityFieldContains(word) : null;
 
 
-        StringExpression recruitmentPeriodEndDate = Expressions.stringTemplate("STR_TO_DATE(SUBSTRING_INDEX({0}, '~', -1), '%Y.%m.%d')", board.recruitmentPeriod);
-        BooleanExpression recruitmentPeriodPredicate = recruitmentPeriodEndDate.goe(String.valueOf(LocalDate.now()));
-
         JPAQuery<Board> contentQuery = selectFrom(board)
-                .where(categoryEq(condition.getCategory()),recruitmentPeriodPredicate,activityFieldExpression)
+                .where(categoryEq(condition.getCategory()),recruitmentPeriodPredicate(),activityFieldExpression)
                 .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
 
-        List<Board> content = contentQuery.fetch();
 
         JPAQuery<Long> countQuery = select(board.count())
                 .from(board)
-                .where(categoryEq(condition.getCategory()),recruitmentPeriodPredicate,activityFieldExpression);
+                .where(categoryEq(condition.getCategory()),recruitmentPeriodPredicate(),activityFieldExpression);
 
-        long totalCount = countQuery.fetchOne();
-        return new PageImpl<>(content, pageable, totalCount);
+        return PageableExecutionUtils.getPage(contentQuery.fetch(),pageable,()->countQuery.fetchCount());
     }
 
 
@@ -74,6 +65,65 @@ public class BoardQuerydslRepositoryImpl extends Querydsl4RepositorySupport impl
         return boardList;
     }
 
+    @Override
+    public Page<Board> searchBoardList(String searchWord, Pageable pageable,BoardSearchCondition boardSearchCondition) {
+
+
+
+        JPAQuery<Board> contentQuery = selectFrom(board)
+                .where(searchWordExpression(searchWord),boardStateEq(boardSearchCondition.getBoardState()))
+                .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+
+
+        JPAQuery<Long> countQuery = select(board.count())
+                .from(board)
+                .where(searchWordExpression(searchWord),boardStateEq(boardSearchCondition.getBoardState()));
+
+        return PageableExecutionUtils.getPage(contentQuery.fetch(),pageable,()->countQuery.fetchCount());
+    }
+
+
+    /**
+     * 진행 , 마감 중 어떤 값이 들어오든 동적으로 검색해주는
+     */
+
+    private BooleanExpression boardStateEq(List<BoardStateEnum> boardStates) {
+        if (boardStates == null || boardStates.isEmpty()) {
+            return null;
+        }
+        return boardStates.stream()
+                .map(state -> {
+                    if (state == BoardStateEnum.ONGOING) {
+                        return recruitmentPeriodPredicate();
+                    }
+                    if (state == BoardStateEnum.CLOSED) {
+                        return closedRecruitmentPredicate();
+                    }
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .reduce(BooleanExpression::or)
+                .orElse(null);
+    }
+
+    /**
+     *  진행 중 활동
+     */
+
+    private BooleanExpression recruitmentPeriodPredicate() {
+        StringExpression recruitmentPeriodEndDate = Expressions.stringTemplate("STR_TO_DATE(SUBSTRING_INDEX({0}, '~', -1), '%Y.%m.%d')", board.recruitmentPeriod);
+        return recruitmentPeriodEndDate.goe(String.valueOf(LocalDate.now()));
+    }
+
+    /**
+     * 마감 된 활동
+     */
+    private BooleanExpression closedRecruitmentPredicate() {
+        StringExpression recruitmentPeriodEndDate = Expressions.stringTemplate("STR_TO_DATE(SUBSTRING_INDEX({0}, '~', -1), '%Y.%m.%d')", board.recruitmentPeriod);
+        return recruitmentPeriodEndDate.lt(String.valueOf(LocalDate.now()));
+    }
 
     /**
      * 동적 orderby
@@ -84,21 +134,25 @@ public class BoardQuerydslRepositoryImpl extends Querydsl4RepositorySupport impl
         
         sort.stream().forEach(order->{
             Order direction = order.isAscending() ? Order.ASC : Order.DESC;
-            System.out.println("order"+direction);
             String property = order.getProperty();
-            System.out.println("property"+property);
             PathBuilder orderByExpression = new PathBuilder(Board.class, "board");
-            System.out.println("orderByExpression"+orderByExpression);
-
             orders.add(new OrderSpecifier(direction,orderByExpression.get(property)));
 
         });
         return orders;
     }
 
+    /**
+     * 카테고리 동적 검색
+     */
     private BooleanExpression categoryEq(String category) {
         return hasText(category) ? board.category.eq(category) : null;
     }
+
+
+    /**
+     * 활동영역 동적처리
+     */
     private BooleanExpression activityFieldContains(String[] activityFields) {
         BooleanExpression result = null;
         for (String field : activityFields) {
@@ -112,9 +166,30 @@ public class BoardQuerydslRepositoryImpl extends Querydsl4RepositorySupport impl
         return result;
     }
 
+
+    /**
+     * boardId 동적검색
+     */
     private BooleanExpression boardIdEq(Long boardId) {
         return hasText(String.valueOf(boardId)) ? board.id.eq(boardId) : null;
     }
+
+    /**
+     * 검색어 단어를 통한 동적검색
+     */
+    private BooleanExpression searchWordExpression(String searchWord) {
+
+        return Optional.ofNullable(searchWord) //seachWord가 null이 아닌경우에 Optional로 감싸기
+                .filter(word->!word.isEmpty()) // searchWord가 비어 있지 않은경우에만 map 함수
+                .map(word-> Stream.of(board.activityName.containsIgnoreCase(word),
+                                      board.activityDetail.containsIgnoreCase(word),
+                                      board.activityField.containsIgnoreCase(word))
+                        .reduce(BooleanExpression::or) // 위 조건들을 OR 연산으로 묶음
+                        .orElse(null))
+                .orElse(null);//  // 만약 조건이 없으면 null 반환
+
+    }
+
 
 
 

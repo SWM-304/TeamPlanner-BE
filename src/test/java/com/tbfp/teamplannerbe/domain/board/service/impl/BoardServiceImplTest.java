@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -201,7 +202,8 @@ class BoardServiceImplTest extends BaseControllerTest {
                 .profileImage("dd.image")
                 .job(Job.valueOf("COLLEGE"))
                 .education(Education.valueOf("COLLEGE"))
-                .educationGrade(4)
+                .admissionDate(YearMonth.parse("2017-03"))
+                .graduationDate(YearMonth.parse(("2022-02")))
                 .birth(LocalDate.parse("2010-10-11"))
                 .address("경기도 시흥 아몰라 우리집")
                 .gender(Gender.valueOf("MALE"))

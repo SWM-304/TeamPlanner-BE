@@ -46,7 +46,7 @@ public class MemberResponseDto {
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class CheckDuplicateResponseDto{
+    public static class CheckDuplicateUsernameResponseDto{
         private String message;
     }
 
@@ -55,7 +55,16 @@ public class MemberResponseDto {
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class EmailAddressResponseDto{
+    public static class CheckDuplicateNicknameResponseDto{
+        private String message;
+    }
+
+    @Builder
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class EmailResponseDto{
         private String message;
     }
 

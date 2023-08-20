@@ -41,9 +41,9 @@ public enum ApplicationErrorType {
     DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST,-20005,"이미 사용중인 닉네임입니다."),
 
 
-    SIGNUP_REQUEST_INVALID_USERNAME(HttpStatus.BAD_REQUEST, -21000, "username"),
+    SIGNUP_REQUEST_INVALID_USERNAME(HttpStatus.BAD_REQUEST, -21000, "아이디를 4글자 이상으로 다시 설정해주세요"),
 
-    SIGNUP_REQUEST_INVALID_PASSWORD(HttpStatus.BAD_REQUEST, -21001, "password"),
+    SIGNUP_REQUEST_INVALID_PASSWORD(HttpStatus.BAD_REQUEST, -21001, "비밀번호를 "),
 
     SIGNUP_REQUEST_INVALID_EMAIL(HttpStatus.BAD_REQUEST, -21002, "email"),
 
@@ -52,7 +52,6 @@ public enum ApplicationErrorType {
     SIGNUP_REQUEST_INVALID_CONTACTEMAIL(HttpStatus.BAD_REQUEST, -21004, "contactEmail"),
 
     SIGNUP_REQUEST_INVALID_NICKNAME(HttpStatus.BAD_REQUEST, -21005, "nickname"),
-
 
     VERIFICATION_CODE_UNMATCHED(HttpStatus.UNAUTHORIZED,-22000, "인증번호가 일치하지 않습니다."),
 

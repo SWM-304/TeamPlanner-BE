@@ -11,6 +11,7 @@ import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.time.YearMonth;
 
 public class MemberRequestDto {
 
@@ -78,7 +79,9 @@ public class MemberRequestDto {
 
         private Education education;
 
-        private Integer educationGrade;
+        private LocalDate admissionDate;
+
+        private LocalDate graduationDate;
 
         private LocalDate birth;
 
@@ -93,14 +96,20 @@ public class MemberRequestDto {
 
         private Long isPublic;
 
-        @NotNull
-        @AssertTrue(message = "아이디 중복 검사가 필요합니다.")
-        private Boolean usernameChecked;
-
-        @NotNull
-        @AssertTrue(message = "이메일 인증이 필요합니다.")
-        private Boolean emailChecked;
-
+        public Member toMember(BasicProfile basicProfile){
+            return Member.builder().
+                    username(username).
+                    password(password).
+                    nickname(nickname).
+                    email(email).
+                    phone(phone).
+                    state(true).
+                    memberRole(MemberRole.MEMBER).
+                    providerType(null).
+                    providerId(null).
+                    basicProfile(basicProfile).
+                    build();
+        }
         public Member toMember(){
             return Member.builder().
                     username(username).
@@ -116,20 +125,21 @@ public class MemberRequestDto {
         }
 
         public BasicProfile toBasicProfile(Member member){
-            return BasicProfile.builder().
-                    profileIntro(profileIntro).
-                    profileImage(profileImage).
-                    job(job).
-                    education(education).
-                    educationGrade(educationGrade).
-                    birth(birth).
-                    address(address).
-                    gender(gender).
-                    kakaoId(kakaoId).
-                    contactEmail(contactEmail).
-                    isPublic(isPublic).
-                    member(member).
-                    build();
+            return BasicProfile.builder()
+                    .profileIntro(profileIntro)
+                    .profileImage(profileImage)
+                    .job(job)
+                    .education(education)
+                    .admissionDate(admissionDate)
+                    .graduationDate(graduationDate)
+                    .birth(birth)
+                    .address(address)
+                    .gender(gender)
+                    .kakaoId(kakaoId)
+                    .contactEmail(contactEmail)
+                    .isPublic(isPublic)
+                    .member(member)
+                    .build();
         }
     }
 
@@ -138,7 +148,9 @@ public class MemberRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CheckDuplicateRequestDto {
+    public static class CheckDuplicateUsernameRequestDto {
+        @NotEmpty(message = "아이디 중복 확인 요청은 빈 값이면 안됩니다.")
+        @Size(min = 4, max = 32, message = "아이디를 4~32글자로 설정해주세요.")
         private String username;
     }
 
@@ -147,9 +159,19 @@ public class MemberRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class EmailAddressRequestDto {
+    public static class CheckDuplicateNicknameRequestDto {
+        @NotEmpty(message = "닉네임 중복 확인 요청은 빈 값이면 안됩니다.")
+        private String nickname;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class EmailRequestDto {
         @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$", message = "이메일 형식이 맞지 않습니다.")
-        private String emailAddress;
+        private String email;
         private VerifyPurpose verifyPurpose;
     }
 
@@ -161,7 +183,7 @@ public class MemberRequestDto {
     public static class VerificationRequestDto {
 
         @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$", message = "이메일 형식이 맞지 않습니다.")
-        private String emailAddress;
+        private String email;
         private String code;
         private VerifyPurpose verifyPurpose;
     }
@@ -172,7 +194,7 @@ public class MemberRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ForgotUsernameRequestDto {
-        private String emailAddress;
+        private String email;
         private String code;
     }
 
@@ -183,7 +205,7 @@ public class MemberRequestDto {
     @AllArgsConstructor
     public static class ForgotPasswordRequestDto {
         private String username;
-        private String emailAddress;
+        private String email;
         private String code;
     }
 

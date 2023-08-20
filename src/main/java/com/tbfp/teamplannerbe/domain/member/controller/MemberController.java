@@ -67,18 +67,23 @@ public class MemberController {
     }
 
     @GetMapping("/signup/enums")
-    public ResponseEntity<Map<String, List<String>>> getEnums() {
+    public ResponseEntity<Map<String, List<Map<String, String>>>> getEnums() {
         return ResponseEntity.ok(memberService.getEnums());
     }
 
-    @PostMapping("/signup/check-duplicate")
-    public ResponseEntity<MemberResponseDto.CheckDuplicateResponseDto> checkDuplicate(@RequestBody MemberRequestDto.CheckDuplicateRequestDto checkDuplicateRequestDto){
-        return ResponseEntity.ok(memberService.checkDuplicate(checkDuplicateRequestDto));
+    @PostMapping("/signup/check-duplicate/username")
+    public ResponseEntity<MemberResponseDto.CheckDuplicateUsernameResponseDto> checkDuplicateUsername(@Valid @RequestBody MemberRequestDto.CheckDuplicateUsernameRequestDto checkDuplicateUsernameRequestDto){
+        return ResponseEntity.ok(memberService.checkDuplicateUsername(checkDuplicateUsernameRequestDto));
+    }
+
+    @PostMapping("/signup/check-duplicate/nickname")
+    public ResponseEntity<MemberResponseDto.CheckDuplicateNicknameResponseDto> checkDuplicateNickname(@Valid @RequestBody MemberRequestDto.CheckDuplicateNicknameRequestDto checkDuplicateNicknameRequestDto){
+        return ResponseEntity.ok(memberService.checkDuplicateNickname(checkDuplicateNicknameRequestDto));
     }
 
     @PostMapping("/signup/send-verification")
-    public ResponseEntity<MemberResponseDto.EmailAddressResponseDto> sendVerificationEmail(@Valid @RequestBody MemberRequestDto.EmailAddressRequestDto emailAddressRequestDto) {
-        return ResponseEntity.ok().body(memberService.sendVerificationEmail(emailAddressRequestDto));
+    public ResponseEntity<MemberResponseDto.EmailResponseDto> sendVerificationEmail(@Valid @RequestBody MemberRequestDto.EmailRequestDto emailRequestDto) {
+        return ResponseEntity.ok().body(memberService.sendVerificationEmail(emailRequestDto));
     }
 
     @PostMapping("/signup/verify")

@@ -6,14 +6,14 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Education {
-    MIDDLE_SCHOOL("중학교 재학"),
-    MIDDLE_SCHOOL_GRADUATE("중학교 졸업"),
-    HIGH_SCHOOL("고등학교 재학"),
-    HIGH_SCHOOL_GRADUATE("고등학교 졸업"),
     COLLEGE("대학교 재학"),
     COLLEGE_GRADUATE("대학교 졸업"),
     GRADUATE_SCHOOL("대학원 재학"),
-    GRADUATE_SCHOOL_GRADUATE("대학원 졸업");
+    GRADUATE_SCHOOL_GRADUATE("대학원 졸업"),
+    HIGH_SCHOOL("고등학교 재학"),
+    HIGH_SCHOOL_GRADUATE("고등학교 졸업"),
+    MIDDLE_SCHOOL("중학교 재학"),
+    MIDDLE_SCHOOL_GRADUATE("중학교 졸업");
 
     private final String label;
 

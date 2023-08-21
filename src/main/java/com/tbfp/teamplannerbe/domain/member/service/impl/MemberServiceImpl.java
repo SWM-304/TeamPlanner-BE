@@ -1,5 +1,6 @@
 package com.tbfp.teamplannerbe.domain.member.service.impl;
 
+import com.tbfp.teamplannerbe.config.redis.util.EmailRedisUtil;
 import com.tbfp.teamplannerbe.domain.auth.JwtProvider;
 import com.tbfp.teamplannerbe.domain.auth.entity.RefreshToken;
 import com.tbfp.teamplannerbe.domain.auth.repository.RefreshTokenRepository;
@@ -49,7 +50,7 @@ public class MemberServiceImpl implements MemberService {
     private final MailSenderService mailSenderService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final ProfileService profileService;
-
+    private final EmailRedisUtil emailRedisUtil;
     @Override
     public Optional<Member> findMemberByUsername(String username) {
         return memberRepository.findMemberByUsername(username);
@@ -158,6 +159,7 @@ public class MemberServiceImpl implements MemberService {
                 build();
     }
 
+
     @Override
     @Transactional
     public MemberResponseDto.CheckDuplicateNicknameResponseDto checkDuplicateNickname(MemberRequestDto.CheckDuplicateNicknameRequestDto checkDuplicateNicknameRequestDto){
@@ -170,7 +172,9 @@ public class MemberServiceImpl implements MemberService {
                 build();
     }
 
-    private ConcurrentHashMap<String, Map<String,Object>> authenticateMap = new ConcurrentHashMap<>();
+
+//    private ConcurrentHashMap<String, Map<String,Object>> authenticateMap = new ConcurrentHashMap<>();
+
 
     @Override
     @Transactional
@@ -178,12 +182,12 @@ public class MemberServiceImpl implements MemberService {
 
         String email = emailRequestDto.getEmail();
         VerifyPurpose verifyPurpose = emailRequestDto.getVerifyPurpose();
-        System.out.println("aa");
+        if (emailRedisUtil.existData(email)) emailRedisUtil.deleteData(email);
+
 
         try {
-            System.out.println("bb");
-            if (authenticateMap.containsKey(email)) authenticateMap.remove(email);
-            System.out.println("cc");
+
+
 
             Integer verificationCode = mailSenderService.getVerificationNumber();
             String mailSubject = "TeamPlanner " + verifyPurpose.getLabel() + " 인증번호입니다.";
@@ -191,13 +195,14 @@ public class MemberServiceImpl implements MemberService {
             mailSenderService.sendEmail(email, mailSubject, mailBody);
 
             //Concurrent에 이메일주소, 인증번호, 만료시간 저장
-            LocalDateTime expireDateTime = LocalDateTime.now().plusSeconds(180);
-            Map<String,Object> innerMap = new ConcurrentHashMap<>();
-            innerMap.put("verificationCode",verificationCode);
-            innerMap.put("expireDateTime",expireDateTime);
-            innerMap.put("verifyPurpose",verifyPurpose);
-            authenticateMap.put(email,innerMap);
-            System.out.println(verificationCode);
+//            LocalDateTime expireDateTime = LocalDateTime.now().plusSeconds(180);
+//            Map<String,Object> innerMap = new ConcurrentHashMap<>();
+//            innerMap.put("verificationCode",verificationCode);
+//            innerMap.put("expireDateTime",expireDateTime);
+//            innerMap.put("verifyPurpose",verifyPurpose);
+            emailRedisUtil.setListData(email,verificationCode,verifyPurpose,60*2L);
+//            authenticateMap.put(emailAddress,innerMap);
+
 
             return MemberResponseDto.EmailResponseDto.builder().
                     message("이메일로 인증번호 발송에 성공했습니다.").
@@ -209,20 +214,21 @@ public class MemberServiceImpl implements MemberService {
 
     public VerificationStatus getVerificationStatus(String email, String userInputCode, VerifyPurpose verifyPurpose){
 
-        try{
-            authenticateMap.containsKey(email);
-        } catch (NullPointerException e){
+
+
+
+        if(!emailRedisUtil.existData(email))  return VerificationStatus.UNPROVIDED;;
+
+
+        List<String> info = emailRedisUtil.getData(email);
+        if(info.isEmpty() || info.get(0)==null){
             return VerificationStatus.UNPROVIDED;
         }
 
-        Map<String,Object> mapInfo = authenticateMap.get(email);
+        String[] splitInfo = info.get(0).split("\\|");
+        String verificationCode = splitInfo[0];
+        VerifyPurpose verifyPurposeInMap = VerifyPurpose.valueOf(splitInfo[1]);
 
-        if(mapInfo==null){
-            return VerificationStatus.UNPROVIDED;
-        }
-        String verificationCode = mapInfo.get("verificationCode").toString();
-        LocalDateTime expireDateTime = (LocalDateTime) mapInfo.get("expireDateTime");
-        VerifyPurpose verifyPurposeInMap = (VerifyPurpose) mapInfo.get("verifyPurpose");
 
         //다른 타입의 인증번호
         if(!verifyPurposeInMap.equals(verifyPurpose)){
@@ -235,20 +241,24 @@ public class MemberServiceImpl implements MemberService {
             return VerificationStatus.UNPROVIDED;
         }
         //인증번호 기한 만료
-        if (expireDateTime.isBefore(LocalDateTime.now())){//인증번호 만료시
-            authenticateMap.remove(email);
-            //인증번호 재발급
-            sendVerificationEmail(
-                    MemberRequestDto.EmailRequestDto.builder().
-                            email(email).
-                            verifyPurpose(verifyPurpose).
-                            build()
-            );
-            return VerificationStatus.EXPIRED;
-        }
-        //인증번호 일치
-        if (userInputCode.equals(verificationCode)) return VerificationStatus.MATCHED;
 
+        //redis 는 만료시간되면 자동으로 삭제됨
+//        if (expireDateTime.isBefore(LocalDateTime.now())){//인증번호 만료시
+//            authenticateMap.remove(emailAddress);
+//            //인증번호 재발급
+//            sendVerificationEmail(
+//                    MemberRequestDto.EmailAddressRequestDto.builder().
+//                            emailAddress(emailAddress).
+//                            verifyPurpose(verifyPurpose).
+//                            build()
+//            );
+//            return VerificationStatus.EXPIRED;
+//        }
+        //인증번호 일치
+        if (userInputCode.equals(verificationCode)){
+            emailRedisUtil.deleteData(email);
+            return VerificationStatus.MATCHED;
+        }
         //인증번호 불일치
         return VerificationStatus.UNMATCHED;
     }
@@ -347,7 +357,7 @@ public class MemberServiceImpl implements MemberService {
             throw new ApplicationException(MAIL_ERROR);
         }
     }
-  
+
     @Override
     public Member findMemberByUsernameOrElseThrowApplicationException(String username) {
         return memberRepository.findMemberByUsername(username).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
@@ -371,5 +381,30 @@ public class MemberServiceImpl implements MemberService {
                 .nickname(member.getNickname())
                 .profileImg(basicProfile.getProfileImage())
                 .build();
+    }
+
+    @Override
+    public MemberResponseDto.idAndEmailVerifyResponseDto verifyIdAndEmail(MemberRequestDto.IdAndEmailVerifyRequestDto verifyRequestDto) {
+
+        memberRepository.findByUsernameAndEmail(verifyRequestDto.getUsername(),verifyRequestDto.getEmail())
+                .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
+
+
+        return MemberResponseDto.idAndEmailVerifyResponseDto.builder()
+                .message("사용자 정보가 일치합니다")
+                .build();
+    }
+
+    @Override
+    public MemberResponseDto.NickNameAndEmailVerifyResponseDto verifyNicknameAndEmail(MemberRequestDto.NickNameAndEmailVerifyRequestDto verifyRequestDto) {
+
+        memberRepository.findByNicknameAndEmail(verifyRequestDto.getNickname(),verifyRequestDto.getEmail())
+                .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
+
+
+        return MemberResponseDto.NickNameAndEmailVerifyResponseDto.builder()
+                .message("사용자 정보가 일치합니다")
+                .build();
+
     }
 }

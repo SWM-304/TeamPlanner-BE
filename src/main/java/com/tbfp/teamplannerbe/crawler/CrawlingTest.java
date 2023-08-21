@@ -109,7 +109,7 @@ public class CrawlingTest {
                 if(element.getText().equals("공모전")){
                     System.out.println("공모전 글 입니다");
 
-                    WebElement recruitmentPeriod = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[4]/h3"));
+                    WebElement recruitmentPeriod = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[4]/h3"));
                     String[] split = recruitmentPeriod.getText().split("~");
                     String startDateString=split[0];
                     String endDateString=split[1];
@@ -123,19 +123,19 @@ public class CrawlingTest {
                         if (currentDateObj.compareTo(startDate) >= 0 && currentDateObj.compareTo(endDate) <= 0) {
                             System.out.println("현재 날짜는 접수 기간에 포함됩니다.");
 
-                            String activityName = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/h1")).getText();
-                            String activityImg = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[1]/div[1]/div/figure/img")).getAttribute("src");
+                            String activityName = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/h1")).getText();
+                            String activityImg = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/div/div/div/figure/img")).getAttribute("src");
 
 
-                            String companyType = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[1]/h3")).getText(); //기업형태
-                            String target = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[2]/h3")).getText(); //참여대상
-                            String prizeScale = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[3]/h3")).getText(); //참여대상
+                            String companyType = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[1]/h3")).getText(); //기업형태
+                            String target = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[2]/h3")).getText(); //참여대상
+                            String prizeScale = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[3]/h3")).getText(); //참여대상
 
-                            String activityUrl = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[3]/h3")).getText(); // 홈페이지
+                            String activityUrl = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[5]/h3")).getText(); // 홈페이지
 
-                            String activityBenefits = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[6]/h3")).getText(); //활동혜택
+                            String activityBenefits = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[6]/h3")).getText(); //활동혜택
 
-                            String activity_field = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[7]/h3/div")).getText(); //공모분야
+                            String activity_field = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[7]/h3/div")).getText(); //공모분야
 
 
 
@@ -183,7 +183,7 @@ public class CrawlingTest {
                     System.out.println("대외활동글 입니다");
 
 
-                    WebElement recruitmentPeriod = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[3]/h3"));
+                    WebElement recruitmentPeriod = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[3]/h3"));
 
                     String[] split = recruitmentPeriod.getText().split("~");
                     String startDateString=split[0];
@@ -199,20 +199,21 @@ public class CrawlingTest {
 
 
 
-                            String activityName = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/h1")).getText();
+                            String activityName = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/h1")).getText();
 
-                            String activityImg = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[1]/div[1]/div/figure/img")).getAttribute("src");
+                            String activityImg = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/div/div/div/figure/img")).getAttribute("src");
 
-                            String companyType = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[1]/h3")).getText(); //기업형태
-                            String target = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[2]/h3")).getText(); //참여대상
-                            String activityPeriod = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[4]/h3")).getText(); //활동기간
-                            String recruitmentCount = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[5]/h3")).getText();; //모집인원
-                            String activityArea =driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[6]/h3/div")).getText();;//활동지역
-                            String preferredSkills = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[7]/h3")).getText();;//우대역량
-                            String activityUrl = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[8]/h3/div")).getText();;//홈페이지
-                            String activityBenefits = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[9]/h3")).getText();;//활동혜택
-                            String interestArea = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[10]/h3/div")).getText();;//관심분야
-                            String activityField = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[11]/h3/div")).getText();;//활동분야
+                            String companyType = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[1]/h3")).getText(); //기업형태
+
+                            String target = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[2]/h3")).getText(); //참여대상
+                            String activityPeriod = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[4]/h3")).getText(); //활동기간
+                            String recruitmentCount = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[5]/h3")).getText();; //모집인원
+                            String activityArea =driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[6]/h3/div")).getText();;//활동지역
+                            String preferredSkills = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[7]/h3")).getText();;//우대역량
+                            String activityUrl = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[7]/h3")).getText();;//홈페이지
+                            String activityBenefits = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[9]/h3")).getText();;//활동혜택
+                            String interestArea = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[10]/h3/div/span")).getText();;//관심분야
+                            String activityField = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[11]/h3/div")).getText();;//활동분야
 
 
                             String activitiyKey=link;
@@ -261,7 +262,7 @@ public class CrawlingTest {
                 if(element.getText().equals("동아리")){
                     System.out.println("동아리글 입니다");
 
-                    WebElement recruitmentPeriod = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[4]/h3"));
+                    WebElement recruitmentPeriod = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[4]/h3"));
 
                     String[] split = recruitmentPeriod.getText().split("~");
                     String startDateString=split[0];
@@ -275,21 +276,21 @@ public class CrawlingTest {
                         if (currentDateObj.compareTo(startDate) >= 0 && currentDateObj.compareTo(endDate) <= 0) {
                             System.out.println("현재 날짜는 접수 기간에 포함됩니다.");
 
-                            String activityName = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/h1")).getText();
+                            String activityName = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/h1")).getText();
 
-                            String activityImg = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[1]/div[1]/div/figure/img")).getAttribute("src");
+                            String activityImg = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/div/div/div/figure/img")).getAttribute("src");
 
 
-                            String companyType = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[1]/h3")).getText();//기업형태
-                            String target = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[2]/h3")).getText();//참여대상
+                            String companyType = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[1]/h3")).getText();//기업형태
+                            String target = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[2]/h3")).getText();//참여대상
 
-                            String activitiyArea = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[3]/h3/div")).getText();//활동지역
-                            String recruitmentCount = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[5]/h3")).getText();//모집인원
-                            String meetingTime = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[6]/h3")).getText();//모임시간
-                            String activityUrl = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[7]/h3/div")).getText();//홈페이지
-                            String activityBenefits = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[8]/h3")).getText();//활동혜택
-                            String interestArea = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[9]/h3/div")).getText();//관심분야
-                            String activityField = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/div[3]/div/main/div[1]/div[2]/div[2]/div[2]/div[10]/h3/div")).getText();//활동분야
+                            String activitiyArea = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[3]/h3/div")).getText();//활동지역
+                            String recruitmentCount = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[5]/h3")).getText();//모집인원
+                            String meetingTime = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[6]/h3")).getText();//모임시간
+                            String activityUrl = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[7]/h3")).getText();//홈페이지
+                            String activityBenefits = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[8]/h3")).getText();//활동혜택
+                            String interestArea = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[9]/h3/div")).getText();//관심분야
+                            String activityField = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[10]/h3/div")).getText();//활동분야
 
                             String activitiyKey=link;
 

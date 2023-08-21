@@ -209,4 +209,29 @@ public class MemberRequestDto {
         private String code;
     }
 
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class IdAndEmailVerifyRequestDto {
+
+        @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$", message = "이메일 형식이 맞지 않습니다.")
+        private String email;
+        @NotEmpty(message = "아이디 중복 확인 요청은 빈 값이면 안됩니다.")
+        private String username;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class NickNameAndEmailVerifyRequestDto {
+
+        @Pattern(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Za-z]{2,6}$", message = "이메일 형식이 맞지 않습니다.")
+        private String email;
+        @NotEmpty(message = "아이디 중복 확인 요청은 빈 값이면 안됩니다.")
+        private String nickname;
+    }
+
 }

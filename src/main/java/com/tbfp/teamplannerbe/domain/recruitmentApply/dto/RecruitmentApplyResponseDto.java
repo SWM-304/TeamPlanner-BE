@@ -1,5 +1,6 @@
 package com.tbfp.teamplannerbe.domain.recruitmentApply.dto;
 
+import com.tbfp.teamplannerbe.domain.recruitmentApply.entity.RecruitmentApply;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,5 +23,30 @@ public class RecruitmentApplyResponseDto {
     @Builder
     public static class DeleteApplyResponse {
         private Long recruitmentApplyId;
+    }
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class GetApplyResponse {
+        private Long recruitmentApplyId;
+        private Long boardId;
+        private String boardName;
+        private Long recruitmentId;
+        private String recruitmentTitle;
+        private String recruitmentContent;
+        private String recruitmentApplyContent;
+
+        public static GetApplyResponse toDto(RecruitmentApply ra) {
+            return GetApplyResponse.builder()
+                    .recruitmentApplyId(ra.getId())
+                    .boardId(ra.getRecruitment().getBoard().getId())
+                    .boardName(ra.getRecruitment().getBoard().getActivityName())
+                    .recruitmentId(ra.getRecruitment().getId())
+                    .recruitmentTitle(ra.getRecruitment().getTitle())
+                    .recruitmentContent(ra.getRecruitment().getContent())
+                    .recruitmentApplyContent(ra.getContent())
+                    .build();
+        }
     }
 }

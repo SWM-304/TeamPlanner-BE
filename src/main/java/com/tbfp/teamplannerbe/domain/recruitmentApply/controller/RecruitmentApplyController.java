@@ -11,23 +11,30 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/api/v1/recruitment/{recruitmentId}/apply")
+@RequestMapping("/api/v1/recruitment")
 @RequiredArgsConstructor
 public class RecruitmentApplyController {
     private final RecruitmentApplyService recruitmentApplyService;
 
     // apply
-    @PostMapping
+    @PostMapping("/{recruitmentId}/apply")
     public ResponseEntity apply(Principal principal, @PathVariable Long recruitmentId, @RequestBody CreateApplyRequest createApplyRequest) {
         return ResponseEntity.ok(
-                recruitmentApplyService.apply(principal.getName(), recruitmentId, createApplyRequest)
+                recruitmentApplyService.apply(principal == null ? null : principal.getName(), recruitmentId, createApplyRequest)
         );
     }
 
     // cancel apply
-    @DeleteMapping
+    @DeleteMapping("/{recruitmentId}/apply")
     public ResponseEntity cancelApply(Principal principal, @PathVariable Long recruitmentId) {
         recruitmentApplyService.cancelApply(principal.getName(), recruitmentId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("");
+    }
+
+    @GetMapping("/apply")
+    public ResponseEntity getApplyList(Principal principal) {
+        return ResponseEntity.ok(
+                recruitmentApplyService.getApplyList(principal == null ? null : principal.getName())
+        );
     }
 }

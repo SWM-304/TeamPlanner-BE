@@ -4,6 +4,7 @@ import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
 import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
 import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
+import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
 import com.tbfp.teamplannerbe.domain.team.entity.Team;
 import lombok.*;
 
@@ -77,6 +78,11 @@ public class Board extends BaseTimeEntity {
     @JoinColumn(name="MEMBER_ID")
     @ManyToOne(fetch = FetchType.LAZY)
     private Member member;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "board")
+    private List<Recruitment> recruitment= new ArrayList<>();
+
 
 
 

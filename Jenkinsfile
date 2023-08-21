@@ -122,9 +122,6 @@ pipeline {
             steps {
                 echo 'Pull Docker Image & Docker Image Run'
                 sshagent(credentials: ['ssh']) {
-
-
-
                     script {
 
                         sh "ssh -o StrictHostKeyChecking=no ubuntu@10.1.3.222 'sudo chmod 666 /var/run/docker.sock'"
@@ -146,6 +143,32 @@ pipeline {
                         sh "ssh -o StrictHostKeyChecking=no ubuntu@10.1.3.222 'docker compose up -d'"
 
                         sh "ssh -o StrictHostKeyChecking=no ubuntu@10.1.3.222 'images=\$(sudo docker images -q -f dangling=true); if [ -n \"\$images\" ]; then sudo docker rmi -f \$images; fi'"
+
+                        }
+                    }
+
+
+                    script {
+
+                        sh "ssh -o StrictHostKeyChecking=no ubuntu@10.1.4.24 'sudo chmod 666 /var/run/docker.sock'"
+
+                        sh "ssh -o StrictHostKeyChecking=no ubuntu@10.1.4.24 'aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com'"
+
+                        sh "ssh -o StrictHostKeyChecking=no ubuntu@10.1.4.24 'docker compose down'"
+                        // Delete existing Docker image
+                        sh "ssh -o StrictHostKeyChecking=no ubuntu@10.1.4.24 'sudo docker rmi -f 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:latest'"
+
+                        docker.withRegistry("https://${ECR_PATH}", "ecr:${REGION}:${AWS_CREDENTIAL_NAME}") {
+
+                        docker.image("${IMAGE_NAME}:${BUILD_NUMBER}").pull()
+
+                        sh "ssh -o StrictHostKeyChecking=no ubuntu@10.1.4.24 'sudo docker ps -q --filter name=${CONTAINER_NAME}'"
+
+                        sh "ssh -o StrictHostKeyChecking=no ubuntu@10.1.4.24 'containers=\$(sudo docker ps -aq --filter name=${CONTAINER_NAME}); if [ -n \"\$containers\" ]; then sudo docker rm -f \$containers; fi'"
+
+                        sh "ssh -o StrictHostKeyChecking=no ubuntu@10.1.4.24 'docker compose up -d'"
+
+                        sh "ssh -o StrictHostKeyChecking=no ubuntu@10.1.4.24 'images=\$(sudo docker images -q -f dangling=true); if [ -n \"\$images\" ]; then sudo docker rmi -f \$images; fi'"
 
                         }
                     }

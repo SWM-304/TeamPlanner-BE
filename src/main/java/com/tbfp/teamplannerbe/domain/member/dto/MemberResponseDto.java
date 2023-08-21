@@ -112,6 +112,7 @@ public class MemberResponseDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class RecruitmentApplicantResponseDto{
+        private Long recruitmentId;
         private String activityName; // 공모전 , 대외활동 명
         @Builder.Default
         private List<RecruitmentWithMemberWithApply> applicantIntro=new ArrayList<>();
@@ -119,6 +120,7 @@ public class MemberResponseDto {
 
 
         public RecruitmentApplicantResponseDto(Recruitment recruitment) {
+            this.recruitmentId=recruitment.getId();
             this.activityName = recruitment.getBoard().getActivityName();
             this.applicantIntro = recruitment.getRecruitmentApplyList().stream()
                     .map(i -> new RecruitmentResponseDto.RecruitmentWithMemberWithApply(i)).collect(Collectors.toList());

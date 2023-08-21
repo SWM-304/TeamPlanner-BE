@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -62,7 +64,7 @@ public class MemberController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<MemberResponseDto.SignUpResponseDto> registerMember(@Valid @RequestBody MemberRequestDto.SignUpRequestDto signUpRequestDto) {
+    public ResponseEntity<MemberResponseDto.SignUpResponseDto> registerMember(@Validated @RequestBody MemberRequestDto.SignUpRequestDto signUpRequestDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(memberService.buildSignUpResponse(signUpRequestDto));
     }
 

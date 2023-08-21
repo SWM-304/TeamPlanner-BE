@@ -1,9 +1,9 @@
 spring:
   config:
     activate:
-      on-profile: prod
+      on-profile: newprod
   server:
-    port: 8080
+    port: 8081
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${SPRING_DATASOURCE_URL}
@@ -93,8 +93,8 @@ amazon:
 
 permitUrls:
   all: /, /api/v1/member/login, /api/v1/member/renew-access-token, /swagger-ui.html, /swagger-ui/**, /v3/api-docs/**, /api/v1/board
-  get: /api/v1/board/**, /api/v1/recruitment/**, /api/v1/member/signup/**, /api/v1/team/**
-  post: /api/v1/signup/**, /api/v1/forgot-username, /api/v1/forgot-password, /api/v1/member/signup/**
+  get: /api/v1/board/**, /api/v1/recruitment/**, /api/v1/member/signup/**
+  post: /api/v1/signup/**, /api/v1/forgot-username, /api/v1/forgot-password
   delete:
   put:
   patch:

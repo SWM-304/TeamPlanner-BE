@@ -8,6 +8,8 @@ import lombok.*;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 public class TeamRequestDto {
@@ -18,10 +20,15 @@ public class TeamRequestDto {
     public static class CreatTeamRequestDto {
 
         private List<Long> selectedUserIds;
+        @NotNull
         private Long recruitId;
+        @NotNull
         private String teamName;
+        @NotNull
         private Long maxTeamSize;
+        @NotNull
         private String startDate;
+        @NotNull
         private String endDate;
 
     }

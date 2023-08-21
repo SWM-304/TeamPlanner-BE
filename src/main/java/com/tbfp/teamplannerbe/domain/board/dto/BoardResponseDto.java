@@ -1,6 +1,7 @@
 package com.tbfp.teamplannerbe.domain.board.dto;
 
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
+import com.tbfp.teamplannerbe.domain.board.entity.BoardStateEnum;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.BoardWithCommentListResponseDto;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.commentToCommentListResponseDto;
@@ -148,5 +149,71 @@ public class BoardResponseDto {
     @AllArgsConstructor
     public static class savedBoardIdResponseDto{
         private Long boardId;
+    }
+
+
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class boardSearchListResponseDto {
+
+        private Long boardId;
+        private String activitiyName; // 공고 제목
+        private String activityImg; //이미지
+        private String category; //카테고리
+        private Long viewCount; //조회수
+        private Long likeCount; //좋아요
+        private String recruitmentPeriod;
+        private Long deadlineInDays;
+        private Long commentCount;
+        private Long recruitmentCount;
+        private String activityField;
+        private String companyType;
+        private BoardStateEnum boardStateEnum;
+
+        public static BoardResponseDto.boardSearchListResponseDto toDTO(Board board) {
+            String[] day = board.getRecruitmentPeriod().split("~");
+
+            // "yyyy.MM.dd" 형식의 날짜 문자열을 LocalDateTime으로 변환
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.M.d");
+            LocalDateTime specificDate = LocalDate.parse(day[1].trim(), formatter).atStartOfDay();
+
+            // 현재 날짜와 마감일 사이의 날짜 차이 계산
+            Long deadlineInDays = ChronoUnit.DAYS.between(LocalDateTime.now(), specificDate);
+            if(deadlineInDays>=0){
+                return boardSearchListResponseDto.builder()
+                        .recruitmentPeriod(board.getRecruitmentPeriod())
+                        .companyType(board.getCompanyType())
+                        .boardId(board.getId())
+                        .activityField(board.getActivityField())
+                        .deadlineInDays(deadlineInDays)
+                        .recruitmentCount(board.getRecruitment().stream().count())
+                        .activitiyName(board.getActivityName())
+                        .activityImg(board.getActivityImg())
+                        .category(board.getCategory())
+                        .viewCount(board.getView())
+                        .boardStateEnum(BoardStateEnum.ONGOING)
+                        .likeCount(board.getLikeCount())
+                        .commentCount(board.getComments().stream().count())
+                        .build();
+            }
+                return boardSearchListResponseDto.builder()
+                        .recruitmentPeriod(board.getRecruitmentPeriod())
+                        .boardId(board.getId())
+                        .companyType(board.getCompanyType())
+                        .activityField(board.getActivityField())
+                        .deadlineInDays(deadlineInDays)
+                        .recruitmentCount(board.getRecruitment().stream().count())
+                        .activitiyName(board.getActivityName())
+                        .activityImg(board.getActivityImg())
+                        .category(board.getCategory())
+                        .viewCount(board.getView())
+                        .boardStateEnum(BoardStateEnum.CLOSED)
+                        .likeCount(board.getLikeCount())
+                        .commentCount(board.getComments().stream().count())
+                        .build();
+
+        }
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Stream;
 
 public interface BoardService {
 
@@ -29,4 +30,6 @@ public interface BoardService {
     void deleteBoard(Long boardId, String userId);
 
     Boolean updateBoard(Long boardId,updateBoardReqeustDto updateBoardReqeustDto, String userId);
+
+    Page<Board> searcBoardList(String searchWord, Pageable pageable,BoardSearchCondition boardSearchCondition);
 }

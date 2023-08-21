@@ -13,4 +13,6 @@ public interface BoardQuerydslRepository {
     Page<Board> getBoardList(BoardSearchCondition condition, Pageable pageable);
 
     List<Board> getBoardAndComment(Long boardId);
+
+    Page<Board> searchBoardList(String searchWord, Pageable pageable,BoardSearchCondition boardSearchCondition);
 }

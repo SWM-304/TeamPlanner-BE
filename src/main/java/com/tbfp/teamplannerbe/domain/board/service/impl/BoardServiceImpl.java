@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class BoardServiceImpl implements BoardService {
 
     private final BoardRepository boardRepository;
@@ -102,7 +103,6 @@ public class BoardServiceImpl implements BoardService {
      */
 
     @Override
-    @Transactional(readOnly = true)
     public Page<Board> searchPageSimple(BoardSearchCondition condition, Pageable pageable) {
         Page<Board> getBoardList = boardRepository.getBoardList(condition, pageable);
 
@@ -152,6 +152,14 @@ public class BoardServiceImpl implements BoardService {
         findBoard.overwrite(updateBoardReqeustDto.toEntity());
 
         return Boolean.TRUE;
+    }
+
+    @Override
+    public Page<Board> searcBoardList(String searchWord, Pageable pageable,BoardSearchCondition boardSearchCondition) {
+
+        Page<Board> searchBoard = boardRepository.searchBoardList(searchWord, pageable,boardSearchCondition);
+
+        return searchBoard;
     }
 
 

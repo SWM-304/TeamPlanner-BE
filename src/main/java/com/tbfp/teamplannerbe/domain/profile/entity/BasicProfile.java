@@ -10,6 +10,8 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.Date;
 
 @Entity
 @Getter
@@ -34,7 +36,9 @@ public class BasicProfile extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Education education;
 
-    private int educationGrade;
+    private LocalDate admissionDate;
+
+    private LocalDate graduationDate;
 
     private LocalDate birth;
 
@@ -52,8 +56,7 @@ public class BasicProfile extends BaseTimeEntity {
     @Column(columnDefinition = "bit default 0")
     private Boolean evaluationPublic;
 
-    @OneToOne
-    @JoinColumn(name = "MEMBER_ID")
+    @OneToOne(mappedBy = "basicProfile", cascade = CascadeType.ALL)
     private Member member;
 
     public ProfileResponseDto.BasicProfileResponseDto toDto(){
@@ -63,7 +66,8 @@ public class BasicProfile extends BaseTimeEntity {
                 .profileImage(profileImage)
                 .job(job)
                 .education(education)
-                .educationGrade(educationGrade)
+                .admissionDate(admissionDate)
+                .graduationDate(graduationDate)
                 .birth(birth)
                 .address(address)
                 .gender(gender)
@@ -74,4 +78,11 @@ public class BasicProfile extends BaseTimeEntity {
                 .build();
     }
 
+//    public Member addBasicProfiletoMember(Member member) {
+//        System.out.println();
+//        // Member 관계 설정
+//        this.member = member;
+//        this.member.addBasicProfile(this); // 이 부분이 Member 엔티티와의 관계 설정을 위한 부분입니다.
+//        return this.member;
+//    }
 }

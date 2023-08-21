@@ -17,15 +17,17 @@ public interface MemberService {
 
     String renewAccessToken(String refreshToken);
 
-    Map<String,List<String>> getEnums();
+    Map<String, List<Map<String, String>>> getEnums();
 
     void registerMember(MemberRequestDto.SignUpRequestDto signUpRequestDto);
 
-    MemberResponseDto.CheckDuplicateResponseDto checkDuplicate(MemberRequestDto.CheckDuplicateRequestDto checkDuplicateRequestDto);
+    MemberResponseDto.CheckDuplicateUsernameResponseDto checkDuplicateUsername(MemberRequestDto.CheckDuplicateUsernameRequestDto checkDuplicateUsernameRequestDto);
+
+    MemberResponseDto.CheckDuplicateNicknameResponseDto checkDuplicateNickname(MemberRequestDto.CheckDuplicateNicknameRequestDto checkDuplicateNicknameRequestDto);
 
     MemberResponseDto.SignUpResponseDto buildSignUpResponse(MemberRequestDto.SignUpRequestDto signUpRequestDto);
 
-    MemberResponseDto.EmailAddressResponseDto sendVerificationEmail(MemberRequestDto.EmailAddressRequestDto emailAddressRequestDto);
+    MemberResponseDto.EmailResponseDto sendVerificationEmail(MemberRequestDto.EmailRequestDto emailRequestDto);
 
     MemberResponseDto.VerificationResponseDto verifyCode(MemberRequestDto.VerificationRequestDto verificationRequestDto);
 

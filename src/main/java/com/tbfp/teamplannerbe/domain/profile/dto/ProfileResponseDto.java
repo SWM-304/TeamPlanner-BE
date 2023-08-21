@@ -11,6 +11,7 @@ import lombok.*;
 
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 public class ProfileResponseDto {
@@ -25,7 +26,8 @@ public class ProfileResponseDto {
         private String profileImage;
         private Job job;
         private Education education;
-        private int educationGrade;
+        private LocalDate admissionDate;
+        private LocalDate graduationDate;
         private LocalDate birth;
         private String address;
         private Gender gender;
@@ -42,7 +44,8 @@ public class ProfileResponseDto {
                     .profileImage(profileImage)
                     .job(job)
                     .education(education)
-                    .educationGrade(educationGrade)
+                    .admissionDate(admissionDate)
+                    .graduationDate(graduationDate)
                     .birth(birth)
                     .address(address)
                     .gender(gender)

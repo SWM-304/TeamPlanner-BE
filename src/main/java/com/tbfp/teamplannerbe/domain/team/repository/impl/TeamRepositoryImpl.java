@@ -36,7 +36,7 @@ public class TeamRepositoryImpl extends Querydsl4RepositorySupport implements Te
                 .distinct()
                 .leftJoin(team.memberTeams, memberTeam).fetchJoin()
                 .leftJoin(memberTeam.member, member).fetchJoin()
-                .leftJoin(member.basicProfile, basicProfile).fetchJoin()
+                .leftJoin(basicProfile.member,member).fetchJoin()
                 .leftJoin(team.recruitment,recruitment).fetchJoin()
                 .leftJoin(recruitment.board,board).fetchJoin()
                 .where(team.id.in(teamIds))

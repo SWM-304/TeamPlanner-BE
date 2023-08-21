@@ -22,6 +22,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.Optional;
 
 import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType.UNAUTHORIZED;
@@ -166,15 +167,14 @@ class CommentServiceImplTest extends BaseControllerTest {
                 .profileImage("dd.image")
                 .job(Job.valueOf("COLLEGE"))
                 .education(Education.valueOf("COLLEGE"))
-                .educationGrade(4)
+                .admissionDate(LocalDate.parse("2017-03-01"))
+                .graduationDate(LocalDate.parse(("2022-02-01")))
                 .birth(LocalDate.parse("2010-10-11"))
                 .address("경기도 시흥 아몰라 우리집")
                 .gender(Gender.valueOf("MALE"))
                 .kakaoId("kakaoId")
                 .contactEmail("asdas@gmail.com")
                 .isPublic(Long.valueOf("1023"))
-                .usernameChecked(true)
-                .emailChecked(true)
                 .build());
     }
 
@@ -189,15 +189,14 @@ class CommentServiceImplTest extends BaseControllerTest {
                 .profileImage("dd.image")
                 .job(Job.valueOf("COLLEGE"))
                 .education(Education.valueOf("COLLEGE"))
-                .educationGrade(4)
+                .admissionDate(LocalDate.parse("2017-03-01"))
+                .graduationDate(LocalDate.parse(("2022-02-01")))
                 .birth(LocalDate.parse("2010-10-11"))
                 .address("경기도 시흥 아몰라 우리집")
                 .gender(Gender.valueOf("MALE"))
                 .kakaoId("kakaoId")
                 .contactEmail("asdas@gmail.com")
                 .isPublic(Long.valueOf("1023"))
-                .usernameChecked(true)
-                .emailChecked(true)
                 .build());
     }
     public Long 공모전생성(){

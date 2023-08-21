@@ -20,7 +20,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
 public class Member extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,10 +61,14 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy ="member", cascade = CascadeType.ALL)
     private List<MemberTeam> memberTeams=new ArrayList<>();
 
-    @JsonIgnore
-    @OneToOne(mappedBy = "member")
+
+    @OneToOne
     @JoinColumn(name = "BASIC_PROFILE_ID")
     private BasicProfile basicProfile;
+
+//    public void addBasicProfile(BasicProfile basicProfile) {
+//        this.basicProfile = basicProfile;
+//    }
 }
 
 

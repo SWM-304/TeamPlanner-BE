@@ -42,6 +42,7 @@ public enum ApplicationErrorType {
     MAIL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, -20004, "메일 전송 중 오류가 발생했습니다."),
     DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST,-20005,"이미 사용중인 닉네임입니다."),
 
+
     //회원가입
     SIGNUP_REQUEST_INVALID_USERNAME(HttpStatus.BAD_REQUEST, -21000, "username"),
     SIGNUP_REQUEST_INVALID_PASSWORD(HttpStatus.BAD_REQUEST, -21001, "password"),
@@ -49,8 +50,7 @@ public enum ApplicationErrorType {
     SIGNUP_REQUEST_INVALID_PHONE(HttpStatus.BAD_REQUEST, -21003, "phone"),
     SIGNUP_REQUEST_INVALID_CONTACTEMAIL(HttpStatus.BAD_REQUEST, -21004, "contactEmail"),
     SIGNUP_REQUEST_INVALID_NICKNAME(HttpStatus.BAD_REQUEST, -21005, "nickname"),
-
-
+  
     // 인증번호
     VERIFICATION_CODE_UNMATCHED(HttpStatus.UNAUTHORIZED,-22000, "인증번호가 일치하지 않습니다."),
     VERIFICATION_CODE_EXPIRED(HttpStatus.BAD_REQUEST,-22001, "인증번호가 만료되어 재전송했습니다."),

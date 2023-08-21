@@ -111,8 +111,8 @@ public class MemberServiceImpl implements MemberService {
         try {
             signUpRequestDto.setPassword(bCryptPasswordEncoder.encode(signUpRequestDto.getPassword()));
             Member member = signUpRequestDto.toMember();
-            BasicProfile basicProfile = signUpRequestDto.toBasicProfile(member);
             memberRepository.save(member);
+            BasicProfile basicProfile = signUpRequestDto.toBasicProfile(member);
             basicProfileRepository.save(basicProfile);
         } catch (Exception e){
             throw new ApplicationException(MEMBER_REGISTER_FAIL);
@@ -121,32 +121,52 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public Map<String,List<String>> getEnums(){
-        Map<String, List<String>> enumsMap = new HashMap<>();
+    public Map<String, List<Map<String, String>>> getEnums(){
+        Map<String, List<Map<String, String>>> enumsMap = new HashMap<>();
 
         enumsMap.put("job", Arrays.stream(Job.values())
-                .map(Job::name)
+                .map(job -> mapEntry(job.name(), job.getLabel()))
                 .collect(Collectors.toList()));
 
         enumsMap.put("education", Arrays.stream(Education.values())
-                .map(Education::name)
+                .map(education -> mapEntry(education.name(), education.getLabel()))
                 .collect(Collectors.toList()));
 
         enumsMap.put("gender", Arrays.stream(Gender.values())
-                .map(Gender::name)
+                .map(gender -> mapEntry(gender.name(), gender.getLabel()))
                 .collect(Collectors.toList()));
 
         return enumsMap;
     }
+
+    private static Map<String, String> mapEntry(String name, String label) {
+        Map<String, String> entry = new HashMap<>();
+        entry.put("name", name);
+        entry.put("label", label);
+        return entry;
+    }
+
     @Override
     @Transactional
-    public MemberResponseDto.CheckDuplicateResponseDto checkDuplicate(MemberRequestDto.CheckDuplicateRequestDto checkDuplicateRequestDto){
-        String username = checkDuplicateRequestDto.getUsername();
+    public MemberResponseDto.CheckDuplicateUsernameResponseDto checkDuplicateUsername(MemberRequestDto.CheckDuplicateUsernameRequestDto checkDuplicateUsernameRequestDto){
+        String username = checkDuplicateUsernameRequestDto.getUsername();
         if(findMemberByUsername(username).isPresent()){
             throw new ApplicationException(DUPLICATE_USERNAME);
         }
-        return MemberResponseDto.CheckDuplicateResponseDto.builder().
+        return MemberResponseDto.CheckDuplicateUsernameResponseDto.builder().
                 message("사용 가능한 아이디입니다.").
+                build();
+    }
+
+    @Override
+    @Transactional
+    public MemberResponseDto.CheckDuplicateNicknameResponseDto checkDuplicateNickname(MemberRequestDto.CheckDuplicateNicknameRequestDto checkDuplicateNicknameRequestDto){
+        String nickname = checkDuplicateNicknameRequestDto.getNickname();
+        if(memberRepository.findByNickname(nickname).isPresent()){
+            throw new ApplicationException(DUPLICATE_NICKNAME);
+        }
+        return MemberResponseDto.CheckDuplicateNicknameResponseDto.builder().
+                message("사용 가능한 닉네임입니다.").
                 build();
     }
 
@@ -154,17 +174,21 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
     @Transactional
-    public MemberResponseDto.EmailAddressResponseDto sendVerificationEmail(MemberRequestDto.EmailAddressRequestDto emailAddressRequestDto) {//인증번호 발급, 재발급
+    public MemberResponseDto.EmailResponseDto sendVerificationEmail(MemberRequestDto.EmailRequestDto emailRequestDto) {//인증번호 발급, 재발급
 
-        String emailAddress = emailAddressRequestDto.getEmailAddress();
-        VerifyPurpose verifyPurpose = emailAddressRequestDto.getVerifyPurpose();
+        String email = emailRequestDto.getEmail();
+        VerifyPurpose verifyPurpose = emailRequestDto.getVerifyPurpose();
+        System.out.println("aa");
+
         try {
-            if (authenticateMap.containsKey(emailAddress)) authenticateMap.remove(emailAddress);
+            System.out.println("bb");
+            if (authenticateMap.containsKey(email)) authenticateMap.remove(email);
+            System.out.println("cc");
 
             Integer verificationCode = mailSenderService.getVerificationNumber();
             String mailSubject = "TeamPlanner " + verifyPurpose.getLabel() + " 인증번호입니다.";
             String mailBody = mailSubject + "\n" + verificationCode.toString();
-            mailSenderService.sendEmail(emailAddress, mailSubject, mailBody);
+            mailSenderService.sendEmail(email, mailSubject, mailBody);
 
             //Concurrent에 이메일주소, 인증번호, 만료시간 저장
             LocalDateTime expireDateTime = LocalDateTime.now().plusSeconds(180);
@@ -172,9 +196,10 @@ public class MemberServiceImpl implements MemberService {
             innerMap.put("verificationCode",verificationCode);
             innerMap.put("expireDateTime",expireDateTime);
             innerMap.put("verifyPurpose",verifyPurpose);
-            authenticateMap.put(emailAddress,innerMap);
+            authenticateMap.put(email,innerMap);
+            System.out.println(verificationCode);
 
-            return MemberResponseDto.EmailAddressResponseDto.builder().
+            return MemberResponseDto.EmailResponseDto.builder().
                     message("이메일로 인증번호 발송에 성공했습니다.").
                     build();
         } catch (Exception e) {
@@ -182,15 +207,15 @@ public class MemberServiceImpl implements MemberService {
         }
     }
 
-    public VerificationStatus getVerificationStatus(String emailAddress, String userInputCode, VerifyPurpose verifyPurpose){
+    public VerificationStatus getVerificationStatus(String email, String userInputCode, VerifyPurpose verifyPurpose){
 
         try{
-            authenticateMap.containsKey(emailAddress);
+            authenticateMap.containsKey(email);
         } catch (NullPointerException e){
             return VerificationStatus.UNPROVIDED;
         }
 
-        Map<String,Object> mapInfo = authenticateMap.get(emailAddress);
+        Map<String,Object> mapInfo = authenticateMap.get(email);
 
         if(mapInfo==null){
             return VerificationStatus.UNPROVIDED;
@@ -202,8 +227,8 @@ public class MemberServiceImpl implements MemberService {
         //다른 타입의 인증번호
         if(!verifyPurposeInMap.equals(verifyPurpose)){
             sendVerificationEmail(
-                    MemberRequestDto.EmailAddressRequestDto.builder().
-                            emailAddress(emailAddress).
+                    MemberRequestDto.EmailRequestDto.builder().
+                            email(email).
                             verifyPurpose(verifyPurpose).
                             build()
             );
@@ -211,11 +236,11 @@ public class MemberServiceImpl implements MemberService {
         }
         //인증번호 기한 만료
         if (expireDateTime.isBefore(LocalDateTime.now())){//인증번호 만료시
-            authenticateMap.remove(emailAddress);
+            authenticateMap.remove(email);
             //인증번호 재발급
             sendVerificationEmail(
-                    MemberRequestDto.EmailAddressRequestDto.builder().
-                            emailAddress(emailAddress).
+                    MemberRequestDto.EmailRequestDto.builder().
+                            email(email).
                             verifyPurpose(verifyPurpose).
                             build()
             );
@@ -232,7 +257,7 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public MemberResponseDto.VerificationResponseDto verifyCode(MemberRequestDto.VerificationRequestDto verificationRequestDto){
         VerificationStatus verificationStatus = getVerificationStatus(
-                verificationRequestDto.getEmailAddress(),
+                verificationRequestDto.getEmail(),
                 verificationRequestDto.getCode(),
                 verificationRequestDto.getVerifyPurpose()
         );
@@ -265,16 +290,16 @@ public class MemberServiceImpl implements MemberService {
     @Override
     @Transactional
     public MemberResponseDto.ForgotUsernameResponseDto findForgotUsername(MemberRequestDto.ForgotUsernameRequestDto forgotUsernameRequestDto){
-        String emailAddress = forgotUsernameRequestDto.getEmailAddress();
+        String email = forgotUsernameRequestDto.getEmail();
         String code = forgotUsernameRequestDto.getCode();
-        VerificationStatus verificationStatus = getVerificationStatus(emailAddress,code,VerifyPurpose.FORGOT_ID);
+        VerificationStatus verificationStatus = getVerificationStatus(email,code,VerifyPurpose.FORGOT_ID);
 
         Boolean emailChecked = true;
         if(verificationStatus!=VerificationStatus.MATCHED) emailChecked = false;
 
         if(!emailChecked) throw new ApplicationException(UNVERIFIED_EMAIL);
 
-        List<String> usernameList = memberRepository.findUsernamesByEmail(emailAddress).orElse(Collections.emptyList());
+        List<String> usernameList = memberRepository.findUsernamesByEmail(email).orElse(Collections.emptyList());
         if(usernameList.isEmpty()) throw new ApplicationException(USER_NOT_FOUND);
 
         return MemberResponseDto.ForgotUsernameResponseDto.builder().
@@ -287,16 +312,16 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public MemberResponseDto.ForgotPasswordResponseDto findForgotPassword(MemberRequestDto.ForgotPasswordRequestDto forgotPasswordRequestDto) {
         String username = forgotPasswordRequestDto.getUsername();
-        String emailAddress = forgotPasswordRequestDto.getEmailAddress();
+        String email = forgotPasswordRequestDto.getEmail();
         String code = forgotPasswordRequestDto.getCode();
-        VerificationStatus verificationStatus = getVerificationStatus(emailAddress,code,VerifyPurpose.FORGOT_PASSWORD);
+        VerificationStatus verificationStatus = getVerificationStatus(email,code,VerifyPurpose.FORGOT_PASSWORD);
 
         Boolean emailChecked = true;
         if(verificationStatus!=VerificationStatus.MATCHED) emailChecked = false;
 
         if (!emailChecked) throw new ApplicationException(UNVERIFIED_EMAIL);
 
-        if(!memberRepository.findUsernamesByEmail(emailAddress).orElse(Collections.emptyList()).contains(username)){
+        if(!memberRepository.findUsernamesByEmail(email).orElse(Collections.emptyList()).contains(username)){
             throw new ApplicationException(INVALID_CONTACT_EMAIL);
         }
 
@@ -309,7 +334,7 @@ public class MemberServiceImpl implements MemberService {
             String newPassword = mailSenderService.getRandomPassword();
             String mailSubject = "TeamPlanner 임시 발급된 비밀번호입니다.";
             String mailBody = mailSubject + "\n반드시 접속 후 비밀번호를 재설정 하시길 바랍니다.\n" + newPassword.toString();
-            mailSenderService.sendEmail(emailAddress, mailSubject, mailBody);
+            mailSenderService.sendEmail(email, mailSubject, mailBody);
 
             String encodedPassword = bCryptPasswordEncoder.encode(newPassword);
             memberRepository.updateMemberPassword(member, encodedPassword);

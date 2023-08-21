@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -399,15 +400,14 @@ class TeamServiceImplTest {
                     .profileImage("dd.image")
                     .job(Job.valueOf("COLLEGE"))
                     .education(Education.valueOf("COLLEGE"))
-                    .educationGrade(4)
+                    .admissionDate(LocalDate.parse("2017-03-01"))
+                    .graduationDate(LocalDate.parse(("2022-02-01")))
                     .birth(LocalDate.parse("2010-10-11"))
                     .address("경기도 시흥 아몰라 우리집")
                     .gender(Gender.valueOf("MALE"))
                     .kakaoId("kakaoId")
                     .contactEmail("asdas@gmail.com")
                     .isPublic(Long.valueOf("1023"))
-                    .usernameChecked(true)
-                    .emailChecked(true)
                     .build());
         }
     }

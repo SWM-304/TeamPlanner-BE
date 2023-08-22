@@ -13,7 +13,8 @@ public enum Education {
     HIGH_SCHOOL("고등학교 재학"),
     HIGH_SCHOOL_GRADUATE("고등학교 졸업"),
     MIDDLE_SCHOOL("중학교 재학"),
-    MIDDLE_SCHOOL_GRADUATE("중학교 졸업");
+    MIDDLE_SCHOOL_GRADUATE("중학교 졸업"),
+    UNKNOWN("해당 없음");
 
     private final String label;
 

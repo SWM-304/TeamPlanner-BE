@@ -56,7 +56,8 @@ public class BasicProfile extends BaseTimeEntity {
     @Column(columnDefinition = "bit default 0")
     private Boolean evaluationPublic;
 
-    @OneToOne(mappedBy = "basicProfile", cascade = CascadeType.ALL)
+    @OneToOne
+    @JoinColumn(name = "MEMBER_ID")
     private Member member;
 
     public ProfileResponseDto.BasicProfileResponseDto toDto(){

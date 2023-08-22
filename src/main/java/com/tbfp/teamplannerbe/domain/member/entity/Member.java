@@ -62,7 +62,7 @@ public class Member extends BaseTimeEntity {
     private List<MemberTeam> memberTeams=new ArrayList<>();
 
 
-    @OneToOne
+    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
     @JoinColumn(name = "BASIC_PROFILE_ID")
     private BasicProfile basicProfile;
 

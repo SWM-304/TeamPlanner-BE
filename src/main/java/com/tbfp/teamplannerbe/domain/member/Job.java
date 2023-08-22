@@ -14,7 +14,8 @@ public enum Job {
     MIDDLE_SCHOOL("중학생"),
     SELF_EMPLOYED("자영업자"),
     ENTREPRENEUR("사업가"),
-    NONE("무직");
+    NONE("무직"),
+    UNKNOWN("해당 없음");;
     private final String label;
 
 }

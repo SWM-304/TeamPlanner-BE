@@ -195,7 +195,6 @@ public class MemberRequestDto {
     @AllArgsConstructor
     public static class ForgotUsernameRequestDto {
         private String email;
-        private String code;
     }
 
     @Getter

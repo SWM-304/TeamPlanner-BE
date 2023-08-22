@@ -61,7 +61,9 @@ public class MailSenderService {
         helper.setFrom(fromEmail);
         helper.setTo(to);
         helper.setSubject(subject);
-        helper.setText(body);
+        String preFormattedBody = "<pre>" + body + "</pre>"; // <pre> 태그 추가
+
+        helper.setText(preFormattedBody, true); // HTML로 렌더링
 
         mailSender.send(mimeMessage);
     }

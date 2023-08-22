@@ -300,16 +300,41 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public MemberResponseDto.ForgotUsernameResponseDto findForgotUsername(MemberRequestDto.ForgotUsernameRequestDto forgotUsernameRequestDto){
         String email = forgotUsernameRequestDto.getEmail();
-        String code = forgotUsernameRequestDto.getCode();
-        VerificationStatus verificationStatus = getVerificationStatus(email,code,VerifyPurpose.FORGOT_ID);
+//        String code = forgotUsernameRequestDto.getCode();
+//        VerificationStatus verificationStatus = getVerificationStatus(email,code,VerifyPurpose.FORGOT_ID);
+//
+//        Boolean emailChecked = true;
+//        if(verificationStatus!=VerificationStatus.MATCHED) emailChecked = false;
+//
+//        if(!emailChecked) throw new ApplicationException(UNVERIFIED_EMAIL);
 
-        Boolean emailChecked = true;
-        if(verificationStatus!=VerificationStatus.MATCHED) emailChecked = false;
-
-        if(!emailChecked) throw new ApplicationException(UNVERIFIED_EMAIL);
-
-        List<String> usernameList = memberRepository.findUsernamesByEmail(email).orElse(Collections.emptyList());
+        List<String> usernameList = memberRepository.findUsernamesByEmail(forgotUsernameRequestDto.getEmail()).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
         if(usernameList.isEmpty()) throw new ApplicationException(USER_NOT_FOUND);
+
+        try {
+            String mailSubject = "TeamPlanner 아이디 안내: " + forgotUsernameRequestDto.getEmail();
+
+            StringBuilder mailBodyBuilder = new StringBuilder();
+            mailBodyBuilder.append("<html><body style=\"font-family: Arial, sans-serif;\">");
+            mailBodyBuilder.append("<div style=\"background-color: #f4f4f4; padding: 20px;\">");
+            mailBodyBuilder.append("<h2 style=\"color: #333;\">안녕하세요, TeamPlanner 계정 관련 안내 메일입니다.</h2>");
+            mailBodyBuilder.append("<p style=\"color: #555;\">요청하신 이메일(").append(forgotUsernameRequestDto.getEmail()).append(")에 연동된 아이디는 다음과 같습니다:</p>");
+            mailBodyBuilder.append("<ul>");
+            for (String username : usernameList) {
+                mailBodyBuilder.append("<li style=\"color: #777;\">").append(username).append("</li>");
+            }
+            mailBodyBuilder.append("</ul>");
+            mailBodyBuilder.append("<p style=\"color: #555;\">더 궁금한 사항이 있으시면 언제든지 문의해주세요.</p>");
+            mailBodyBuilder.append("<p style=\"color: #555;\">감사합니다,<br>TeamPlanner 드림</p>");
+            mailBodyBuilder.append("</div>");
+            mailBodyBuilder.append("</body></html>");
+
+            String mailBody = mailBodyBuilder.toString();
+            mailSenderService.sendEmail(email, mailSubject, mailBody);
+        }catch (Exception e) {
+            throw new ApplicationException(MAIL_ERROR);
+        }
+
 
         return MemberResponseDto.ForgotUsernameResponseDto.builder().
                 usernames(usernameList).

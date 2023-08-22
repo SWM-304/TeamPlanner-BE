@@ -112,6 +112,13 @@ public class MemberController {
     public ResponseEntity<?> getApplicantList(Principal principal){
         return ResponseEntity.ok().body(memberService.findApplicantList(principal.getName()));
     }
+    @PostMapping("/email-verify")
+    public ResponseEntity<?> idAndEmailVerify(@RequestBody MemberRequestDto.IdAndEmailVerifyRequestDto verifyRequestDto){
+        return ResponseEntity.ok().body(memberService.verifyIdAndEmail(verifyRequestDto));
+    }
 
-
+    @PostMapping("/idEmail-verify")
+    public ResponseEntity<?> idAndEmailVerify(@RequestBody MemberRequestDto.NickNameAndEmailVerifyRequestDto verifyRequestDto){
+        return ResponseEntity.ok().body(memberService.verifyNicknameAndEmail(verifyRequestDto));
+    }
 }

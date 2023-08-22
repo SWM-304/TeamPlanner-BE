@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.mail.internet.MimeMessage;
@@ -28,6 +29,8 @@ public class MailSenderService {
         this.mailSender = mailSender;
     }
 
+
+    @Async
     public void sendEmail(String to, String subject, String body) throws Exception{
         /*SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
@@ -58,7 +61,9 @@ public class MailSenderService {
         helper.setFrom(fromEmail);
         helper.setTo(to);
         helper.setSubject(subject);
-        helper.setText(body);
+        String preFormattedBody = "<pre>" + body + "</pre>"; // <pre> 태그 추가
+
+        helper.setText(preFormattedBody, true); // HTML로 렌더링
 
         mailSender.send(mimeMessage);
     }

@@ -43,4 +43,8 @@ public interface MemberService {
     List<RecruitmentApplicantResponseDto> findApplicantList(String name);
 
     MemberResponseDto.getMemberInfoDto getMemberInfo(String username);
+
+    MemberResponseDto.idAndEmailVerifyResponseDto verifyIdAndEmail(MemberRequestDto.IdAndEmailVerifyRequestDto verifyRequestDto);
+
+    MemberResponseDto.NickNameAndEmailVerifyResponseDto verifyNicknameAndEmail(MemberRequestDto.NickNameAndEmailVerifyRequestDto verifyRequestDto);
 }

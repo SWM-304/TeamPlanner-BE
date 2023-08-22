@@ -154,4 +154,22 @@ public class MemberResponseDto {
         private String nickname;
         private String profileImg;
     }
+
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class idAndEmailVerifyResponseDto {
+        private String message;
+    }
+
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class NickNameAndEmailVerifyResponseDto {
+        private String message;
+    }
 }

@@ -141,7 +141,7 @@ pipeline {
         sh'''
             cd /var/jenkins_home/workspace/teamPlannerBackEnd_jenkinsFile
 
-            aws deploy create-deployment --application-name teamplanner-webapp --s3-location "bucket=teamplanner-codeploy-bucket,key=teamplanner-backend.zip,bundleType=zip" --deployment-group-name teamplanner-backend-deploy-group-$BUILD_NUMBER --deployment-config-name CodeDeployDefault.OneAtATime --description "Deploy Init for teamplanner-backend-deploy-group"
+            aws deploy create-deployment --application-name teamplanner-webapp --s3-location "bucket=teamplanner-codeploy-bucket,key=teamplanner-backend.zip,bundleType=zip" --deployment-group-name teamplanner-backend-deploy-group --deployment-config-name CodeDeployDefault.OneAtATime --description "Deploy Init for teamplanner-backend-deploy-group"
         '''
     }
 }

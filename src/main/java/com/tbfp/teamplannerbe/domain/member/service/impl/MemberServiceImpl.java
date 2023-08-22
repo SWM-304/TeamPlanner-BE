@@ -200,7 +200,7 @@ public class MemberServiceImpl implements MemberService {
 //            innerMap.put("verificationCode",verificationCode);
 //            innerMap.put("expireDateTime",expireDateTime);
 //            innerMap.put("verifyPurpose",verifyPurpose);
-            emailRedisUtil.setListData(email,verificationCode,verifyPurpose,60*2L);
+            emailRedisUtil.setListData(email,verificationCode,verifyPurpose,60*3L);
 //            authenticateMap.put(emailAddress,innerMap);
 
 
@@ -228,7 +228,6 @@ public class MemberServiceImpl implements MemberService {
         String[] splitInfo = info.get(0).split("\\|");
         String verificationCode = splitInfo[0];
         VerifyPurpose verifyPurposeInMap = VerifyPurpose.valueOf(splitInfo[1]);
-
 
         //다른 타입의 인증번호
         if(!verifyPurposeInMap.equals(verifyPurpose)){

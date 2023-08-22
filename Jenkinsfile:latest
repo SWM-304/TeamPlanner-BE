@@ -1,0 +1,182 @@
+pipeline {
+    agent any
+    options {
+    timeout(time: 1, unit: 'HOURS') // set timeout 1 hour
+    }
+
+    environment {
+
+        TIME_ZONE = 'Asia/Seoul'
+
+        //github
+        TARGET_BRANCH = 'develop'
+        REPOSITORY_URL= 'https://github.com/SWM-304/TeamPlanner-BE-CICD.git'
+
+        //docker-hub
+        registryCredential = 'docker-hub'
+
+        //aws ecr
+
+        CONTAINER_NAME = 'teamplanner-backend-container'
+        AWS_CREDENTIAL_NAME = 'AWS_ECR'
+        ECR_PATH = '129715120090.dkr.ecr.ap-northeast-2.amazonaws.com'
+        IMAGE_NAME = '129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver'
+        REGION = 'ap-northeast-2'
+    }
+
+
+
+    stages {
+
+
+        stage('init') {
+            steps {
+                echo 'init stage'
+                deleteDir()
+            }
+            post {
+                success {
+                    echo 'success init in pipeline'
+                }
+                failure {
+                    error 'fail init in pipeline'
+                }
+            }
+        }
+
+        stage('Prepare') {
+            steps {
+                echo 'Cloning Repository'
+                git branch: 'develop',
+                    credentialsId: 'repo-and-hook-access-token-credentials',
+                    url: 'https://github.com/SWM-304/TeamPlanner-BE-CICD.git'
+            }
+            post {
+                success {
+                    echo 'Successfully Cloned Repository'
+                }
+                failure {
+                    error 'This pipeline stops here...'
+                }
+            }
+        }
+       // 일단은 테스트없이 빌드
+        stage('Build Gradle') {
+            steps {
+                echo 'Build Gradle'
+
+                dir('.'){
+                    sh '''
+                        pwd
+                        cd /var/jenkins_home/workspace/teamplanner-backend
+                        chmod +x ./gradlew
+                        ./gradlew build --exclude-task test
+                    '''
+                }
+            }
+            post {
+                failure {
+                    error 'This pipeline stops here...'
+                }
+            }
+        }
+
+        // 도커 이미지를 만든다. build number로 태그를 주되 latest 태그도 부여한다.
+        stage('Build Docker') {
+            steps {
+                echo 'Build Docker'
+                sh """
+                    cd /var/jenkins_home/workspace/teamPlannerBackEnd_jenkinsFile
+                    docker builder prune
+                    docker build -t $IMAGE_NAME:$BUILD_NUMBER .
+                    docker tag $IMAGE_NAME:$BUILD_NUMBER $IMAGE_NAME:latest
+                """
+            }
+            post {
+                failure {
+                    error 'This pipeline stops here...'
+                }
+            }
+        }
+
+
+    // jar 파일과 script파일을 s3에 넣어줘야함.
+    // stage('deploy create application') {
+    //     steps {
+    //         echo 'deploy create application'
+
+    //         // Clean up unused Docker images, including those created within the last hour
+    //         sh "aws deploy create-application --application-name teamplanner-webapp"
+    //     }
+    // }
+
+     // 빌드넘버 태그와 latest 태그 둘 다 올린다.
+        stage('Push Docker') {
+            steps {
+                echo 'Push Docker'
+                script {
+                    // cleanup current user docker credentials
+                    sh 'rm -f ~/.dockercfg ~/.docker/config.json || true'
+
+                    docker.withRegistry("https://${ECR_PATH}", "ecr:${REGION}:${AWS_CREDENTIAL_NAME}") {
+                        docker.image("${IMAGE_NAME}:${BUILD_NUMBER}").push()
+                        docker.image("${IMAGE_NAME}:latest").push()
+                    }
+                }
+            }
+            post {
+                failure {
+                    error 'This pipeline stops here...'
+                }
+            }
+        }
+
+    stage('S3 script upload And  push deploy application') {
+        steps {
+            echo 'deploy push application And S3 script upload'
+            sh'''
+                cd /var/jenkins_home/workspace
+                zip teamplanner-backend.zip teamplanner-backend
+                cd /var/jenkins_home/workspace/teamplanner-backend
+                aws deploy push --application-name teamplanner-webapp --s3-location s3://teamplanner-codeploy-bucket/teamplanner-backend.zip --ignore-hidden-files
+
+            '''
+        }
+    }
+
+
+    stage('push deploy application') {
+    steps {
+        echo 'deploy push application And S3 script upload'
+        sh'''
+            cd /var/jenkins_home/workspace/teamplanner-backend
+
+            aws deploy create-deployment --application-name teamplanner-webapp --s3-location "bucket=teamplanner-codeploy-bucket,key=teamplanner-backend.zip,bundleType=zip" --deployment-group-name teamplanner-backend-deploy-group --deployment-config-name CodeDeployDefault.OneAtATime --description "Deploy Init for teamplanner-backend-deploy-group"
+        '''
+    }
+}
+
+
+    stage('Clean Up Docker Images on Jenkins Server') {
+        steps {
+            echo 'Cleaning up unused Docker images on Jenkins server'
+
+            // Clean up unused Docker images, including those created within the last hour
+            sh "docker image prune -f --all --filter \"until=1h\""
+        }
+    }
+
+
+
+
+}
+
+    post {
+        success {
+            slackSend (channel: '#cicd-notification', color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+        }
+        failure {
+            slackSend (channel: '#cicd-notification', color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+        }
+    }
+}

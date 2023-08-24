@@ -33,12 +33,22 @@ public class RecruitmentResponseDto {
         private String authorProfileImg;
 
         private Integer commentCount;
+        private String recruitmentBoardRecruitmentPeriod;
+        private String recruitmentBoardActivityName;
+        private String recruitmentBoardImg;
+        private String recruitmentBoardActivityField;
+        private String recruitmentBoardCategory;
 
         @QueryProjection
         public RecruitmentSearchDto(Long id, String title, String content, Integer viewCount, Integer likeCount, Integer currentMemberSize, Integer maxMemberSize, LocalDateTime createdAt
                                     , String authorNickname
                                     , String authorProfileImg
                                     , Integer commentCount
+                                    , String recruitmentBoardRecruitmentPeriod
+                                    , String activityName
+                                    , String recruitmentBoardImg
+                                    , String recruitmentBoardActivityField
+                                    , String recruitmentBoardCategory
         ) {
             this.id = id;
             this.title = title;
@@ -51,6 +61,13 @@ public class RecruitmentResponseDto {
             this.authorNickname = authorNickname;
             this.authorProfileImg = authorProfileImg;
             this.commentCount = commentCount;
+            this.recruitmentBoardRecruitmentPeriod = recruitmentBoardRecruitmentPeriod;
+            this.recruitmentBoardActivityName = activityName;
+            this.recruitmentBoardImg = recruitmentBoardImg;
+            this.recruitmentBoardActivityField = recruitmentBoardActivityField;
+            this.recruitmentBoardCategory = recruitmentBoardCategory;
+
+//            this.recruitmentBoardRecruitmentEndDate = LocalDate.parse(recruitmentBoardRecruitmentPeriod.split("~")[1].trim(), DateTimeFormatter.ofPattern("yy.M.d")).atStartOfDay();
         }
     }
     @Getter

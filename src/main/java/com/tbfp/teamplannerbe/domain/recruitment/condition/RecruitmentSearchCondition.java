@@ -13,4 +13,5 @@ public class RecruitmentSearchCondition {
     private String authorNameContain;
     private Long boardIdContain;
     private String boardTitleContain;
+    private String boardCategoryContain;
 }

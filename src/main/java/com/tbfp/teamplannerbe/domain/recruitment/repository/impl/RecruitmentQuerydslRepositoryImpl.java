@@ -36,7 +36,12 @@ public class RecruitmentQuerydslRepositoryImpl extends Querydsl4RepositorySuppor
                                 recruitment.createdAt,
                                 recruitment.author.nickname,
                                 recruitment.author.basicProfile.profileImage,
-                                recruitment.commentList.size()
+                                recruitment.commentList.size(),
+                                recruitment.board.recruitmentPeriod,
+                                recruitment.board.activityName,
+                                recruitment.board.activityImg,
+                                recruitment.board.activityField,
+                                recruitment.board.category
                                 ))
                         .from(recruitment)
                         .leftJoin(recruitment.board, board)
@@ -46,11 +51,14 @@ public class RecruitmentQuerydslRepositoryImpl extends Querydsl4RepositorySuppor
                                 contentContain(recruitmentSearchCondition.getContentContain()),
                                 authorNameContain(recruitmentSearchCondition.getAuthorNameContain()),
                                 boardTitleContain(recruitmentSearchCondition.getBoardTitleContain()),
-                                boardIdContain(recruitmentSearchCondition.getBoardIdContain())
+                                boardIdContain(recruitmentSearchCondition.getBoardIdContain()),
+                                boardCategoryContain(recruitmentSearchCondition.getBoardCategoryContain())
                         )
         );
     }
-
+    private BooleanExpression boardCategoryContain(String boardCategoryContain) {
+        return hasText(boardCategoryContain) ? recruitment.board.category.contains(boardCategoryContain) : null;
+    }
     private BooleanExpression boardIdContain(Long boardIdContain) {
         return (boardIdContain != null) ? recruitment.board.id.eq(boardIdContain) : null;
     }

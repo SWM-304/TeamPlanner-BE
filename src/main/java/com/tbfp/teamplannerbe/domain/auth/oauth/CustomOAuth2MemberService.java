@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.Map;
 
+import static com.tbfp.teamplannerbe.domain.auth.ProviderType.NAVER;
+
 
 @Slf4j
 @Service
@@ -52,10 +54,8 @@ public class CustomOAuth2MemberService implements OAuth2UserService<OAuth2UserRe
         String userNameAttributeName = userRequest.getClientRegistration()
                 .getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName(); // OAuth2 로그인 시 키(PK)가 되는 값
         Map<String, Object> attributes = oAuth2User.getAttributes(); // 소셜 로그인에서 API가 제공하는 userInfo의 Json 값(유저 정보들)
-
         // socialType에 따라 유저 정보를 통해 OAuthAttributes 객체 생성
         OAuthAttributes extractAttributes = OAuthAttributes.of(providerType, userNameAttributeName, attributes);
-
         Member createdUser = getUser(extractAttributes, providerType); // getUser() 메소드로 Member 객체 생성 후 반환
 
         // DefaultOAuth2User를 구현한 CustomOAuth2User 객체를 생성해서 반환
@@ -70,6 +70,9 @@ public class CustomOAuth2MemberService implements OAuth2UserService<OAuth2UserRe
     private ProviderType getProviderType(String registrationId) {
         if(KAKAO.equals(registrationId)) {
             return ProviderType.KAKAO;
+        }
+        if("naver".equalsIgnoreCase(registrationId)){
+            return ProviderType.NAVER;
         }
         return ProviderType.GOOGLE;
     }

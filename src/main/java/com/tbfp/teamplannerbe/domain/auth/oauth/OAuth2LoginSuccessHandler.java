@@ -2,6 +2,7 @@ package com.tbfp.teamplannerbe.domain.auth.oauth;
 
 import com.tbfp.teamplannerbe.domain.auth.JwtProvider;
 import com.tbfp.teamplannerbe.domain.auth.MemberRole;
+import com.tbfp.teamplannerbe.domain.auth.cookie.CookieUtil;
 import com.tbfp.teamplannerbe.domain.auth.service.RefreshTokenService;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
@@ -63,7 +64,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private void loginSuccess(HttpServletResponse response, CustomOAuth2Member oAuth2Member,String domain) {
         log.info("OAuth2LoginSuccessHandler.loginSuccess");
-        log.info("살려줘"+domain);
+
         String accessToken = jwtProvider.generateAccessToken(oAuth2Member.getUsername());
         String refreshToken = jwtProvider.generateRefreshToken(oAuth2Member.getUsername());
 

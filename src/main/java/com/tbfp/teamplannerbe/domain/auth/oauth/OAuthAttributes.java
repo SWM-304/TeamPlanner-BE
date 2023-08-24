@@ -34,6 +34,9 @@ public class OAuthAttributes {
         if (providerType == ProviderType.KAKAO) {
             return ofKakao(userNameAttributeName, attributes);
         }
+        if(providerType==ProviderType.NAVER){
+            return ofNaver(userNameAttributeName,attributes);
+        }
         return ofGoogle(userNameAttributeName, attributes);
     }
 
@@ -41,6 +44,12 @@ public class OAuthAttributes {
         return OAuthAttributes.builder()
                 .nameAttributeKey(userNameAttributeName)
                 .oauth2MemberInfo(new KakaoOAuth2MemberInfo(attributes))
+                .build();
+    }
+    private static OAuthAttributes ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
+        return OAuthAttributes.builder()
+                .nameAttributeKey(userNameAttributeName)
+                .oauth2MemberInfo(new NaverOAuth2MemberInfo(attributes))
                 .build();
     }
 

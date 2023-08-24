@@ -2,5 +2,5 @@ package com.tbfp.teamplannerbe.domain.auth;
 
 
 public enum ProviderType {
-    KAKAO, GOOGLE
+    KAKAO, GOOGLE, NAVER
 }

@@ -56,7 +56,7 @@ public class BasicProfile extends BaseTimeEntity {
     @Column(columnDefinition = "bit default 0")
     private Boolean evaluationPublic;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 

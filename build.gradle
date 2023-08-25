@@ -135,6 +135,7 @@ dependencies {
     //    jasypt
     implementation 'com.github.ulisesbocchio:jasypt-spring-boot-starter:3.0.3'
 
+
     // Selenium WebDriver
     implementation 'org.seleniumhq.selenium:selenium-java:3.141.59'
 

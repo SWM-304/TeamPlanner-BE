@@ -1,5 +1,6 @@
 package com.tbfp.teamplannerbe.crawler;
 
+import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.board.service.BoardService;
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -38,7 +39,7 @@ public class CrawlingTest {
     SimpleDateFormat format = new SimpleDateFormat("yy.M.d");
 
     // 현재 날짜와 시간 가져오기
-    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime now = LocalDateTime.now(  );
 
     // 형식 지정
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
@@ -46,9 +47,15 @@ public class CrawlingTest {
     // 날짜 형식 변환
     String currentDate = now.format(formatter);
 
+
+    private final String CHROME_DRIVER_PATH = "/Users/minwookim/Downloads/chromedriver-mac-arm64/chromedriver";
+
+
     @Scheduled(fixedDelay = 7 * 24 * 60 * 60 * 1000) // 1 week
     public void searchXml() throws IOException {
-        WebDriverManager.chromedriver().setup();
+        System.setProperty("webdriver.chrome.driver", CHROME_DRIVER_PATH);
+
+//        WebDriverManager.chromedriver().setup();
         int maxNumber = maxNumberXml();
         String baseUrl = "https://linkareer.com/sitemap/activities/%s.xml";
 
@@ -82,7 +89,8 @@ public class CrawlingTest {
             options.addArguments("--disable-dev-shm-usage");
             options.addArguments("--disable-gpu");
             options.addArguments("--window-size=1920x1080");
-//            options.addArguments("--disable-websocket");
+            options.addArguments("--single-process");
+            options.addArguments("--disable-websocket");
 
             //위에서 설정한 옵션은 담은 드라이버 객체 생성
             //옵션을 설정하지 않았을 때에는 생략 가능하다.
@@ -107,10 +115,73 @@ public class CrawlingTest {
         for (WebElement element : elements) {
 
                 if(element.getText().equals("공모전")){
+
+
+                    String activityName="";
+                    String companyType="";
+                    String target="";
+                    String prizeScale="";
+                    String activityUrl="";
+                    String activityBenefits="";
+                    String activityField="";
+                    String recruitmentPeriod="";
+                    String activityImg="";
+
                     System.out.println("공모전 글 입니다");
 
-                    WebElement recruitmentPeriod = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[4]/h3"));
-                    String[] split = recruitmentPeriod.getText().split("~");
+                    // 이미지 ,타이틀 , 각종 상세정보를 가져오는 태그들
+                    List<WebElement> activityContainers = driver.findElements(By.cssSelector("div[class^='ActivityInformationFieldContainer']"));
+                    List<WebElement> title = driver.findElements(By.cssSelector("main[class^='main-container']"));
+                    WebElement activityInfo = driver.findElement(By.className("activity-info"));
+                    List<WebElement> imageTags = activityInfo.findElements(By.tagName("img"));
+                    activityImg=imageTags.get(0).getAttribute("src");
+
+
+                    for (WebElement webElement : title) {
+                        String text = webElement.getText();
+                        String[] lines = text.split("\n");
+                        activityName=lines[0];
+                    }
+                    // 찾은 요소들을 iterator로 순회하며 정보를 가져옵니다.
+                    for (WebElement container : activityContainers) {
+                        // 필요한 정보를 찾아 출력하거나 다른 작업을 수행합니다.
+                        String text = container.getText();
+                        String[] lines = text.split("\n");
+
+                        for (int i = 0; i < lines.length-1; i += 2) {
+                            String field = lines[i];
+                            String value = lines[i + 1];
+
+                            switch (field) {
+                                case "기업형태":
+                                    companyType = value;
+                                    break;
+                                case "참여대상":
+                                    target = value;
+                                    break;
+                                case "시상규모":
+                                    prizeScale = value;
+                                    break;
+                                case "접수기간":
+                                    recruitmentPeriod = value;
+                                    break;
+                                case "홈페이지":
+                                    activityUrl = value;
+                                    break;
+                                case "활동혜택":
+                                    activityBenefits = value;
+                                    break;
+                                case "공모분야":
+                                    activityField = value;
+                                    break;
+                            }
+                        }
+                    }
+
+
+
+
+                    String[] split = recruitmentPeriod.split("~");
                     String startDateString=split[0];
                     String endDateString=split[1];
 
@@ -122,27 +193,8 @@ public class CrawlingTest {
 
                         if (currentDateObj.compareTo(startDate) >= 0 && currentDateObj.compareTo(endDate) <= 0) {
                             System.out.println("현재 날짜는 접수 기간에 포함됩니다.");
-
-                            String activityName = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/h1")).getText();
-                            String activityImg = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/div/div/div/figure/img")).getAttribute("src");
-
-
-                            String companyType = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[1]/h3")).getText(); //기업형태
-                            String target = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[2]/h3")).getText(); //참여대상
-                            String prizeScale = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[3]/h3")).getText(); //참여대상
-
-                            String activityUrl = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[5]/h3")).getText(); // 홈페이지
-
-                            String activityBenefits = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[6]/h3")).getText(); //활동혜택
-
-                            String activity_field = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[7]/h3/div")).getText(); //공모분야
-
-
-
                             String activitiyKey=link;
 
-                            // 상세내용 jsoup으로 못가져오게 막아놔서  동적크롤링으로 변환
-//                            String activitiyDetail = doc.select(".ActivityDetailTabContent__StyledWrapper-sc-b973f285-0.juIUdj > div").html();
                             WebElement activityDetailElement = driver.findElement(By.xpath("//*[@id=\"DETAIL\"]/div[1]/div"));;//상세내용
 
                             // detailluterHTML 가져오기
@@ -164,7 +216,7 @@ public class CrawlingTest {
                                     .activityBenefits(activityBenefits)
                                     .interestArea("")
                                     .homepage("")
-                                    .activityField(activity_field)
+                                    .activityField(activityField)
                                     .prizeScale(prizeScale)
                                     .competitionCategory("")
                                     .preferredSkills("")
@@ -182,10 +234,85 @@ public class CrawlingTest {
                 if(element.getText().equals("대외활동")){
                     System.out.println("대외활동글 입니다");
 
+                    String activityName="";
+                    String companyType="";
+                    String target="";
+                    String activityPeriod="";
+                    String recruitmentCount="";
+                    String activityArea="";
+                    String preferredSkills="";
+                    String activityUrl="";
+                    String activityBenefits="";
+                    String interestArea="";
+                    String activityField="";
+                    String recruitmentPeriod="";
+                    String activityImg="";
 
-                    WebElement recruitmentPeriod = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[3]/h3"));
 
-                    String[] split = recruitmentPeriod.getText().split("~");
+                    // 이미지 ,타이틀 , 각종 상세정보를 가져오는 태그들
+                    List<WebElement> activityContainers = driver.findElements(By.cssSelector("div[class^='ActivityInformationFieldContainer']"));
+                    List<WebElement> title = driver.findElements(By.cssSelector("main[class^='main-container']"));
+                    WebElement activityInfo = driver.findElement(By.className("activity-info"));
+                    List<WebElement> imageTags = activityInfo.findElements(By.tagName("img"));
+                    activityImg=imageTags.get(0).getAttribute("src");
+
+                    for (WebElement webElement : title) {
+                        String text = webElement.getText();
+                        String[] lines = text.split("\n");
+                        activityName=lines[0];
+                    }
+                    // 찾은 요소들을 iterator로 순회하며 정보를 가져옵니다.
+                    for (WebElement container : activityContainers) {
+                        // 필요한 정보를 찾아 출력하거나 다른 작업을 수행합니다.
+                        String text = container.getText();
+                        String[] lines = text.split("\n");
+
+                        for (int i = 0; i < lines.length-1; i += 2) {
+                            String field = lines[i];
+                            String value = lines[i + 1];
+
+                            switch (field) {
+                                case "기업형태":
+                                    companyType = value;
+                                    break;
+                                case "참여대상":
+                                    target = value;
+                                    break;
+                                case "접수기간":
+                                    recruitmentPeriod = value;
+                                    break;
+                                case "활동기간":
+                                    activityPeriod = value;
+                                    break;
+                                case "모집인원":
+                                    recruitmentCount = value;
+                                    break;
+                                case "활동지역":
+                                    activityArea = value;
+                                    break;
+                                case "공모분야":
+                                    activityField = value;
+                                    break;
+                                case "홈페이지":
+                                    activityUrl = value;
+                                    break;
+                                case "관심분야":
+                                    interestArea = value;
+                                    break;
+                                case "활동분야":
+                                    activityField = value;
+                                    break;
+                                case "활동혜택":
+                                    activityBenefits = value;
+                                    break;
+                                case "우대역량":
+                                    preferredSkills = value;
+                                    break;
+                            }
+                        }
+                    }
+
+                    String[] split = recruitmentPeriod.split("~");
                     String startDateString=split[0];
                     String endDateString=split[1];
 
@@ -198,28 +325,8 @@ public class CrawlingTest {
                             System.out.println("현재 날짜는 접수 기간에 포함됩니다.");
 
 
+                            String activityKey=link;
 
-                            String activityName = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/h1")).getText();
-
-                            String activityImg = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/div/div/div/figure/img")).getAttribute("src");
-
-                            String companyType = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[1]/h3")).getText(); //기업형태
-
-                            String target = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[2]/h3")).getText(); //참여대상
-                            String activityPeriod = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[4]/h3")).getText(); //활동기간
-                            String recruitmentCount = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[5]/h3")).getText();; //모집인원
-                            String activityArea =driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[6]/h3/div")).getText();;//활동지역
-                            String preferredSkills = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[7]/h3")).getText();;//우대역량
-                            String activityUrl = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[7]/h3")).getText();;//홈페이지
-                            String activityBenefits = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[9]/h3")).getText();;//활동혜택
-                            String interestArea = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[10]/h3/div/span")).getText();;//관심분야
-                            String activityField = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[11]/h3/div")).getText();;//활동분야
-
-
-                            String activitiyKey=link;
-
-
-//
 //                            // 상세내용 jsoup으로 못가져오게 막아놔서  동적크롤링으로 변환
 //                            String activitiyDetail = doc.select(".ActivityDetailTabContent__StyledWrapper-sc-b973f285-0.juIUdj > div").html();
                             WebElement activityDetailElement = driver.findElement(By.xpath("//*[@id=\"DETAIL\"]/div[1]/div"));;//상세내용
@@ -228,8 +335,9 @@ public class CrawlingTest {
                             // detailluterHTML 가져오기
                             String activitiyDetail = activityDetailElement.getAttribute("outerHTML");
 
+                            System.out.println(activityKey);
                             Board board = Board.builder()
-                                    .activityKey(activitiyKey)
+                                    .activityKey(activityKey)
                                     .activityName(activityName)
                                     .activityUrl(activityUrl)
                                     .activityImg(activityImg)
@@ -262,9 +370,81 @@ public class CrawlingTest {
                 if(element.getText().equals("동아리")){
                     System.out.println("동아리글 입니다");
 
-                    WebElement recruitmentPeriod = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[4]/h3"));
+                    String activityName="";
+                    String activityImg="";
+                    String companyType="";
+                    String target="";
+                    String activityArea="";
+                    String recruitmentCount="";
+                    String meetingTime="";
+                    String activityUrl="";
+                    String activityBenefits="";
+                    String interestArea="";
+                    String activityField="";
+                    String recruitmentPeriod="";
 
-                    String[] split = recruitmentPeriod.getText().split("~");
+
+                    // 이미지 ,타이틀 , 각종 상세정보를 가져오는 태그들
+                    List<WebElement> activityContainers = driver.findElements(By.cssSelector("div[class^='ActivityInformationFieldContainer']"));
+                    List<WebElement> title = driver.findElements(By.cssSelector("main[class^='main-container']"));
+                    WebElement activityInfo = driver.findElement(By.className("activity-info"));
+                    List<WebElement> imageTags = activityInfo.findElements(By.tagName("img"));
+                    activityImg=imageTags.get(0).getAttribute("src");
+
+                    for (WebElement webElement : title) {
+                        String text = webElement.getText();
+                        String[] lines = text.split("\n");
+                        activityName=lines[0];
+                    }
+                    // 찾은 요소들을 iterator로 순회하며 정보를 가져옵니다.
+                    for (WebElement container : activityContainers) {
+                        // 필요한 정보를 찾아 출력하거나 다른 작업을 수행합니다.
+                        String text = container.getText();
+                        String[] lines = text.split("\n");
+
+                        for (int i = 0; i < lines.length-1; i += 2) {
+                            String field = lines[i];
+                            String value = lines[i + 1];
+
+                            switch (field) {
+                                case "기업형태":
+                                    companyType = value;
+                                    break;
+                                case "참여대상":
+                                    target = value;
+                                    break;
+                                case "활동지역":
+                                    activityArea = value;
+                                    break;
+                                case "접수기간":
+                                    recruitmentPeriod = value;
+                                    break;
+                                case "모집인원":
+                                    recruitmentCount = value;
+                                    break;
+                                case "모임시간":
+                                    meetingTime = value;
+                                    break;
+                                case "홈페이지":
+                                    activityUrl = value;
+                                    break;
+                                case "활동혜택":
+                                    activityBenefits = value;
+                                    break;
+                                case "관심분야":
+                                    interestArea = value;
+                                    break;
+                                case "활동분야":
+                                    activityField = value;
+                                    break;
+
+                            }
+                        }
+                    }
+
+//                    WebElement recruitmentPeriod = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[4]/h3"));
+
+                    String[] split = recruitmentPeriod.split("~");
                     String startDateString=split[0];
                     String endDateString=split[1];
 
@@ -276,30 +456,10 @@ public class CrawlingTest {
                         if (currentDateObj.compareTo(startDate) >= 0 && currentDateObj.compareTo(endDate) <= 0) {
                             System.out.println("현재 날짜는 접수 기간에 포함됩니다.");
 
-                            String activityName = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/h1")).getText();
-
-                            String activityImg = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/div/div/div/figure/img")).getAttribute("src");
-
-
-                            String companyType = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[1]/h3")).getText();//기업형태
-                            String target = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[2]/h3")).getText();//참여대상
-
-                            String activitiyArea = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[3]/h3/div")).getText();//활동지역
-                            String recruitmentCount = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[5]/h3")).getText();//모집인원
-                            String meetingTime = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[6]/h3")).getText();//모임시간
-                            String activityUrl = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[7]/h3")).getText();//홈페이지
-                            String activityBenefits = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[8]/h3")).getText();//활동혜택
-                            String interestArea = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[9]/h3/div")).getText();//관심분야
-                            String activityField = driver.findElement(By.xpath("//*[@id=\"__next\"]/div[1]/div/main/div/main/div[1]/div/ul/li/div[2]/div[1]/div[10]/h3/div")).getText();//활동분야
-
                             String activitiyKey=link;
 
-
-                            // 상세내용 jsoup으로 못가져오게 막아놔서  동적크롤링으로 변환
-//                            String activitiyDetail = doc.select(".ActivityDetailTabContent__StyledWrapper-sc-b973f285-0.juIUdj > div").html();
                             WebElement activityDetailElement = driver.findElement(By.xpath("//*[@id=\"DETAIL\"]/div[1]/div"));;//상세내용
 
-                            // detailluterHTML 가져오기
                             String activitiyDetail = activityDetailElement.getAttribute("outerHTML");
 
                             Board board = Board.builder()
@@ -311,7 +471,7 @@ public class CrawlingTest {
                                     .category("동아리")
                                     .companyType(companyType)
                                     .target(target)
-                                    .activityArea(activitiyArea)
+                                    .activityArea(activityArea)
                                     .recruitmentPeriod(startDateString+"~"+endDateString)
                                     .recruitmentCount(recruitmentCount)
                                     .meetingTime(meetingTime)
@@ -353,11 +513,7 @@ public class CrawlingTest {
 
     }
 
-    /**
-     *
-     * @return
-     * 80
-     */
+
     public int maxNumberXml(){
         int maxNumber = 0;
         try {

@@ -1,5 +1,6 @@
 package com.tbfp.teamplannerbe.domain.member;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -17,5 +18,10 @@ public enum Job {
     NONE("무직"),
     UNKNOWN("해당 없음");;
     private final String label;
+
+    @JsonValue
+    public String getLabel(){
+        return label;
+    }
 
 }

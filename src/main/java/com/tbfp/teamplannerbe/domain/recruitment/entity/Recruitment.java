@@ -6,6 +6,7 @@ import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentRequestDto.RecruitmentUpdateRequestDto;
 import com.tbfp.teamplannerbe.domain.recruitmentApply.entity.RecruitmentApply;
 import com.tbfp.teamplannerbe.domain.recruitmentComment.entity.RecruitmentComment;
+import com.tbfp.teamplannerbe.domain.recruitmentLike.entity.RecruitmentLike;
 import com.tbfp.teamplannerbe.domain.team.entity.Team;
 import lombok.*;
 
@@ -54,6 +55,10 @@ public class Recruitment extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "recruitment")
     @Builder.Default
+    private List<RecruitmentLike> recruitmentLikeList=new ArrayList<>();
+
+    @OneToMany(mappedBy = "recruitment")
+    @Builder.Default
     private List<Team> teams=new ArrayList<>();
 
 
@@ -62,6 +67,7 @@ public class Recruitment extends BaseTimeEntity {
     public void incrementViewCount() {
         this.viewCount++;
     }
+
 
     public void update(RecruitmentUpdateRequestDto recruitmentUpdateRequestDto) {
         this.title = recruitmentUpdateRequestDto.getNewTitle();
@@ -72,5 +78,9 @@ public class Recruitment extends BaseTimeEntity {
 
     public void incrementLikeCount() {
         this.likeCount++;
+    }
+
+    public void decrementLikeCount() {
+        this.likeCount--;
     }
 }

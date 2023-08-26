@@ -47,7 +47,6 @@ public class BoardController {
             @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
     })
     public ResponseEntity<?> boardDetail(@PathVariable Long boardId){
-
         return ResponseEntity.status(HttpStatus.OK).body(boardService.getBoardDetail(boardId));
     }
 

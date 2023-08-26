@@ -9,4 +9,6 @@ import java.util.Optional;
 
 public interface RecruitmentLikeRepository extends JpaRepository<RecruitmentLike, Long> {
     Optional<RecruitmentLike> findByMemberAndRecruitment(Member member, Recruitment recruitment);
+
+    Optional<RecruitmentLike> findByMemberIdAndRecruitmentId(Long memberId,Long recruitmentId);
 }

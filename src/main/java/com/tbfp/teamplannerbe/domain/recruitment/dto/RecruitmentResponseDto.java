@@ -121,6 +121,7 @@ public class RecruitmentResponseDto {
         private LocalDateTime boardEndDate;
         private String authorNickname;
         private String authorProfileImg;
+        private Boolean recruitmentState;
 
         @Builder.Default
         private List<RecruitmentCommentDto> commentList = new ArrayList<>();
@@ -141,6 +142,11 @@ public class RecruitmentResponseDto {
                     .boardEndDate(LocalDate.parse(recruitment.getBoard().getRecruitmentPeriod().split("~")[1].trim(), DateTimeFormatter.ofPattern("yy.M.d")).atStartOfDay())
                     .authorNickname(recruitment.getAuthor().getNickname())
                     .authorProfileImg(recruitment.getAuthor().getBasicProfile().getProfileImage())
+                    .recruitmentState(recruitment.getRecruitmentLikeList().stream().
+                            map(like-> like.getMember().getUsername()).
+                            anyMatch(userId -> userId.equals(username))
+                    )
+
                     .build();
         }
 

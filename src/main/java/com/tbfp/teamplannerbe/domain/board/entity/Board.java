@@ -1,6 +1,7 @@
 package com.tbfp.teamplannerbe.domain.board.entity;
 
 import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
+import com.tbfp.teamplannerbe.domain.boardLike.entity.BoardLike;
 import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
 import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
@@ -140,6 +141,9 @@ public class Board extends BaseTimeEntity {
         this.view=view;
     }
     public void plusLikeCount(Long count) {
+        this.likeCount=count;
+    }
+    public void minusLikeCount(Long count) {
         this.likeCount=count;
     }
 }

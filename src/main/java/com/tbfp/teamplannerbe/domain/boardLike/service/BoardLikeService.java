@@ -1,7 +1,12 @@
 package com.tbfp.teamplannerbe.domain.boardLike.service;
 
-public interface BoardLikeService {
-    void createLikesOnBoard(Long boardId, Long memberId);
+import com.tbfp.teamplannerbe.domain.boardLike.dto.BoardLikeResponseDto;
+import com.tbfp.teamplannerbe.domain.boardLike.dto.BoardLikeResponseDto.boardStateResponseDto;
 
-    void deleteLikesOnBoard(Long boardLikeId, Long memberId);
+public interface BoardLikeService {
+    void createLikesOnBoard(Long boardId, String username);
+
+    void deleteLikesOnBoard(Long boardLikeId, String username);
+
+    boardStateResponseDto getLikeState(Long boardId,String username);
 }

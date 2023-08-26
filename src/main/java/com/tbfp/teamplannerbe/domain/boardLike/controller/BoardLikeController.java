@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @RestController
 @RequestMapping("/api/v1/board/{boardId}/boardLike")
 @RequiredArgsConstructor
@@ -22,16 +24,16 @@ public class BoardLikeController {
     private final BoardLikeService boardLikeService;
 
 
-    @GetMapping("/user/{memberId}")
+    @GetMapping("")
     @Operation(summary = "공고 좋아요 API", description = "공고아이디와 멤버아이디로 좋아요 추가")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
             @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
     })
-    public ResponseEntity<?> addLikeToBoard(@PathVariable Long boardId,@PathVariable Long memberId){
+    public ResponseEntity<?> addLikeToBoard(@PathVariable Long boardId, Principal principal){
 
-        boardLikeService.createLikesOnBoard(boardId,memberId);
+        boardLikeService.createLikesOnBoard(boardId,principal.getName());
         return ResponseEntity.status(HttpStatus.OK).body("좋아요 성공");
     }
     @Operation(summary = "공고 좋아요 삭제 API", description = "좋아요 아이디와 멤버아이디로 삭제")
@@ -40,9 +42,22 @@ public class BoardLikeController {
             @ApiResponse(responseCode = "400", description = "잘못된 요청"),
             @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
     })
-    @DeleteMapping("/{boardLikeId}/user/{memberId}")
-    public ResponseEntity<?> deleteLikeToBoard(@PathVariable Long boardLikeId,@PathVariable Long memberId){
-        boardLikeService.deleteLikesOnBoard(boardLikeId,memberId);
+    @DeleteMapping("/{boardLikeId}")
+    public ResponseEntity<?> deleteLikeToBoard(@PathVariable Long boardLikeId,Principal principal){
+        boardLikeService.deleteLikesOnBoard(boardLikeId,principal.getName());
         return ResponseEntity.status(HttpStatus.OK).body("좋아요 삭제 성공");
+    }
+    @Operation(summary = "공고 좋아요 상태확인", description = "토큰 Principal로 좋아요 상태확인")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
+    })
+    @GetMapping("/state")
+    public ResponseEntity<?> getLikeState(@PathVariable Long boardId,Principal principal){
+
+        return ResponseEntity.status(HttpStatus.OK).body(
+                boardLikeService.getLikeState(boardId,principal.getName())
+        );
     }
 }

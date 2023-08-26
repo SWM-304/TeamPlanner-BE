@@ -4,14 +4,18 @@ import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.distributeLock.DistributeLock;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
+import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
 import com.tbfp.teamplannerbe.domain.member.service.MemberService;
+import com.tbfp.teamplannerbe.domain.recruitment.dto.RecruitmentResponseDto;
 import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
 import com.tbfp.teamplannerbe.domain.recruitment.service.RecruitmentService;
+import com.tbfp.teamplannerbe.domain.recruitmentLike.dto.RecruitmentLikeResponseDto;
 import com.tbfp.teamplannerbe.domain.recruitmentLike.entity.RecruitmentLike;
 import com.tbfp.teamplannerbe.domain.recruitmentLike.repository.RecruitmentLikeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -22,11 +26,12 @@ public class RecruitmentLikeService {
     private final RecruitmentService recruitmentService;
     private final MemberService memberService;
     private final RecruitmentLikeRepository recruitmentLikeRepository;
+    private final MemberRepository memberRepository;
 
 //    @Transactional
 
     @DistributeLock(key="#recruitmentId")
-    public String like(Long recruitmentId, String username) {
+    public RecruitmentLikeResponseDto.RecruitmentLikeSuccessResponseDto like(Long recruitmentId, String username) {
         // check already liked?
 //      pessimistic write lock version is faster twice as much distribute lock(redisson RLock)
         Member member = memberService.findMemberByUsername(username)
@@ -42,11 +47,11 @@ public class RecruitmentLikeService {
         if (recruitmentLikeOptional.isPresent()) throw new ApplicationException(ApplicationErrorType.ALREADY_LIKED);
 
         // like
-        recruitmentLikeRepository.save(
-            RecruitmentLike.builder()
-                    .recruitment(recruitment)
-                    .member(member)
-                    .build()
+        RecruitmentLike recruitmentLike = recruitmentLikeRepository.save(
+                RecruitmentLike.builder()
+                        .recruitment(recruitment)
+                        .member(member)
+                        .build()
         );
         recruitmentService.increaseLikeCount(recruitment.getId());
 /*
@@ -87,7 +92,18 @@ public class RecruitmentLikeService {
                 log.info("thread name = " + name + ": unlock");
             }
         }*/
-        return "success";
+        return RecruitmentLikeResponseDto.RecruitmentLikeSuccessResponseDto.builder()
+                .recruitmentLikeId(recruitmentLike.getId())
+                .build();
     }
 
+
+    @Transactional
+    public void cancel(Long recruitmentId,String username) {
+        Member member = memberRepository.findByUsername(username).orElseThrow(() -> new ApplicationException(ApplicationErrorType.USER_NOT_FOUND));
+        RecruitmentLike recruitmentLike = recruitmentLikeRepository.findByMemberIdAndRecruitmentId(member.getId(), recruitmentId)
+                .orElseThrow(() -> new ApplicationException(ApplicationErrorType.NOT_FOUND));
+        recruitmentLikeRepository.deleteById(recruitmentLike.getId());
+        recruitmentService.decreaseLikeCount(recruitmentId);
+    }
 }

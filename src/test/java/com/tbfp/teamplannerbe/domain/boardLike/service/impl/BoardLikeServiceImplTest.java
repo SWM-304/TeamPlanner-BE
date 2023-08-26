@@ -68,7 +68,7 @@ class BoardLikeServiceImplTest extends BaseControllerTest {
 
 
         //좋아요 호출
-        boardLikeService.createLikesOnBoard(boardId,user.get().getId());
+        boardLikeService.createLikesOnBoard(boardId,user.get().getUsername());
         em.flush();
         em.clear();
 

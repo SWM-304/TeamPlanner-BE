@@ -90,6 +90,12 @@ public class RecruitmentService {
                 .orElseThrow(() -> new ApplicationException(ApplicationErrorType.NOT_FOUND));
         recruitment.incrementLikeCount();
     }
+    @Transactional
+    public void decreaseLikeCount(Long id) {
+        Recruitment recruitment = recruitmentRepository.findById(id)
+                .orElseThrow(() -> new ApplicationException(ApplicationErrorType.NOT_FOUND));
+        recruitment.decrementLikeCount();
+    }
 
     public Recruitment findByIdOrElseThrowApplicationException(Long recruitmentId) {
         return recruitmentRepository.findById(recruitmentId).orElseThrow(() -> new ApplicationException(ApplicationErrorType.RECRUITMENT_NOT_FOUND));

@@ -36,9 +36,11 @@ public class RecruitmentApplyResponseDto {
         private String recruitmentTitle;
         private String recruitmentContent;
         private String recruitmentApplyContent;
+        private String boardImage;
 
         public static GetApplyResponse toDto(RecruitmentApply ra) {
             return GetApplyResponse.builder()
+                    .boardImage(ra.getRecruitment().getBoard().getActivityImg())
                     .recruitmentApplyId(ra.getId())
                     .boardId(ra.getRecruitment().getBoard().getId())
                     .boardName(ra.getRecruitment().getBoard().getActivityName())

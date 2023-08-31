@@ -43,12 +43,6 @@ public class GlobalExceptionHandlerFilter extends OncePerRequestFilter {
             }
         } catch (Exception ex){
             throw ex;
-//            log.error("exception exception handler filter");
-//            log.info("ex.getMessage() = " + ex.getMessage());
-//            ex.printStackTrace();
-//            response.setStatus(HttpStatus.BAD_REQUEST.value());
-//            response.setCharacterEncoding("utf-8");
-//            response.setContentType("application/json");
         }
     }
 }

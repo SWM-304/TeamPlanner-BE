@@ -66,7 +66,7 @@ public enum ApplicationErrorType {
 
     //팀
     USER_NOT_IN_TEAM(HttpStatus.BAD_REQUEST,-24000,"사용자가 소속된 팀이 아닙니다."),
-    EVALUATION_SCORE_NOT_IN_SCOPE(HttpStatus.BAD_REQUEST,-24001,"평가 점수는 총합 0이상 30이하여야 합니다."),
+    EVALUATION_SCORE_NOT_IN_SCOPE(HttpStatus.BAD_REQUEST,-24001,"평가 점수는 총합 0이상 40이하여야 합니다."),
     EVALUATION_NOT_EXIST(HttpStatus.BAD_REQUEST,-24002,"평가가 존재하지 않습니다."),
     NOT_AUTHOR_OF_EVALUATION(HttpStatus.BAD_REQUEST,-24003,"본 평가의 작성자가 아닙니다."),
     UNABLE_TO_EVALUATE_MYSELF(HttpStatus.BAD_REQUEST,-24004,"자기 자신을 평가할 수 없습니다."),

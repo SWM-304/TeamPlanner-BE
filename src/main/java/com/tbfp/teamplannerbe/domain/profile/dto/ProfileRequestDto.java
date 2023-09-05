@@ -161,24 +161,24 @@ public class ProfileRequestDto {
     public static class CreateEvaluationRequestDto {
         private String comment;
 
-        @Min(value = 1,message = "평가 점수는 1 이상 10 이하여야 합니다.")
-        @Max(value = 10, message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        @Min(value = 0,message = "평가 점수는 0 이상 10 이하여야 합니다.")
+        @Max(value = 10, message = "평가 점수는 0 이상 10 이하여야 합니다.")
         private Integer stat1;
 
-        @Min(value = 1,message = "평가 점수는 1 이상 10 이하여야 합니다.")
-        @Max(value = 10, message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        @Min(value = 0,message = "평가 점수는 0 이상 10 이하여야 합니다.")
+        @Max(value = 10, message = "평가 점수는 0 이상 10 이하여야 합니다.")
         private Integer stat2;
 
-        @Min(value = 1,message = "평가 점수는 1 이상 10 이하여야 합니다.")
-        @Max(value = 10, message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        @Min(value = 0,message = "평가 점수는 0 이상 10 이하여야 합니다.")
+        @Max(value = 10, message = "평가 점수는 0 이상 10 이하여야 합니다.")
         private Integer stat3;
 
-        @Min(value = 1,message = "평가 점수는 1 이상 10 이하여야 합니다.")
-        @Max(value = 10, message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        @Min(value = 0,message = "평가 점수는 0 이상 10 이하여야 합니다.")
+        @Max(value = 10, message = "평가 점수는 0 이상 10 이하여야 합니다.")
         private Integer stat4;
 
-        @Min(value = 1,message = "평가 점수는 1 이상 10 이하여야 합니다.")
-        @Max(value = 10, message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        @Min(value = 0,message = "평가 점수는 0 이상 10 이하여야 합니다.")
+        @Max(value = 10, message = "평가 점수는 0 이상 10 이하여야 합니다.")
         private Integer stat5;
 
 
@@ -206,24 +206,24 @@ public class ProfileRequestDto {
 
         private String comment;
 
-        @Min(value = 1,message = "평가 점수는 1 이상 10 이하여야 합니다.")
-        @Max(value = 10, message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        @Min(value = 0,message = "평가 점수는 0 이상 10 이하여야 합니다.")
+        @Max(value = 10, message = "평가 점수는 0 이상 10 이하여야 합니다.")
         private Integer stat1;
 
-        @Min(value = 1,message = "평가 점수는 1 이상 10 이하여야 합니다.")
-        @Max(value = 10, message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        @Min(value = 0,message = "평가 점수는 0 이상 10 이하여야 합니다.")
+        @Max(value = 10, message = "평가 점수는 0 이상 10 이하여야 합니다.")
         private Integer stat2;
 
-        @Min(value = 1,message = "평가 점수는 1 이상 10 이하여야 합니다.")
-        @Max(value = 10, message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        @Min(value = 0,message = "평가 점수는 0 이상 10 이하여야 합니다.")
+        @Max(value = 10, message = "평가 점수는 0 이상 10 이하여야 합니다.")
         private Integer stat3;
 
-        @Min(value = 1,message = "평가 점수는 1 이상 10 이하여야 합니다.")
-        @Max(value = 10, message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        @Min(value = 0,message = "평가 점수는 0 이상 10 이하여야 합니다.")
+        @Max(value = 10, message = "평가 점수는 0 이상 10 이하여야 합니다.")
         private Integer stat4;
 
-        @Min(value = 1,message = "평가 점수는 1 이상 10 이하여야 합니다.")
-        @Max(value = 10, message = "평가 점수는 1 이상 10 이하여야 합니다.")
+        @Min(value = 0,message = "평가 점수는 0 이상 10 이하여야 합니다.")
+        @Max(value = 10, message = "평가 점수는 0 이상 10 이하여야 합니다.")
         private Integer stat5;
 
         public Evaluation toEntity(Member authorMember, Member subjectMember, Team team){

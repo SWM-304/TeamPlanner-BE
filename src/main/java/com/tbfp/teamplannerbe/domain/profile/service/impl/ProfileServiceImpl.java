@@ -297,9 +297,9 @@ public class ProfileServiceImpl implements ProfileService {
         MemberTeam memberTeam = memberTeamRepository.findByMemberIdsAndTeamIds(authorMember.getId(), subjectMemberId, givenTeamId);
         if (memberTeam == null) throw new ApplicationException(USER_NOT_IN_TEAM);
 
-        // 평가 점수 총합은 0~30 이어야 함
+        // 평가 점수 총합은 0~40 이어야 함
         Integer sum = updateEvaluationRequestDto.getStat1() + updateEvaluationRequestDto.getStat2() + updateEvaluationRequestDto.getStat3() + updateEvaluationRequestDto.getStat4() + updateEvaluationRequestDto.getStat5();
-        if (sum < 0 || sum > 30) throw new ApplicationException(EVALUATION_SCORE_NOT_IN_SCOPE);
+        if (sum < 0 || sum > 40) throw new ApplicationException(EVALUATION_SCORE_NOT_IN_SCOPE);
 
         //save
         Evaluation evaluation = updateEvaluationRequestDto.toEntity(authorMember, subjectMember, givenTeam);

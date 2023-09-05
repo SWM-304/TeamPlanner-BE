@@ -161,6 +161,7 @@ public class RecruitmentResponseDto {
             private Long parentCommentId;
             private String memberUsername;
             private String memberProfileImg;
+            private String memberNickname;
 
             public static RecruitmentCommentDto toDto(boolean isAuthorOfRecruitment, String username, RecruitmentComment recruitmentComment) {
                 String dtoUsername;
@@ -185,6 +186,7 @@ public class RecruitmentResponseDto {
                         .memberUsername(dtoUsername)
                         .parentCommentId(recruitmentComment.getParentComment() == null ? null : recruitmentComment.getParentComment().getId())
                         .memberProfileImg(recruitmentComment.getMember().getBasicProfile().getProfileImage())
+                        .memberNickname(recruitmentComment.getMember().getNickname())
                         .build();
             }
         }

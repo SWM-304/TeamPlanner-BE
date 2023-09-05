@@ -153,6 +153,7 @@ public class MemberResponseDto {
         private String username;
         private String nickname;
         private String profileImg;
+        private Long memberId;
     }
 
 

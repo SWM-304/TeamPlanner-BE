@@ -47,4 +47,6 @@ public interface MemberService {
     MemberResponseDto.idAndEmailVerifyResponseDto verifyIdAndEmail(MemberRequestDto.IdAndEmailVerifyRequestDto verifyRequestDto);
 
     MemberResponseDto.NickNameAndEmailVerifyResponseDto verifyNicknameAndEmail(MemberRequestDto.NickNameAndEmailVerifyRequestDto verifyRequestDto);
+
+    Member findMemberByNicknameOrElseThrowApplicationException(String nickname);
 }

@@ -20,6 +20,9 @@ public class MemberDetails implements UserDetails {
         return null;
     }
 
+    public String getNickname() {
+        return member.getNickname();
+    }
     @Override
     public String getPassword() {
         return member.getPassword();

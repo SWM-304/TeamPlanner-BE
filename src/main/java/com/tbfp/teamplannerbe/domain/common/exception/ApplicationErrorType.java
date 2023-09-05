@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 public enum ApplicationErrorType {
 
 
+    BAD_REQUEST(HttpStatus.BAD_REQUEST, -134321, "BAD REQUEST"),
     //토큰
     EXPIRED_ACCESS_TOKEN(HttpStatus.BAD_REQUEST, -70000, "만료된 엑세스 토큰입니다."),
     REFRESH_TOKEN_FOR_USER_NOT_FOUND(HttpStatus.BAD_REQUEST, -7, "리프레시 토큰을 찾을 수 없습니다."),
@@ -50,7 +51,7 @@ public enum ApplicationErrorType {
     SIGNUP_REQUEST_INVALID_PHONE(HttpStatus.BAD_REQUEST, -21003, "phone"),
     SIGNUP_REQUEST_INVALID_CONTACTEMAIL(HttpStatus.BAD_REQUEST, -21004, "contactEmail"),
     SIGNUP_REQUEST_INVALID_NICKNAME(HttpStatus.BAD_REQUEST, -21005, "nickname"),
-  
+
     // 인증번호
     VERIFICATION_CODE_UNMATCHED(HttpStatus.UNAUTHORIZED,-22000, "인증번호가 일치하지 않습니다."),
     VERIFICATION_CODE_EXPIRED(HttpStatus.BAD_REQUEST,-22001, "인증번호가 만료되어 재전송했습니다."),
@@ -88,11 +89,6 @@ public enum ApplicationErrorType {
     ALREADY_TEAM_ACCEPT(HttpStatus.BAD_REQUEST,-62001,"이미 승인된 사람이 포함되어 있습니다"),
     AUTHOR_CANNOT_PARTICIPATE(HttpStatus.BAD_REQUEST,-62002,"작성자는 참여신청을 할 수 없습니다"),
     TEAM_NOT_FOUND(HttpStatus.BAD_REQUEST,-62003,"팀을 찾을 수 없습니다");
-
-
-
-
-
 
 
     private final HttpStatus httpStatus;

@@ -36,8 +36,9 @@ public class RecruitmentApplyResponseDto {
         private String recruitmentTitle;
         private String recruitmentContent;
         private String recruitmentApplyContent;
+        private String applyUsernickname;
 
-        public static GetApplyResponse toDto(RecruitmentApply ra) {
+        public static GetApplyResponse toDto(RecruitmentApply ra,String nickname) {
             return GetApplyResponse.builder()
                     .recruitmentApplyId(ra.getId())
                     .boardId(ra.getRecruitment().getBoard().getId())
@@ -46,6 +47,7 @@ public class RecruitmentApplyResponseDto {
                     .recruitmentTitle(ra.getRecruitment().getTitle())
                     .recruitmentContent(ra.getRecruitment().getContent())
                     .recruitmentApplyContent(ra.getContent())
+                    .applyUsernickname(nickname)
                     .build();
         }
     }

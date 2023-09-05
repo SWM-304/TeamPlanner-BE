@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -82,7 +83,11 @@ public class RecruitmentApplyServiceImpl implements RecruitmentApplyService {
 
     @Override
     public List<GetApplyResponse> getApplyList(String username) {
+        Optional<Member> member = memberService.findMemberByUsername(username);
+        if(member.isEmpty()){
+            throw new ApplicationException(ApplicationErrorType.USER_NOT_FOUND);
+        }
         List<RecruitmentApply> ra = recruitmentApplyRepository.findAllRecruitmentApplyByApplicant_Username(username);
-        return ra.stream().map(GetApplyResponse::toDto).collect(Collectors.toList());
+        return ra.stream().map(ra1 -> GetApplyResponse.toDto(ra1,member.get().getNickname())).collect(Collectors.toList());
     }
 }

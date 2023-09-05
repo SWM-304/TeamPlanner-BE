@@ -403,6 +403,7 @@ public class MemberServiceImpl implements MemberService {
         return getMemberInfoDto.builder()
                 .username(username)
                 .nickname(member.getNickname())
+                .memberId(member.getId())
                 .profileImg(basicProfile.getProfileImage())
                 .build();
     }
@@ -430,5 +431,9 @@ public class MemberServiceImpl implements MemberService {
                 .message("사용자 정보가 일치합니다")
                 .build();
 
+    }
+    @Override
+    public Member findMemberByNicknameOrElseThrowApplicationException(String nickname) {
+        return memberRepository.findByNickname(nickname).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
     }
 }

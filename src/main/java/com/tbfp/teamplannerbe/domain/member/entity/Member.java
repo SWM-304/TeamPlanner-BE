@@ -1,9 +1,9 @@
 package com.tbfp.teamplannerbe.domain.member.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tbfp.teamplannerbe.domain.auth.MemberRole;
 import com.tbfp.teamplannerbe.domain.auth.ProviderType;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
+import com.tbfp.teamplannerbe.domain.chat.entity.ChatRoomMember;
 import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
 import com.tbfp.teamplannerbe.domain.common.base.BaseTimeEntity;
 import com.tbfp.teamplannerbe.domain.profile.entity.BasicProfile;
@@ -65,6 +65,9 @@ public class Member extends BaseTimeEntity {
     @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
     @JoinColumn(name = "BASIC_PROFILE_ID")
     private BasicProfile basicProfile;
+
+    @OneToMany(mappedBy = "member")
+    private List<ChatRoomMember> chatRoomMemberList = new ArrayList<>();
 
 //    public void addBasicProfile(BasicProfile basicProfile) {
 //        this.basicProfile = basicProfile;

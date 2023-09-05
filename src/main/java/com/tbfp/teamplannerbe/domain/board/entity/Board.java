@@ -89,6 +89,7 @@ public class Board extends BaseTimeEntity {
 
 
 
+
     public void overwrite(Board board) {
         this.activityName = board.activityName;
         this.activityUrl = board.activityUrl;

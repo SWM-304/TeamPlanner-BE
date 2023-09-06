@@ -1,12 +1,9 @@
 package com.tbfp.teamplannerbe.domain.chat.service.impl;
 
 import com.tbfp.teamplannerbe.config.redis.util.ChattingRedisUtil;
-import com.tbfp.teamplannerbe.domain.chat.dto.response.ChattingResponse;
-import com.tbfp.teamplannerbe.domain.chat.dto.response.ChattingRoomDetailResponse;
-import com.tbfp.teamplannerbe.domain.chat.dto.response.MemberResponse;
+import com.tbfp.teamplannerbe.domain.chat.dto.response.*;
 import com.tbfp.teamplannerbe.domain.chat.entity.ChatMessage;
 import com.tbfp.teamplannerbe.domain.chat.entity.ChatRoomMember;
-import com.tbfp.teamplannerbe.domain.chat.dto.response.ChatRoomResponseDto;
 import com.tbfp.teamplannerbe.domain.chat.entity.ChatRoom;
 import com.tbfp.teamplannerbe.domain.chat.repository.ChatRoomMemberRepository;
 import com.tbfp.teamplannerbe.domain.chat.repository.ChatRoomRepository;
@@ -119,13 +116,12 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         log.info("nickname = " + nickname);
         log.info("targetNickname = " + targetNickname);
         Member member = memberService.findMemberByNicknameOrElseThrowApplicationException(nickname);
-        log.info("member = " + member);
+        log.info("member = " + member.getNickname());
         Member targetMember = memberService.findMemberByNicknameOrElseThrowApplicationException(targetNickname);
-        log.info("targetMember = " + targetMember);
+        log.info("targetMember = " + targetMember.getNickname());
 
         // 자기자신과 target이 같을 수 없다.
         if (member == targetMember) throw new ApplicationException(ApplicationErrorType.BAD_REQUEST);
-
         // 이미 존재하는 채팅방인지 확인
         boolean chatRoomExists = member.getChatRoomMemberList().stream()
                 .anyMatch(chatRoomMember -> {
@@ -161,6 +157,33 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         );
         redisMessageListener.enterChattingRoom(chatRoom.getId());
         return chatRoom.getId();
+    }
+
+    // 채팅 방이 존재하지는 여부
+    public ChattingRoomCheckResponseDto chatRoomCheck(String nickname, String targetNickname) {
+
+
+        Member member = memberService.findMemberByNicknameOrElseThrowApplicationException(nickname);
+        log.info("member = " + member.getNickname());
+        Member targetMember = memberService.findMemberByNicknameOrElseThrowApplicationException(targetNickname);
+        log.info("targetMember = " + targetMember.getNickname());
+
+        if (member == targetMember) throw new ApplicationException(ApplicationErrorType.BAD_REQUEST);
+        // 이미 존재하는 채팅방인지 확인
+        boolean chatRoomExists = member.getChatRoomMemberList().stream()
+                .anyMatch(chatRoomMember -> {
+                    ChatRoom chatRoom = chatRoomMember.getChatRoom();
+                    List<ChatRoomMember> chatRoomMemberList = chatRoom.getChatRoomMemberList();
+                    return chatRoomMemberList.size() == 2
+                            && chatRoomMemberList.stream().allMatch(
+                            crm -> crm.getMember().equals(member) || crm.getMember().equals(targetMember)
+                    );
+                });
+
+        // false 시 이미 존재하는 채팅 방
+        return ChattingRoomCheckResponseDto.builder()
+                .roomCheck(!chatRoomExists)
+                .build();
     }
 
 
@@ -201,6 +224,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private String toCreatedDate(LocalDateTime createdAt) {
         return createdAt.getHour() + TIME_DELIMITER + createdAt.getMinute();
     }
+
 
     //채팅방 불러오기
 //    public List<ChatRoom> findAllRoom() {

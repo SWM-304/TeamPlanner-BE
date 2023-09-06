@@ -37,6 +37,12 @@ public class ChatRoomController {
                 chatRoomService.getRoomList(memberDetails.getNickname())
         );
     }
+    @GetMapping("/room-check/{targetnickname}")
+    public ResponseEntity isRoomCheck(@PathVariable String targetnickname,@AuthenticationPrincipal MemberDetails memberDetails){
+        return ResponseEntity.ok(
+                chatRoomService.chatRoomCheck(memberDetails.getNickname(),targetnickname));
+
+    }
 
     /**
      * 채팅방을 새로 생성해주는곳!

@@ -1,0 +1,3 @@
+ALTER TABLE board
+    MODIFY homepage MEDIUMTEXT;
+

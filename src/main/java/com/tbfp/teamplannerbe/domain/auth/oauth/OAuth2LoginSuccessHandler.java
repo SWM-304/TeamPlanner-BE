@@ -58,6 +58,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             referer = "http://localhost:3000/";
         }
         currentDomain = referer;
+
         return currentDomain;
     }
 
@@ -84,6 +85,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 //                                    .build()
 //                    )
 //            );
+            System.out.println("domain test=>"+domain);
             response.sendRedirect(domain+"oauth2/redirect?accessToken=" + accessToken + "&refreshToken=" + refreshToken);
         } catch (IOException e) {
             throw new RuntimeException(e);

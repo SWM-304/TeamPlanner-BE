@@ -18,10 +18,4 @@ public enum Job {
     NONE("무직"),
     UNKNOWN("해당 없음");;
     private final String label;
-
-    @JsonValue
-    public String getLabel(){
-        return label;
-    }
-
 }

@@ -3,6 +3,7 @@ os: linux
 files:
   - source: /
     destination: /home/ubuntu/cityweb
+    overwrite: yes
 hooks:
   BeforeInstall:
     - location: scripts/setup_docker.sh

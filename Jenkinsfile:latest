@@ -10,7 +10,7 @@ pipeline {
 
         //github
         TARGET_BRANCH = 'develop'
-        REPOSITORY_URL= 'https://github.com/SWM-304/TeamPlanner-BE-CICD.git'
+        REPOSITORY_URL= 'https://github.com/SWM-304/TeamPlanner-BE.git'
 
         //docker-hub
         registryCredential = 'docker-hub'
@@ -49,7 +49,7 @@ pipeline {
                 echo 'Cloning Repository'
                 git branch: 'develop',
                     credentialsId: 'repo-and-hook-access-token-credentials',
-                    url: 'https://github.com/SWM-304/TeamPlanner-BE-CICD.git'
+                    url: 'https://github.com/SWM-304/TeamPlanner-BE.git'
             }
             post {
                 success {

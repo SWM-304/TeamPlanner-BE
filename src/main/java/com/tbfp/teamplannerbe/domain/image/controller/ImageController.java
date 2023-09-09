@@ -35,6 +35,17 @@ public class ImageController {
         return ResponseEntity.ok(imageService.getPreSignedUrl(principal.getName(),extension));
     }
 
+    @GetMapping("/new-pre-signed-url")
+    @Operation(summary = "회원 가입시 첫 preSigned url 발급", description = "이미지를 업로드 할 pre-signed url을 발급한다. extension:이미지 확장자명 ")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
+    })
+    public ResponseEntity<ImageResponseDto.GetPreSignedUrlResponseDto> getNewPreSignedUrl(@RequestParam String name, @RequestParam String extension){
+        return ResponseEntity.ok(imageService.getPreSignedUrl(name,extension));
+    }
+
     @DeleteMapping("/image")
     @Operation(summary = "image를 삭제한다", description = "filename의 이름을 가지는 이미지를 삭제한다. ")
     @ApiResponses({

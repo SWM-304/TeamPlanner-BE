@@ -15,6 +15,3 @@ if docker images | awk '{print $1}' | grep -q "^$image_name\$"; then
 else
     echo "Docker 이미지 '$image_name'는 이미 존재하지 않습니다."
 fi
-
-sleep 0.5
-sudo docker pull 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:latest

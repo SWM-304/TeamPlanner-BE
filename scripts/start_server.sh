@@ -4,7 +4,8 @@ homefolder="/home/ubuntu"
 basefolder="${homefolder}/cityweb"
 NOW="$(date +'%Y%m%d')_$(date +'%H%M%S')"
 LOGFILE=${homefolder}/start_$NOW.log
-cd ${basefolder}
+aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com
+sleep 5
 sudo docker-compose up -d
 cd ${homefolder}
 sudo ls -al > $LOGFILE

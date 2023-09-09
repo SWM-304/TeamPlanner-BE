@@ -1,9 +1,7 @@
 package com.tbfp.teamplannerbe.config.redis;
 
 import com.tbfp.teamplannerbe.domain.chat.service.RedisSubscriber;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -18,8 +16,8 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
-@Profile("prod")
-public class RedisConfig {
+@Profile("local")
+public class LocalRedisConfig {
 
     private static final String TOPIC_NAME = "topic";
 
@@ -28,9 +26,6 @@ public class RedisConfig {
 
     @Value("${spring.redis.port}")
     private int port;
-
-    @Value("${spring.redis.password}")
-    private String redisPassword;
 
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {
@@ -56,7 +51,7 @@ public class RedisConfig {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(host);
         redisStandaloneConfiguration.setPort(port);
-        redisStandaloneConfiguration.setPassword(redisPassword);
+//        redisStandaloneConfiguration.setPassword(redisPassword);
         return new LettuceConnectionFactory(redisStandaloneConfiguration);
     }
 

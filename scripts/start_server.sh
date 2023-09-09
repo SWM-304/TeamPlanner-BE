@@ -4,6 +4,7 @@ homefolder="/home/ubuntu"
 basefolder="${homefolder}/cityweb"
 NOW="$(date +'%Y%m%d')_$(date +'%H%M%S')"
 LOGFILE=${homefolder}/start_$NOW.log
+cd ${homefolder}
 sudo docker-compose up -d
 cd ${homefolder}
 sudo ls -al > $LOGFILE

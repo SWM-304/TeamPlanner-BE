@@ -37,8 +37,6 @@ public class Member extends BaseTimeEntity {
 
     private String email;
 
-    private String phone;
-
     private Boolean state;
 
     @Enumerated(EnumType.STRING)

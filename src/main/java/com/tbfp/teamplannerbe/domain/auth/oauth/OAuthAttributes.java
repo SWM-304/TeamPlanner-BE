@@ -75,7 +75,6 @@ public class OAuthAttributes {
                 .username(providerType.name() + "-" + UUID.randomUUID())
                 .state(true)
                 .password("" + UUID.randomUUID())
-                .phone("")
                 .nickname(providerType.name() + "-" + UUID.randomUUID())
 //                .nickname(oauth2MemberInfo.getNickname())
 //                .imageUrl(oauth2MemberInfo.getImageUrl())

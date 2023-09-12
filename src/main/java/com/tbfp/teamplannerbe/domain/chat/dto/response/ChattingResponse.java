@@ -13,4 +13,5 @@ public class ChattingResponse {
     private String content;
     private String createdDate;
     private String createdTime;
+    private Integer readCount;
 }

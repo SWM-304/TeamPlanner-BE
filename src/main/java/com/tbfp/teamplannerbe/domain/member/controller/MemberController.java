@@ -55,12 +55,8 @@ public class MemberController {
 
         // token body comment
         return ResponseEntity.ok(MemberResponseDto.MemberRenewAccessTokenResponseDto.builder()
-                                                                .accessToken(
-                                                                        accessToken
-        ).build()
+                .accessToken(accessToken).build()
         );
-
-//        return ResponseEntity.ok("");
     }
 
     @PostMapping("/signup")

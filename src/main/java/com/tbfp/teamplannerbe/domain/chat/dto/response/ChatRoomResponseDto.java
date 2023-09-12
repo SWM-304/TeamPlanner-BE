@@ -16,20 +16,15 @@ public class ChatRoomResponseDto {
         private List<Map<String, String>> memberList; // List<Map>으로 변경
         private String lastMessageText;
         private String lastMessageTime;
+        private Integer readCount;
 
-//        public static ChatRoomListDto toDto(ChatRoomMember chatRoomMember) {
-//            return builder()
-//                    .roomId(chatRoomMember.getChatRoom().getId())
-//                    .memberList(chatRoomMember.getChatRoom().getChatRoomMemberList().stream().map(crm -> {return crm.getMember().getNickname();}).collect(Collectors.toList()))
-//                    .build();
-//        }
-//
         @Builder
-        public ChatRoomListDto(Long roomId, List<Map<String, String>> memberList, String lastMessageText, String lastMessageTime) {
+        public ChatRoomListDto(Long roomId, List<Map<String, String>> memberList, String lastMessageText, String lastMessageTime,Integer readCount) {
             this.roomId = roomId;
             this.memberList = memberList;
             this.lastMessageText = lastMessageText;
             this.lastMessageTime = lastMessageTime;
+            this.readCount=readCount;
         }
     }
 }

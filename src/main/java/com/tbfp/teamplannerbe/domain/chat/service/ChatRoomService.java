@@ -13,5 +13,6 @@ public interface ChatRoomService {
 
     ChattingRoomCheckResponseDto chatRoomCheck(String nickname,String targetNickname);
 
+    void readCountDecrease(String chatId);
 
 }

@@ -54,6 +54,10 @@ public class ChatRoomController {
                 chatRoomService.createRoom(memberDetails.getNickname(), createRoomDto.getTargetNickname())
         );
     }
+    @GetMapping("/{chatId}")
+    public void checkSubscribeThenReadCountDecrease(@PathVariable String chatId) {
+        chatRoomService.readCountDecrease(chatId);
+    }
 
 //    /**
 //     *

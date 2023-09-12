@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.SignatureException;
 import java.util.Date;
 
 @Component
@@ -17,7 +18,7 @@ public class JwtProvider {
     private String SECRET_KEY;
 
     public final long ACCESS_TOKEN_EXPIRATION_TIME = 1000L * 60 * 30; // 30 min
-//    public final long ACCESS_TOKEN_EXPIRATION_TIME = 1000L * 5; // 5 sec
+
     public final long REFRESH_TOKEN_EXPIRATION_TIME = 1000L * 60 * 60 * 24 * 14; // 14 week
 //    public final long REFRESH_TOKEN_EXPIRATION_TIME = 1000L * 20; // 20 sec
 

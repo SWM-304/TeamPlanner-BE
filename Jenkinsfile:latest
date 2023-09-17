@@ -10,7 +10,7 @@ pipeline {
 
         //github
         TARGET_BRANCH = 'develop'
-        REPOSITORY_URL= 'https://github.com/SWM-304/TeamPlanner-BE-CICD.git'
+        REPOSITORY_URL= 'https://github.com/SWM-304/TeamPlanner-BE.git'
 
         //docker-hub
         registryCredential = 'docker-hub'
@@ -49,7 +49,7 @@ pipeline {
                 echo 'Cloning Repository'
                 git branch: 'develop',
                     credentialsId: 'repo-and-hook-access-token-credentials',
-                    url: 'https://github.com/SWM-304/TeamPlanner-BE-CICD.git'
+                    url: 'https://github.com/SWM-304/TeamPlanner-BE.git'
             }
             post {
                 success {
@@ -141,7 +141,7 @@ pipeline {
         sh'''
             cd /var/jenkins_home/workspace/teamPlannerBackEnd_jenkinsFile
 
-            aws deploy create-deployment --application-name teamplanner-webapp --s3-location "bucket=teamplanner-codeploy-bucket,key=teamplanner-backend.zip,bundleType=zip" --deployment-group-name teamplanner-backend-deploy-group --deployment-config-name CodeDeployDefault.OneAtATime --description "Deploy Init for teamplanner-backend-deploy-group"
+            aws deploy create-deployment --application-name teamplanner-webapp --s3-location "bucket=teamplanner-codeploy-bucket,key=teamplanner-backend.zip,bundleType=zip" --deployment-group-name teamplanner-backend-deploy --deployment-config-name CodeDeployDefault.OneAtATime --description "Deploy Init for teamplanner-backend-deploy-group"
         '''
     }
 }

@@ -5,10 +5,11 @@ import com.tbfp.teamplannerbe.domain.chat.dto.response.*;
 import com.tbfp.teamplannerbe.domain.chat.entity.ChatMessage;
 import com.tbfp.teamplannerbe.domain.chat.entity.ChatRoomMember;
 import com.tbfp.teamplannerbe.domain.chat.entity.ChatRoom;
+import com.tbfp.teamplannerbe.domain.chat.repository.ChatRepository;
 import com.tbfp.teamplannerbe.domain.chat.repository.ChatRoomMemberRepository;
 import com.tbfp.teamplannerbe.domain.chat.repository.ChatRoomRepository;
 import com.tbfp.teamplannerbe.domain.chat.service.ChatRoomService;
-import com.tbfp.teamplannerbe.domain.chat.service.RedisMessageListener;
+import com.tbfp.teamplannerbe.domain.chat.service.pobsub.RedisMessageListener;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
@@ -21,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -29,7 +29,6 @@ import java.util.stream.Stream;
 @Transactional(readOnly = true)
 public class ChatRoomServiceImpl implements ChatRoomService {
 
-    private static final String CHATTING_ROOM_KEY_HEADER = "CHATTING_ROOM:";
     private static final String dot = ".";
     private static final String TIME_DELIMITER = ":";
 
@@ -39,6 +38,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private final MemberService memberService;
     private final RedisMessageListener redisMessageListener;
     private final ChattingRedisUtil redisConnector;
+    private final ChatRepository chatRepository;
 
 
     /**
@@ -50,14 +50,9 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 //        redisMessageListener.enterChattingRoom(chattingRoomId);
         Member member = memberService.findMemberByNicknameOrElseThrowApplicationException(nickname);
         List<ChatRoomMember> chatRoomMemberList = member.getChatRoomMemberList();
-
-
-
-
-
         List<ChatRoomResponseDto.ChatRoomListDto> resultList = chatRoomMemberList.stream()
                 .flatMap(crm ->
-                        redisConnector.getMessages(CHATTING_ROOM_KEY_HEADER + crm.getChatRoom().getId()).stream()) // 모든 채팅 메시지를 하나의 스트림으로 펼칩니다.
+                        chatRepository.readRoomWithChatMessageList(crm.getChatRoom().getId()).stream()) // 모든 채팅 메시지를 하나의 스트림으로 펼칩니다.
                 .collect(Collectors.groupingBy(
                         message -> message.getRoomId(),
                         Collectors.collectingAndThen(
@@ -77,7 +72,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                                                     .collect(Collectors.toList()))
                                             .lastMessageTime(toCreatedTime(message.getCreatedAt()))
                                             .lastMessageText(message.getMessage())
-
+                                            .readCount(message.getReadCount())
                                             .build();
                                     return result;
                                 }).orElse(null)
@@ -101,7 +96,29 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
 
     public ChattingRoomDetailResponse getMyRoom(String nickname, Long chattingRoomId) {
-        log.info("내 방에 들어와서 채팅을 작성하게 되면 실제 토픽을 생성해주는 곳");
+        log.info("선택한 채팅방 정보를 보여주는 서비스 로직");
+
+
+        Member member = memberService.findMemberByNicknameOrElseThrowApplicationException(nickname);
+//         채팅방번호로 채팅방에 있는 MemberList 를 전부 가져옴
+        List<ChatMessage> chatMessages = chatRepository.readRoomWithChatMessageList(chattingRoomId);
+//
+//        chatMessages.stream().map(chatMember -> !chatMember.getSenderId().equals(member.getId()) && chatMember.getReadCount() > 0)
+
+
+        // 내가 아닌 상대방이 해당 채팅방에 들어와 채팅을 확인하게 되면 ReadCount-=1
+
+        List<ChatMessage> updateChatReadCount = chatMessages.stream()
+                .filter(chatMember -> !Objects.equals(chatMember.getSenderId(), member.getId()) && chatMember.getReadCount() > 0)
+                .map(chatMember -> {
+                    chatMember.decreaseReadCount();
+                    return chatMember;
+                })
+                .collect(Collectors.toList());
+
+
+        chatRepository.saveAllChatMessage(updateChatReadCount);
+
         redisMessageListener.enterChattingRoom(chattingRoomId);
         ChatRoom chattingRoom = getChattingRoomById(chattingRoomId);
         return ChattingRoomDetailResponse.builder()
@@ -186,6 +203,16 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .build();
     }
 
+    @Transactional
+    public void readCountDecrease(String chatId) {
+        ChatMessage chat = chatRepository.findAllChatMessageListByChatId(chatId);
+
+        if(chat.getReadCount()>0){
+            chat.decreaseReadCount();
+            chatRepository.saveChatMessage(chat);
+        }
+    }
+
 
     private ChatRoom getChattingRoomById(Long chattingRoomId) {
         log.info("해당하는 챗 id 가져오는 곳");
@@ -195,7 +222,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private List<ChattingResponse> getChattingResponses(Long chattingRoomId) {
         log.info("redis 토픽안에 담긴 메세지를 가져오는 곳");
 
-        return redisConnector.getMessages(CHATTING_ROOM_KEY_HEADER + chattingRoomId)
+
+        return chatRepository.readRoomWithChatMessageList(chattingRoomId)
                 .stream()
                 .sorted(Comparator.comparing(ChatMessage::getCreatedAt))
                 .map(message -> ChattingResponse.builder()
@@ -204,6 +232,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                         .createdDate(toCreatedDate(message.getCreatedAt()))
                         .createdTime(toCreatedTime(message.getCreatedAt()))
                         .chatId(message.getId())
+                        .readCount(message.getReadCount())
                         .build())
                 .collect(Collectors.toList());
     }
@@ -224,6 +253,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private String toCreatedDate(LocalDateTime createdAt) {
         return createdAt.getHour() + TIME_DELIMITER + createdAt.getMinute();
     }
+
+
 
 
     //채팅방 불러오기

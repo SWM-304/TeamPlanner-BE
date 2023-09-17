@@ -1,4 +1,4 @@
-package com.tbfp.teamplannerbe.domain.chat.service;
+package com.tbfp.teamplannerbe.domain.chat.service.pobsub;
 
 import com.tbfp.teamplannerbe.domain.chat.dto.request.ChatRoomRequestDto.ChattingReqeust;
 import com.tbfp.teamplannerbe.domain.common.util.JsonParser;
@@ -18,7 +18,6 @@ public class RedisPublisher {
 
     public void publish(ChannelTopic topic, ChattingReqeust chattingRequest) {
         log.info("퍼블리시 하는 곳");
-
         redisTemplate.convertAndSend(topic.getTopic(), jsonParser.toJson(chattingRequest));
     }
 }

@@ -27,6 +27,8 @@ public class ChatRoomRequestDto {
         private String content;
         private String createdDate;
         private String createdTime;
+        private Integer readCount;
+        private String id;
 
         public ChatMessage toChatting() {
             return ChatMessage.builder()
@@ -35,6 +37,7 @@ public class ChatRoomRequestDto {
                     .message(content)
                     .roomId(chattingRoomId)
                     .createdAt(LocalDateTime.now())
+                    .readCount(readCount)
                     .build();
         }
     }

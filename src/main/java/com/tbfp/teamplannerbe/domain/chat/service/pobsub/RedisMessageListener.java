@@ -1,4 +1,4 @@
-package com.tbfp.teamplannerbe.domain.chat.service;
+package com.tbfp.teamplannerbe.domain.chat.service.pobsub;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

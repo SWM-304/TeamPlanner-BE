@@ -129,6 +129,7 @@ dependencies {
     // queryDsl
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     implementation 'org.jetbrains:annotations:24.0.0'
+    implementation 'org.jetbrains:annotations:24.0.0'
     annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
 
 
@@ -166,6 +167,9 @@ dependencies {
 
     // redisson
     implementation 'org.redisson:redisson-spring-boot-starter:3.17.7'
+
+    //dynamodb
+    implementation 'io.github.boostchicken:spring-data-dynamodb:5.2.3'
 
 
     //javamail

@@ -73,6 +73,7 @@ spring:
   redis:
     host: ${SPRING_REDIS_HOST}
     port: ${SPRING_REDIS_PORT}
+    password: ${SPRING_REDIS_PASSWORD}
 
   flyway:
     enabled: true
@@ -98,6 +99,7 @@ springdoc:
   
 amazon:
   aws:
+    endpoint: dynamodb.ap-northeast-2.amazonaws.com
     accessKey: ENC(2c1CtG+taOT9pHnmFuoSHmeL12IrZLyQq6jgNbUFicI=)
     secretKey: ENC(o2AZZVhzY12A7m7Vk8ZorqVENHq1OJO36xmTQk4MZAz0vHbsOwPIiLFpFFikkQdKntNxEE2Bxb0=)
     region: ENC(gGm9/hJVzdCVEEmIdsfDPAnanlIsxaJl)
@@ -106,7 +108,7 @@ amazon:
 permitUrls:
   get: /api/v1/board/**, /api/v1/recruitment/**, /api/v1/member/signup/**/, /api/v1/image/new-pre-signed-url, /api/v1/profile/techStacks
   post: /api/v1/member/signup/**, /api/v1/member/forgot-username, /api/v1/member/forgot-password,/api/v1/member/email-verify,/api/v1/member/idEmail-verify
-  all: /, /api/v1/member/login, /api/v1/member/renew-access-token, /swagger-ui.html, /swagger-ui/**, /v3/api-docs/**, /api/v1/board,/ws/chat/**
+  all: /, /api/1/member/login, /api/v1/member/renew-access-token, /swagger-ui.html, /swagger-ui/**, /v3/api-docs/**, /api/v1/board ,/ws/chat/**
   delete:
   put:
   patch:

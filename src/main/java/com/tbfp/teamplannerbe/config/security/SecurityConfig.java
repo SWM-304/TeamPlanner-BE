@@ -115,6 +115,7 @@ public class SecurityConfig {
 //                .antMatchers(HttpMethod.GET, "/api/v1/board/**","/api/v1/recruitment/**","/api/v1/member/signup/**").permitAll()
 //                .antMatchers(HttpMethod.POST, "/api/v1/signup/**","/api/v1/forgot-username","/api/v1/forgot-password").permitAll()
                 .antMatchers(HttpMethod.POST, permitUrls.get(HttpMethod.POST)).permitAll()
+                .antMatchers("/chat/**").hasRole("MEMBER")
                 .anyRequest().authenticated()
                 .and()
                 .oauth2Login()

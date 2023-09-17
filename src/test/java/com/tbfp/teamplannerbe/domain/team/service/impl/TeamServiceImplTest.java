@@ -38,6 +38,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -336,6 +337,8 @@ class TeamServiceImplTest {
         createdTeamResponseDto result = teamService.createTeam("test0", createTeamDto);
 
 
+        Optional<Member> member1 = memberService.findMemberByUsername("test0");
+        System.out.println("여기 닷"+member1.get().getPassword()+member1.get().getBasicProfile());
 
         List<TeamResponseDto.GetMyTeamResponseDto> getMyTeamResponseDtos = teamService.getMyTeam("test0");
         //Assertion
@@ -353,7 +356,6 @@ class TeamServiceImplTest {
             // 팀 멤버 리스트가 기대하는 멤버 리스트와 동일한지 확인
             List<MemberResponseDto.MemberInfoDto> expectedMemberInfos = member.stream().map(MemberResponseDto.MemberInfoDto::toDto).collect(Collectors.toList());
             List<MemberResponseDto.MemberInfoDto> actualMemberInfos = team.getMemberInfos();
-            System.out.println(actualMemberInfos);
             Assert.assertEquals(expectedMemberInfos,actualMemberInfos);
         }
 
@@ -391,6 +393,7 @@ class TeamServiceImplTest {
     public void 셋업멤버() {
 
         for(int i=0;i<3;i++) {
+
             memberService.registerMember(MemberRequestDto.SignUpRequestDto.builder()
                     .username("test"+i)
                     .password("1234")

@@ -1,7 +1,9 @@
 package com.tbfp.teamplannerbe.domain.member;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 @Getter

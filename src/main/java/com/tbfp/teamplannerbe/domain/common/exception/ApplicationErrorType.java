@@ -88,7 +88,12 @@ public enum ApplicationErrorType {
     TEAM_CAPACITY_EXCEEDED(HttpStatus.BAD_REQUEST, -62000, "팀 최대인원 수를 초과하였습니다."),
     ALREADY_TEAM_ACCEPT(HttpStatus.BAD_REQUEST,-62001,"이미 승인된 사람이 포함되어 있습니다"),
     AUTHOR_CANNOT_PARTICIPATE(HttpStatus.BAD_REQUEST,-62002,"작성자는 참여신청을 할 수 없습니다"),
-    TEAM_NOT_FOUND(HttpStatus.BAD_REQUEST,-62003,"팀을 찾을 수 없습니다");
+    TEAM_NOT_FOUND(HttpStatus.BAD_REQUEST,-62003,"팀을 찾을 수 없습니다"),
+
+    //채팅
+    CHAT_NOT_FOUND(HttpStatus.BAD_REQUEST,-62004,"채팅을 찾을 수 없습니다");
+
+    ;
 
 
     private final HttpStatus httpStatus;

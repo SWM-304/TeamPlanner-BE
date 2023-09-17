@@ -104,7 +104,7 @@ amazon:
     bucket: ENC(DY8KvVk0IQLZUQvhbosqcCuw9yOzwVd5ouVEybAZtFk=)
 
 permitUrls:
-  get: /api/v1/board/**, /api/v1/recruitment/**, /api/v1/member/signup/**/, /api/v1/image/new-pre-signed-url
+  get: /api/v1/board/**, /api/v1/recruitment/**, /api/v1/member/signup/**/, /api/v1/image/new-pre-signed-url, /api/v1/profile/techStacks
   post: /api/v1/member/signup/**, /api/v1/member/forgot-username, /api/v1/member/forgot-password,/api/v1/member/email-verify,/api/v1/member/idEmail-verify
   all: /, /api/v1/member/login, /api/v1/member/renew-access-token, /swagger-ui.html, /swagger-ui/**, /v3/api-docs/**, /api/v1/board,/ws/chat/**
   delete:

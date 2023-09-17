@@ -80,5 +80,16 @@ public class ProfileController {
         profileService.deleteProfile(principal.getName());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    @GetMapping("/techStacks")
+    @Operation(summary = "기술스택 목록", description = "기술스택 목록을 반환한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
+    })
+    public ResponseEntity<?> getTechStackItems(){
+        return ResponseEntity.ok(profileService.getTechStackItems());
+    }
 }
 

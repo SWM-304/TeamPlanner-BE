@@ -50,6 +50,7 @@ public class Board extends BaseTimeEntity {
 
     private String meetingTime; // 모임시간
 
+    @Column(columnDefinition = "MEDIUMTEXT")
     private String homepage; // 주최 url 주소
 
     private String activityBenefits; // 활동혜택

@@ -68,17 +68,13 @@ public class ProfileRequestDto {
     @AllArgsConstructor
     public static class TechStackRequestDto{
         private Long id;
-        private Integer experiencedYear;
-        private Integer experiencedMonth;
-        private SkillLevel skillLevel;
+        private Integer skillLevel;
         private TechStackItem techStackItem;
         private CRUDType crudType;
 
         public TechStack toEntity(Member member){
             return TechStack.builder()
                     .id(id)
-                    .experiencedYear(experiencedYear)
-                    .experiencedMonth(experiencedMonth)
                     .skillLevel(skillLevel)
                     .techStackItem(techStackItem)
                     .member(member)

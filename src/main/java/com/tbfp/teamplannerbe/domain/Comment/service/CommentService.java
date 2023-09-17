@@ -18,7 +18,7 @@ public interface CommentService {
 
     UpdatedCommentResponseDto updateComment(UpdateCommentRequestDto updateCommentRequestDto);
 
-    CreatedchildCommentResponseDto sendBigComment(CommentToCommentCreateRequestDto commentToCommentCreateRequestDto, String username);
+    CreatedchildCommentResponseDto sendCommentToComment(CommentToCommentCreateRequestDto commentToCommentCreateRequestDto, String username);
 
     List<commentToCommentListResponseDto> getCommentToCommentList(Long boardId, Long commentId);
 }

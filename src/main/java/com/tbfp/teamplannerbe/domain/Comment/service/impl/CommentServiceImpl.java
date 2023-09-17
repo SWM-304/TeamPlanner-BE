@@ -69,7 +69,9 @@ public class CommentServiceImpl implements CommentService {
                 .member(member)
                 .isConfidential(createCommentRequestDto.getIsConfidential())
                 .build();
+
         Comment savedComment = commentRepository.save(comment);
+
         CreatedCommentResponseDto commentResponseDto = savedComment.toDto();
         return commentResponseDto;
     }
@@ -83,29 +85,11 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public void deleteComment(Long boardId, Long commentId) {
-        Board board = boardRepository.findById(boardId)
+        boardRepository.findById(boardId)
                 .orElseThrow(() -> new ApplicationException(BOARD_NOT_FOUND));
 
         Comment findComment=commentRepository.findById(commentId).
                 orElseThrow(()->new ApplicationException(COMMENT_NOT_FOUND));
-
-
-//        // 공고글 하고 Comment 둘다 있고 부모댓글이라면 삭제가능
-//        if (findComment.get().getDepth()==1 && findBoard!=null && findComment!=null){
-////            deleteId = commentRepository.deleteComment(commentId);
-//
-//            // 부모댓글 state 값 false
-//            findComment.get().setState(false);
-//            // 자식댓글은 queryDsl bulkUpdate를 통해 한꺼번에 처리
-//            //주의사항 ** 데이터베이스에 직접 쿼리를 날리기때문에 영속성컨텍스트와 값이 달라질 수 있음 flush 및 clear 필수
-//            commentRepository.stateFalseComment(findComment.get().getId());
-//
-//            commentJpaRepository.save(findComment.get());
-//
-//            em.flush();
-//            em.clear();
-//        }
-        // 자식댓글일 경우 해결 댓글만 state 값 false
         if(findComment.isState()){
             findComment.changeState(false);
             commentRepository.save(findComment);
@@ -170,11 +154,7 @@ public class CommentServiceImpl implements CommentService {
     // 내가 그 댓글 볼 수 있어야함 ( 내가 쓴 댓글이거나 남이 썻는데 confidential 이 아님)
     // 또는 내가 모집글의 작성자임
     @Transactional
-    public CreatedchildCommentResponseDto sendBigComment(CommentToCommentCreateRequestDto commentToCommentCreateRequestDto, String username) {
-
-
-
-
+    public CreatedchildCommentResponseDto sendCommentToComment(CommentToCommentCreateRequestDto commentToCommentCreateRequestDto, String username) {
         Comment childComment=null;
         Member member = memberRepository.findMemberByUsername(username)
                 .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
@@ -183,34 +163,16 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new ApplicationException(BOARD_NOT_FOUND));
         Optional<Comment> findParentComment = commentRepository.findById(commentToCommentCreateRequestDto.getParentCommentId());
 
-        // 비밀댓글이 아니여야하고
-
+        //비밀댓글이 아니여야하고
         //isAccessible 변수는 다음 조건 중 하나를 만족할 때 true로 설정
         //현재 사용자가 게시판을 작성한 사용자와 동일한 경우.
         //댓글이 비밀 댓글이 아닌 경우.
         //현재 사용자가 해당 댓글을 작성한 사용자와 동일한 경우.
-        if(board.getMember()==null){
-            boolean isAccessible=(!findParentComment.get().isConfidential() || findParentComment.get().getMember().getUsername().equals(username));
-            if (!isAccessible){
-                throw new ApplicationException(ApplicationErrorType.UNAUTHORIZED);
-            }
-        }
-        if(board.getMember()!=null){
-            boolean isAccessible = board.getMember().getUsername().equals(member.getUsername())
-                    || (!findParentComment.get().isConfidential() || findParentComment.get().getMember().getUsername().equals(username));
-            if (!isAccessible){
-                throw new ApplicationException(ApplicationErrorType.UNAUTHORIZED);
-            }
-        }
+        commentToCommentValidation(username, member, board, findParentComment);
 
         if (commentToCommentCreateRequestDto.getParentCommentId() != null) {
             Comment parentComment = commentRepository.findById(commentToCommentCreateRequestDto.getParentCommentId())
                     .orElseThrow(() -> new RuntimeException("부모 댓글을 찾을 수 없습니다"));
-
-
-
-
-
             childComment = Comment.builder()
                     .content(commentToCommentCreateRequestDto.getContent())
                     .state(true)
@@ -219,17 +181,9 @@ public class CommentServiceImpl implements CommentService {
                     .isConfidential(commentToCommentCreateRequestDto.getIsConfidential())
                     .build();
 
-//            if(parentComment.getId()!=childComment.getId()){
-//                parentComment.setParentComment(childComment);
-//            }
-
-//            System.out.println("=================");
-//            commentRepository.save(parentComment);  // 부모 댓글 저장
-//            System.out.println("=================");
             childComment.setParentComment(parentComment);
             //부모댓글 카운트 동기화
             parentComment.incrementchildCommentCount();
-
             commentRepository.save(childComment);  // 대댓글 저장
 
 
@@ -243,9 +197,23 @@ public class CommentServiceImpl implements CommentService {
                 .username(childComment.getMember().getUsername())
                 .isConfidential(String.valueOf(childComment.isConfidential()))
                 .build();
-
-
         return commentToComment;
+    }
+
+    private static void commentToCommentValidation(String username, Member member, Board board, Optional<Comment> findParentComment) {
+        if(board.getMember()==null){
+            boolean isAccessible=(!findParentComment.get().isConfidential() || findParentComment.get().getMember().getUsername().equals(username));
+            if (!isAccessible){
+                throw new ApplicationException(ApplicationErrorType.UNAUTHORIZED);
+            }
+        }
+        if(board.getMember()!=null){
+            boolean isAccessible = board.getMember().getUsername().equals(member.getUsername())
+                    || (!findParentComment.get().isConfidential() || findParentComment.get().getMember().getUsername().equals(username));
+            if (!isAccessible){
+                throw new ApplicationException(ApplicationErrorType.UNAUTHORIZED);
+            }
+        }
     }
 
     @Override

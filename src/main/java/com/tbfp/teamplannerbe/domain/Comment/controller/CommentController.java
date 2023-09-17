@@ -62,7 +62,7 @@ public class CommentController {
     @PostMapping("/{commentId}/comment")
     public ResponseEntity<?> createCommentToComment(@RequestBody CommentToCommentCreateRequestDto commentToCommentCreateRequestDto, Principal principal){
 
-        return ResponseEntity.status(HttpStatus.OK).body(commentService.sendBigComment(commentToCommentCreateRequestDto,principal.getName()));
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.sendCommentToComment(commentToCommentCreateRequestDto,principal.getName()));
     }
 
 

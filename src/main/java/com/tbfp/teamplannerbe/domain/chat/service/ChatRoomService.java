@@ -1,6 +1,7 @@
 package com.tbfp.teamplannerbe.domain.chat.service;
 
 import com.tbfp.teamplannerbe.domain.chat.dto.response.ChatRoomResponseDto;
+import com.tbfp.teamplannerbe.domain.chat.dto.response.ChattingReadCountResponseDto;
 import com.tbfp.teamplannerbe.domain.chat.dto.response.ChattingRoomCheckResponseDto;
 import com.tbfp.teamplannerbe.domain.chat.dto.response.ChattingRoomDetailResponse;
 
@@ -13,6 +14,6 @@ public interface ChatRoomService {
 
     ChattingRoomCheckResponseDto chatRoomCheck(String nickname,String targetNickname);
 
-    void readCountDecrease(String chatId);
+    ChattingReadCountResponseDto readCountDecrease(String chatId);
 
 }

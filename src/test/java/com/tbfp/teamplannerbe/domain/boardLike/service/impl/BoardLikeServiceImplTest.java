@@ -180,7 +180,6 @@ class BoardLikeServiceImplTest extends BaseControllerTest {
                 .username("test")
                 .password("1234")
                 .email("asdas@gmail.com")
-                .phone("010-0000-0000")
                 .profileIntro("나는 훌륭한 일꾼입니다")
                 .profileImage("dd.image")
                 .job(Job.valueOf("COLLEGE"))

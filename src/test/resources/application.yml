@@ -1,4 +1,7 @@
 spring:
+  redis:
+    host: localhost
+    port: 6379
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/testdb
@@ -53,9 +56,6 @@ spring:
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
   #  redis configuration
-  redis:
-    host: localhost
-    port: 6379
   flyway:
     enabled: true
     baseline-on-migrate: true
@@ -73,7 +73,24 @@ logging.level:
 jwt:
   secret_key: ENC(mmf+mUwEemm7lqzn7MyjYaYVlRpGN25Xpvmo4jQ4ctx7tNdCrjBXR2JdWIZjh6LAupCdrOSI44WtK+dUp4tym1fIiEfdYbNpNudokWdOtKf1JnRMMB8PasGfLDAPofA0uNViAU3SZeK0hd9oeTBo3P+LawaOOimGe4G7FZqQIA0x4B0IIkJx9WGN+O3zam1UZdtcTd4WA0Ojnal1JcjcwDRJ1XcmsDyGHVQ5LSWMN0PydTg0hCd4COYUz5ORRKAE2ytwgmhPF0A=)
 
+amazon:
+  aws:
+    endpoint: dynamodb.ap-northeast-2.amazonaws.com
+    accessKey: ENC(2c1CtG+taOT9pHnmFuoSHmeL12IrZLyQq6jgNbUFicI=)
+    secretKey: ENC(o2AZZVhzY12A7m7Vk8ZorqVENHq1OJO36xmTQk4MZAz0vHbsOwPIiLFpFFikkQdKntNxEE2Bxb0=)
+    region: ENC(gGm9/hJVzdCVEEmIdsfDPAnanlIsxaJl)
+    bucket: ENC(DY8KvVk0IQLZUQvhbosqcCuw9yOzwVd5ouVEybAZtFk=)
 
 springdoc:
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
+
+
+
+permitUrls:
+  get: /api/v1/board/**, /api/v1/recruitment/**, /api/v1/member/signup/**/, /api/v1/image/new-pre-signed-url
+  post: /api/v1/member/signup/**, /api/v1/member/forgot-username, /api/v1/member/forgot-password,/api/v1/member/email-verify,/api/v1/member/idEmail-verify
+  all: /, /api/v1/member/login, /api/v1/member/renew-access-token, /swagger-ui.html, /swagger-ui/**, /v3/api-docs/**, /api/v1/board,/ws/chat/**
+  delete:
+  put:
+  patch:

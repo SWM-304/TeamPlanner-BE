@@ -27,6 +27,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 @Slf4j
@@ -75,19 +77,43 @@ public class CrawlingTest {
      */
 
     public int maxNumberXml(){
-        int maxNumber = 0;
+        int maxActivityNum = -1;
         try {
-            Document doc = Jsoup.connect("https://linkareer.com/robots.txt").get();
+            Document doc = Jsoup.connect("https://linkareer.com/sitemap/sitemapindex.xml").get();
             String robotsTxt = doc.text();
             // Find the sitemap URLs
+            System.out.println(robotsTxt);
 
-            String[] split = robotsTxt.split("Sitemap:");
-            maxNumber=split.length-6;
+            String[] text = robotsTxt.split(" ");
+
+
+            String pattern = "https://linkareer.com/sitemap/activities/(\\d+)\\.xml";
+
+
+            for (String url : text) {
+                Matcher matcher = Pattern.compile(pattern).matcher(url);
+                if (matcher.find()) {
+                    int activityNum = Integer.parseInt(matcher.group(1));
+                    if (activityNum > maxActivityNum) {
+                        maxActivityNum = activityNum;
+                    }
+                }
+            }
+
+            if (maxActivityNum != -1) {
+                System.out.println("가장 큰 활동 번호: " + maxActivityNum);
+            } else {
+                System.out.println("활동 URL을 찾을 수 없습니다.");
+            }
+
+
+            
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println(maxNumber);
-        return maxNumber;
+
+        return maxActivityNum;
+
     }
 
     /**

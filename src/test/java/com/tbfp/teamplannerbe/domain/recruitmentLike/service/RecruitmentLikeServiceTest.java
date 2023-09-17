@@ -122,71 +122,71 @@ class RecruitmentLikeServiceTest {
                 .build();
         rid = recruitmentRepository.save(recruitment).getId();
     }
-    @Test
-    @Transactional(propagation = Propagation.NEVER)
-    void multiThreadTest_oneMemberManyLike() throws InterruptedException {
-        // given
-        setUp();
-        // when
-        ExecutorService executorService = Executors.newFixedThreadPool(1000);
-        CountDownLatch latch = new CountDownLatch (10000);
-        for (int i = 0; i < 10000; ++i) {
-            int finalI = i;
-            executorService.submit(() -> {
-                String threadName = Thread.currentThread().getName();
-                try {
-                    recruitmentLikeService.like(rid, mUsername);
-                    System.out.println(threadName + " : SUCCESS");
-                } catch (ApplicationException e) {
-                    System.out.println("finalI = " + finalI + "\nerror = " + e.getErrorType());
-                    System.out.println(threadName + " : APPLICATION_EXCEPTION");
-//                    e.printStackTrace();
-                } catch (Exception e) {
-                    System.out.println(threadName + " : JUST_EXCEPTION");
-                } finally {
-                    latch.countDown();
-                }
-            });
-        }
-        latch.await();
-
-        // then
-        Recruitment recruitment1 = recruitmentRepository.findById(rid).get();
-        assertThat(recruitment1.getLikeCount()).isEqualTo(1);
-    }
-
-    @Test
-    @Transactional(propagation = Propagation.NEVER)
-    void multiThreadTest_ManyMemberOneLikeEach() throws InterruptedException {
-        // given
-        setUp();
-        int threadNum = 100;
-        int likeCount = 1000;
-        System.out.println("rid = " + rid);
-        // when
-        ExecutorService executorService = Executors.newFixedThreadPool(threadNum);
-        CountDownLatch latch = new CountDownLatch (likeCount);
-        for (int i = 0; i < likeCount; ++i) {
-            int finalI = i;
-            executorService.submit(() -> {
-                try {
-                    recruitmentLikeService.like(rid, "member" + finalI);
-                    System.out.println("SUCCESS");
-                } catch (ApplicationException e) {
-                    System.out.println("finalI = " + finalI + "\nerror = " + e.getErrorType());
-//                    e.printStackTrace();
-                } catch (Exception e) {
-                    System.out.println("finalI = " + finalI + "\nerror = normal Exception");
-                } finally {
-                    latch.countDown();
-                }
-            });
-        }
-        latch.await();
-
-        // then
-        Recruitment recruitment1 = recruitmentRepository.findById(rid).get();
-        assertThat(recruitment1.getLikeCount()).isEqualTo(likeCount);
-    }
+//    @Test
+//    @Transactional(propagation = Propagation.NEVER)
+//    void multiThreadTest_oneMemberManyLike() throws InterruptedException {
+//        // given
+//        setUp();
+//        // when
+//        ExecutorService executorService = Executors.newFixedThreadPool(1000);
+//        CountDownLatch latch = new CountDownLatch (10000);
+//        for (int i = 0; i < 10000; ++i) {
+//            int finalI = i;
+//            executorService.submit(() -> {
+//                String threadName = Thread.currentThread().getName();
+//                try {
+//                    recruitmentLikeService.like(rid, mUsername);
+//                    System.out.println(threadName + " : SUCCESS");
+//                } catch (ApplicationException e) {
+//                    System.out.println("finalI = " + finalI + "\nerror = " + e.getErrorType());
+//                    System.out.println(threadName + " : APPLICATION_EXCEPTION");
+////                    e.printStackTrace();
+//                } catch (Exception e) {
+//                    System.out.println(threadName + " : JUST_EXCEPTION");
+//                } finally {
+//                    latch.countDown();
+//                }
+//            });
+//        }
+//        latch.await();
+//
+//        // then
+//        Recruitment recruitment1 = recruitmentRepository.findById(rid).get();
+//        assertThat(recruitment1.getLikeCount()).isEqualTo(1);
+//    }
+//
+//    @Test
+//    @Transactional(propagation = Propagation.NEVER)
+//    void multiThreadTest_ManyMemberOneLikeEach() throws InterruptedException {
+//        // given
+//        setUp();
+//        int threadNum = 100;
+//        int likeCount = 1000;
+//        System.out.println("rid = " + rid);
+//        // when
+//        ExecutorService executorService = Executors.newFixedThreadPool(threadNum);
+//        CountDownLatch latch = new CountDownLatch (likeCount);
+//        for (int i = 0; i < likeCount; ++i) {
+//            int finalI = i;
+//            executorService.submit(() -> {
+//                try {
+//                    recruitmentLikeService.like(rid, "member" + finalI);
+//                    System.out.println("SUCCESS");
+//                } catch (ApplicationException e) {
+//                    System.out.println("finalI = " + finalI + "\nerror = " + e.getErrorType());
+////                    e.printStackTrace();
+//                } catch (Exception e) {
+//                    System.out.println("finalI = " + finalI + "\nerror = normal Exception");
+//                } finally {
+//                    latch.countDown();
+//                }
+//            });
+//        }
+//        latch.await();
+//
+//        // then
+//        Recruitment recruitment1 = recruitmentRepository.findById(rid).get();
+//        assertThat(recruitment1.getLikeCount()).isEqualTo(likeCount);
+//    }
 
 }

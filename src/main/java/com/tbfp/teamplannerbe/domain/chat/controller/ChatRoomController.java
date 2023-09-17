@@ -55,8 +55,10 @@ public class ChatRoomController {
         );
     }
     @GetMapping("/{chatId}")
-    public void checkSubscribeThenReadCountDecrease(@PathVariable String chatId) {
-        chatRoomService.readCountDecrease(chatId);
+    public ResponseEntity checkSubscribeThenReadCountDecrease(@PathVariable String chatId) {
+        return ResponseEntity.ok(
+                chatRoomService.readCountDecrease(chatId)
+        );
     }
 
 //    /**

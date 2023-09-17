@@ -50,44 +50,24 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 //        redisMessageListener.enterChattingRoom(chattingRoomId);
         Member member = memberService.findMemberByNicknameOrElseThrowApplicationException(nickname);
         List<ChatRoomMember> chatRoomMemberList = member.getChatRoomMemberList();
-        List<ChatRoomResponseDto.ChatRoomListDto> resultList = chatRoomMemberList.stream()
-                .flatMap(crm ->
-                        chatRepository.readRoomWithChatMessageList(crm.getChatRoom().getId()).stream()) // 모든 채팅 메시지를 하나의 스트림으로 펼칩니다.
-                .collect(Collectors.groupingBy(
-                        message -> message.getRoomId(),
-                        Collectors.collectingAndThen(
-                                Collectors.maxBy(Comparator.comparing(ChatMessage::getCreatedAt)),
-                                maxMessage -> maxMessage.map(message -> {
-                                    ChatRoomResponseDto.ChatRoomListDto result = ChatRoomResponseDto.ChatRoomListDto.builder()
-                                            .roomId(message.getRoomId())
-                                            .memberList(chatRoomMemberList.stream()
-                                                    .flatMap(crm -> crm.getChatRoom().getChatRoomMemberList().stream()
-                                                            .filter(c->c.getChatRoom().getId().equals(message.getRoomId()))
-                                                            .map(c -> {
-                                                                Map<String, String> memberInfo = new HashMap<>();
-                                                                memberInfo.put("nickname", c.getMember().getNickname());
-                                                                memberInfo.put("profileImage", c.getMember().getBasicProfile().getProfileImage()); // 프로필 이미지 필드 추가
-                                                                return memberInfo;
-                                                            }))
-                                                    .collect(Collectors.toList()))
-                                            .lastMessageTime(toCreatedTime(message.getCreatedAt()))
-                                            .lastMessageText(message.getMessage())
-                                            .readCount(message.getReadCount())
-                                            .build();
-                                    return result;
-                                }).orElse(null)
-                        )
-                ))
-                .values()
-                .stream()
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+        Map<Long, ChatRoomResponseDto.ChatRoomListDto> roomMap = new HashMap<>();
 
-        return resultList;
+        chatRoomMemberList.forEach(chatRoomMember -> {
+            Long roomId = chatRoomMember.getChatRoom().getId();
+            List<ChatMessage> messages = chatRepository.readRoomWithChatMessageList(roomId);
+            if (!messages.isEmpty()) {
+                ChatMessage latestMessage = findLatestMessage(messages);
 
+                if (latestMessage != null) {
+                    List<Map<String, String>> memberInfoList = extractMemberInfoList(chatRoomMemberList, roomId);
 
-//        return chatRoomMemberList.stream().map(ChatRoomResponseDto.ChatRoomListDto::toDto).
-//                collect(Collectors.toList());
+                    ChatRoomResponseDto.ChatRoomListDto roomDto = createChatRoomListDto(roomId, memberInfoList, latestMessage);
+                    roomMap.put(roomId, roomDto);
+                }
+            }
+        });
+
+        return new ArrayList<>(roomMap.values());
     }
 
     /**
@@ -102,9 +82,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         Member member = memberService.findMemberByNicknameOrElseThrowApplicationException(nickname);
 //         채팅방번호로 채팅방에 있는 MemberList 를 전부 가져옴
         List<ChatMessage> chatMessages = chatRepository.readRoomWithChatMessageList(chattingRoomId);
-//
-//        chatMessages.stream().map(chatMember -> !chatMember.getSenderId().equals(member.getId()) && chatMember.getReadCount() > 0)
-
 
         // 내가 아닌 상대방이 해당 채팅방에 들어와 채팅을 확인하게 되면 ReadCount-=1
 
@@ -130,12 +107,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Transactional
     public Long createRoom(String nickname, String targetNickname) {
         log.info("ChatRoomService.createRoom");
-        log.info("nickname = " + nickname);
-        log.info("targetNickname = " + targetNickname);
         Member member = memberService.findMemberByNicknameOrElseThrowApplicationException(nickname);
-        log.info("member = " + member.getNickname());
         Member targetMember = memberService.findMemberByNicknameOrElseThrowApplicationException(targetNickname);
-        log.info("targetMember = " + targetMember.getNickname());
 
         // 자기자신과 target이 같을 수 없다.
         if (member == targetMember) throw new ApplicationException(ApplicationErrorType.BAD_REQUEST);
@@ -181,9 +154,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
 
         Member member = memberService.findMemberByNicknameOrElseThrowApplicationException(nickname);
-        log.info("member = " + member.getNickname());
         Member targetMember = memberService.findMemberByNicknameOrElseThrowApplicationException(targetNickname);
-        log.info("targetMember = " + targetMember.getNickname());
 
         if (member == targetMember) throw new ApplicationException(ApplicationErrorType.BAD_REQUEST);
         // 이미 존재하는 채팅방인지 확인
@@ -204,15 +175,47 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Transactional
-    public void readCountDecrease(String chatId) {
+    public ChattingReadCountResponseDto readCountDecrease(String chatId) {
         ChatMessage chat = chatRepository.findAllChatMessageListByChatId(chatId);
 
         if(chat.getReadCount()>0){
             chat.decreaseReadCount();
             chatRepository.saveChatMessage(chat);
         }
+        return ChattingReadCountResponseDto.builder()
+                .readCount(chat.getReadCount())
+                .build();
     }
 
+
+    private ChatMessage findLatestMessage(List<ChatMessage> messages) {
+        return messages.stream()
+                .max(Comparator.comparing(ChatMessage::getCreatedAt))
+                .orElse(null);
+    }
+
+    private List<Map<String, String>> extractMemberInfoList(List<ChatRoomMember> chatRoomMemberList, Long roomId) {
+        return chatRoomMemberList.stream()
+                .flatMap(crm -> crm.getChatRoom().getChatRoomMemberList().stream())
+                .filter(c -> c.getChatRoom().getId().equals(roomId))
+                .map(c -> {
+                    Map<String, String> memberInfo = new HashMap<>();
+                    memberInfo.put("nickname", c.getMember().getNickname());
+                    memberInfo.put("profileImage", c.getMember().getBasicProfile().getProfileImage());
+                    return memberInfo;
+                })
+                .collect(Collectors.toList());
+    }
+
+    private ChatRoomResponseDto.ChatRoomListDto createChatRoomListDto(Long roomId, List<Map<String, String>> memberInfoList, ChatMessage latestMessage) {
+        return ChatRoomResponseDto.ChatRoomListDto.builder()
+                .roomId(roomId)
+                .memberList(memberInfoList)
+                .lastMessageTime(toCreatedTime(latestMessage.getCreatedAt()))
+                .lastMessageText(latestMessage.getMessage())
+                .readCount(latestMessage.getReadCount())
+                .build();
+    }
 
     private ChatRoom getChattingRoomById(Long chattingRoomId) {
         log.info("해당하는 챗 id 가져오는 곳");
@@ -253,26 +256,4 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private String toCreatedDate(LocalDateTime createdAt) {
         return createdAt.getHour() + TIME_DELIMITER + createdAt.getMinute();
     }
-
-
-
-
-    //채팅방 불러오기
-//    public List<ChatRoom> findAllRoom() {
-//        return chatRoomRepository.findAllRoom();
-//    }
-//
-//    //채팅방 하나 불러오기
-//    public ChatRoom findById(String roomId) {
-//        return chatRoomRepository.findById(roomId);
-//    }
-//
-//    //채팅방 생성
-//    public ChatRoom createRoom(String name) {
-//        return chatRoomRepository.createRoom(name);
-//    }
-//
-//    public List<ChatRoom> findByNickname(String name) {
-//        return chatRoomRepository.findByNickname(name);
-//    }
 }

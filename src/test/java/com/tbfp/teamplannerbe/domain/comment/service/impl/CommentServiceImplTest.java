@@ -85,7 +85,7 @@ class CommentServiceImplTest extends BaseControllerTest {
                 .memberId("test")
                 .build());
 
-        CreatedchildCommentResponseDto createdchildCommentResponseDto = commentService.sendBigComment(
+        CreatedchildCommentResponseDto createdchildCommentResponseDto = commentService.sendCommentToComment(
                 CommentRequestDto.CommentToCommentCreateRequestDto.builder()
                         .isConfidential(Boolean.valueOf("true"))
                         .boardId(boardId)
@@ -118,7 +118,7 @@ class CommentServiceImplTest extends BaseControllerTest {
 
 
         try {
-            CreatedchildCommentResponseDto createdchildCommentResponseDto = commentService.sendBigComment(
+            CreatedchildCommentResponseDto createdchildCommentResponseDto = commentService.sendCommentToComment(
                     CommentRequestDto.CommentToCommentCreateRequestDto.builder()
                             .isConfidential(Boolean.valueOf("true"))
                             .boardId(boardId)

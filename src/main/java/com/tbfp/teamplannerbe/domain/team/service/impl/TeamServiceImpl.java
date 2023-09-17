@@ -21,6 +21,7 @@ import com.tbfp.teamplannerbe.domain.team.repository.TeamRepository;
 import com.tbfp.teamplannerbe.domain.team.service.TeamService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,50 +44,29 @@ public class TeamServiceImpl implements TeamService {
     private final MemberRepository memberRepository;
     private final MemberTeamRepository memberTeamRepository;
     private final RecruitmentApplyRepository recruitmentApplyRepository;
-    private final EvaluationRepository evaluationRepository;
 
 
     @Transactional
     @Override
     public TeamResponseDto.createdTeamResponseDto createTeam(String username, TeamRequestDto.CreatTeamRequestDto creatTeamRequestDto) {
 
-        System.out.println(creatTeamRequestDto.getSelectedUserIds().size());
+        createdTeamResponseDto result = null;
+
         if(creatTeamRequestDto.getSelectedUserIds().size()==0){
             throw new ApplicationException(USER_NOT_FOUND);
         }
-
-        createdTeamResponseDto result = null;
-
-        //selected 한게 참여신청리스트에 해당 팀원모집글에 대해 신청한적이 있는지 확인 신청 한적이없다면 예외처리
-        //병렬 스트림의 경우 여러 스레드에서 요소를 처리하므로, 첫 번째 요소를 찾는 것보다 임의의 요소를 찾는 것이 더 효율
-        creatTeamRequestDto.getSelectedUserIds().stream()
-                .map(selectedUserId -> recruitmentApplyRepository.findRecruitmentApplyByRecruitment_IdAndApplicant_Id(
-                        creatTeamRequestDto.getRecruitId(), selectedUserId
-                ).orElseThrow(() -> new ApplicationException(RECRUITMENT_APPLY_NOT_APPLIED)))
-                .filter(recruitmentApply -> recruitmentApply.getState() == ACCEPT)
-                .findAny()
-                .ifPresent(recruitmentApply -> {
-                    throw new ApplicationException(ALREADY_TEAM_ACCEPT);
-                });
-
-
         // 해당하는 모집글이 아직도 존재하는지 확인
         Recruitment recruitment = recruitmentRepository.findById(creatTeamRequestDto.getRecruitId())
                 .orElseThrow(() -> new ApplicationException(RECRUITMENT_NOT_FOUND));
         Member leaderMember = memberRepository.findByUsername(username).
                 orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
 
-
         //자기 자신을 팀으로 설정하는경우 예외처리 , 팀의 팀장으로 그대로 남아있게함.
         if (creatTeamRequestDto.getSelectedUserIds().contains(leaderMember.getId())) {
             throw new ApplicationException(UNAUTHORIZED);
         }
 
-        // 승인 할 멤버들이 존재하는지 검사
-        List<Member> selectedMembers = creatTeamRequestDto.getSelectedUserIds().stream()
-                .map(memberId -> memberRepository.findById(memberId)
-                        .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND)))
-                .collect(Collectors.toList());
+        List<Member> selectedMembers = selectedMebmerValidation(creatTeamRequestDto);
 
         // 모집글에 대한 팀을 조회
         Team findTeam = teamRepository.findByRecruitmentId(recruitment.getId());
@@ -110,14 +90,7 @@ public class TeamServiceImpl implements TeamService {
             savedTeam.addTeamMembers(selectedMembers, username);
 
 
-            // 저장된 멤버들을 순회하면서 recruitmentApply 상태값을 ACCEPT값으로 변경
-            selectedMembers.forEach(member -> {
-                RecruitmentApply recruitmentApply = recruitmentApplyRepository.findRecruitmentApplyByRecruitment_IdAndApplicant_Id(
-                        creatTeamRequestDto.getRecruitId(), member.getId()
-                ).orElseThrow(() -> new ApplicationException(RECRUITMENT_APPLY_NOT_APPLIED));
-
-                recruitmentApply.updateState(ACCEPT);
-            });
+            updateStatusToAccept(creatTeamRequestDto, selectedMembers);
 
             // 변경된 상태값 저장
             Team updatedTeam = teamRepository.save(savedTeam);
@@ -138,18 +111,11 @@ public class TeamServiceImpl implements TeamService {
             // team 정보 저장
             Team chagedTeam = teamRepository.save(findTeam);
 
-
             // team에 members 추가
             chagedTeam.addTeamMembers(selectedMembers, username);
 
             // 저장된 멤버들을 순회하면서 recruitmentApply 상태값을 ACCEPT값으로 변경
-            selectedMembers.forEach(member -> {
-                RecruitmentApply recruitmentApply = recruitmentApplyRepository.findRecruitmentApplyByRecruitment_IdAndApplicant_Id(
-                        creatTeamRequestDto.getRecruitId(), member.getId()
-                ).orElseThrow(() -> new ApplicationException(RECRUITMENT_APPLY_NOT_APPLIED));
-
-                recruitmentApply.updateState(ACCEPT);
-            });
+            updateStatusToAccept(creatTeamRequestDto, selectedMembers);
 
             // 변경된 상태값 저장
             Team updatedTeam = teamRepository.save(chagedTeam);
@@ -160,6 +126,35 @@ public class TeamServiceImpl implements TeamService {
 
 
         return result;
+    }
+
+    private void updateStatusToAccept(TeamRequestDto.CreatTeamRequestDto creatTeamRequestDto, List<Member> selectedMembers) {
+        // 저장된 멤버들을 순회하면서 recruitmentApply 상태값을 ACCEPT값으로 변경
+        selectedMembers.stream().map(member -> recruitmentApplyRepository.findRecruitmentApplyByRecruitment_IdAndApplicant_Id(
+                creatTeamRequestDto.getRecruitId(), member.getId()
+        ).orElseThrow(() -> new ApplicationException(RECRUITMENT_APPLY_NOT_APPLIED))).forEach(recruitmentApply -> recruitmentApply.updateState(ACCEPT));
+    }
+
+
+    private List<Member> selectedMebmerValidation(TeamRequestDto.CreatTeamRequestDto creatTeamRequestDto) {
+        //selected 한게 참여신청리스트에 해당 팀원모집글에 대해 신청한적이 있는지 확인 신청 한적이없다면 예외처리
+        creatTeamRequestDto.getSelectedUserIds().stream()
+                .map(selectedUserId -> recruitmentApplyRepository.findRecruitmentApplyByRecruitment_IdAndApplicant_Id(
+                        creatTeamRequestDto.getRecruitId(), selectedUserId
+                ).orElseThrow(() -> new ApplicationException(RECRUITMENT_APPLY_NOT_APPLIED)))
+                .filter(recruitmentApply -> recruitmentApply.getState() == ACCEPT)
+                .findAny()
+                .ifPresent(recruitmentApply -> {
+                    throw new ApplicationException(ALREADY_TEAM_ACCEPT);
+                });
+
+
+        // 승인 할 멤버들이 존재하는지 검사
+        List<Member> selectedMembers = creatTeamRequestDto.getSelectedUserIds().stream()
+                .map(memberId -> memberRepository.findById(memberId)
+                        .orElseThrow(() -> new ApplicationException(USER_NOT_FOUND)))
+                .collect(Collectors.toList());
+        return selectedMembers;
     }
 
 

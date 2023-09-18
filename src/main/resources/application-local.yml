@@ -1,4 +1,6 @@
 spring:
+  session:
+    store-type: none
   config:
     activate:
       on-profile: local
@@ -78,7 +80,7 @@ spring:
     enabled: true
     baseline-on-migrate: true
     baseline-version: 0
-    locations: classpath:db/migration
+    locations: classpath:db/migration, classpath:db/seed
     url: jdbc:mysql://localhost:3306/testdb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     user: root
     password:

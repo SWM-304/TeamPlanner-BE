@@ -1,4 +1,6 @@
 spring:
+  session:
+    store-type: none
   config:
     activate:
       on-profile: prod

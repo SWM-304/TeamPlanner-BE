@@ -18,6 +18,13 @@ import java.util.List;
 public class ChatRepositoryImpl implements ChatRepository {
 
     private final DynamoChatRepository dynamoChatRepository;
+
+
+    @Override
+    public ChatMessage saveChatMessageForReadCount(ChatMessage chatMessage) {
+        return dynamoChatRepository.save(chatMessage);
+    }
+
     @Override
     public String saveChatMessage(ChatMessage chatMessage) {
         return dynamoChatRepository.save(chatMessage).getId();

@@ -175,15 +175,16 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
 
     @Transactional
-    public ChattingReadCountResponseDto readCountDecrease(String chatId) {
+    public ChattingReadCountResponseDto readCountDecrease(String chatId){
+        ChatMessage chatMessage=null;
         ChatMessage chat = chatRepository.findAllChatMessageListByChatId(chatId);
 
         if(chat.getReadCount()>0){
             chat.decreaseReadCount();
-            chatRepository.saveChatMessage(chat);
+            chatMessage = chatRepository.saveChatMessageForReadCount(chat);
         }
         return ChattingReadCountResponseDto.builder()
-                .readCount(chat.getReadCount())
+                .readCount(chatMessage.getReadCount())
                 .build();
     }
 

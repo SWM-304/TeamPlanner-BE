@@ -12,6 +12,8 @@ public interface ChatRepository {
 
     void saveAllChatMessage(List<ChatMessage> chatMessage);
 
+    ChatMessage saveChatMessageForReadCount(ChatMessage chatMessage);
+
 
 }
 

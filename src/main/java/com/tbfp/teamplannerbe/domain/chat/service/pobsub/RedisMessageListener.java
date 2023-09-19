@@ -16,6 +16,7 @@ public class RedisMessageListener {
 
     private static final Map<Long, ChannelTopic> TOPICS = new HashMap<>();
 
+
     private final RedisMessageListenerContainer redisMessageListenerContainer;
     private final RedisSubscriber redisSubscriber;
 

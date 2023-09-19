@@ -1,6 +1,7 @@
 package com.tbfp.teamplannerbe.domain.chat.service.impl;
 
 import com.tbfp.teamplannerbe.config.redis.util.ChattingRedisUtil;
+import com.tbfp.teamplannerbe.domain.chat.dto.redis.RedisChatRoom;
 import com.tbfp.teamplannerbe.domain.chat.dto.response.*;
 import com.tbfp.teamplannerbe.domain.chat.entity.ChatMessage;
 import com.tbfp.teamplannerbe.domain.chat.entity.ChatRoomMember;
@@ -8,6 +9,7 @@ import com.tbfp.teamplannerbe.domain.chat.entity.ChatRoom;
 import com.tbfp.teamplannerbe.domain.chat.repository.ChatRepository;
 import com.tbfp.teamplannerbe.domain.chat.repository.ChatRoomMemberRepository;
 import com.tbfp.teamplannerbe.domain.chat.repository.ChatRoomRepository;
+import com.tbfp.teamplannerbe.domain.chat.repository.RedisChatRoomRepository;
 import com.tbfp.teamplannerbe.domain.chat.service.ChatRoomService;
 import com.tbfp.teamplannerbe.domain.chat.service.pobsub.RedisMessageListener;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
@@ -37,7 +39,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final MemberService memberService;
     private final RedisMessageListener redisMessageListener;
-    private final ChattingRedisUtil redisConnector;
     private final ChatRepository chatRepository;
 
 
@@ -84,17 +85,17 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         List<ChatMessage> chatMessages = chatRepository.readRoomWithChatMessageList(chattingRoomId);
 
         // 내가 아닌 상대방이 해당 채팅방에 들어와 채팅을 확인하게 되면 ReadCount-=1
+//
+//        List<ChatMessage> updateChatReadCount = chatMessages.stream()
+//                .filter(chatMember -> !Objects.equals(chatMember.getSenderId(), member.getId()) && chatMember.getReadCount() > 0)
+//                .map(chatMember -> {
+//                    chatMember.decreaseReadCount();
+//                    return chatMember;
+//                })
+//                .collect(Collectors.toList());
 
-        List<ChatMessage> updateChatReadCount = chatMessages.stream()
-                .filter(chatMember -> !Objects.equals(chatMember.getSenderId(), member.getId()) && chatMember.getReadCount() > 0)
-                .map(chatMember -> {
-                    chatMember.decreaseReadCount();
-                    return chatMember;
-                })
-                .collect(Collectors.toList());
-
-
-        chatRepository.saveAllChatMessage(updateChatReadCount);
+//
+//        chatRepository.saveAllChatMessage(updateChatReadCount);
 
         redisMessageListener.enterChattingRoom(chattingRoomId);
         ChatRoom chattingRoom = getChattingRoomById(chattingRoomId);
@@ -149,6 +150,25 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         return chatRoom.getId();
     }
 
+    @Transactional
+    public ChattingReadCountResponseDto readCountDecrease(String chatId){
+        ChatMessage chat = chatRepository.findAllChatMessageListByChatId(chatId);
+
+
+
+        if(chat.getReadCount()>0){
+            chat.decreaseReadCount();
+            ChatMessage chatMessage = chatRepository.saveChatMessageForReadCount(chat);
+            return ChattingReadCountResponseDto.builder()
+                    .readCount(chatMessage.getReadCount())
+                    .build();
+        }
+        return ChattingReadCountResponseDto.builder()
+                .readCount(chat.getReadCount())
+                .build();
+    }
+
+
     // 채팅 방이 존재하지는 여부
     public ChattingRoomCheckResponseDto chatRoomCheck(String nickname, String targetNickname) {
 
@@ -173,23 +193,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .roomCheck(!chatRoomExists)
                 .build();
     }
-
-    @Transactional
-    public ChattingReadCountResponseDto readCountDecrease(String chatId){
-        ChatMessage chat = chatRepository.findAllChatMessageListByChatId(chatId);
-
-        if(chat.getReadCount()>0){
-            chat.decreaseReadCount();
-            ChatMessage chatMessage = chatRepository.saveChatMessageForReadCount(chat);
-            return ChattingReadCountResponseDto.builder()
-                    .readCount(chatMessage.getReadCount())
-                    .build();
-        }
-        return ChattingReadCountResponseDto.builder()
-                .readCount(chat.getReadCount())
-                .build();
-    }
-
 
     private ChatMessage findLatestMessage(List<ChatMessage> messages) {
         return messages.stream()

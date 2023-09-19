@@ -26,8 +26,6 @@ public class RedisSubscriber implements MessageListener {
     private final JsonParser jsonParser;
     private final RedisTemplate redisTemplate;
     private final SimpMessageSendingOperations messagingTemplate;
-    private final ChatRepository chatRepository;
-    UserHelper userHelper;
     private static final String DOT = ".";
     private static final String TIME_DELIMITER = ":";
 

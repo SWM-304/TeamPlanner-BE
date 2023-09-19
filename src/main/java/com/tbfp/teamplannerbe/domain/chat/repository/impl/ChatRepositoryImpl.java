@@ -26,6 +26,12 @@ public class ChatRepositoryImpl implements ChatRepository {
     }
 
     @Override
+    public List<ChatMessage> findAllChatListByRoomId(Integer roomId) {
+        List<ChatMessage> result = dynamoChatRepository.findAllByRoomId(Long.valueOf(roomId));
+        return result;
+    }
+
+    @Override
     public String saveChatMessage(ChatMessage chatMessage) {
         return dynamoChatRepository.save(chatMessage).getId();
     }

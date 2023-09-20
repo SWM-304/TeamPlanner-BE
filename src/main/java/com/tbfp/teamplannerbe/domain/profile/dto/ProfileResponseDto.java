@@ -63,16 +63,12 @@ public class ProfileResponseDto {
     @AllArgsConstructor
     public static class TechStackResponseDto{
         private Long id;
-        private Integer experiencedYear;
-        private Integer experiencedMonth;
-        private SkillLevel skillLevel;
+        private Integer skillLevel;
         private TechStackItem techStackItem;
 
         public TechStack toEntity(Member member){
             return TechStack.builder()
                     .id(id)
-                    .experiencedYear(experiencedYear)
-                    .experiencedMonth(experiencedMonth)
                     .skillLevel(skillLevel)
                     .techStackItem(techStackItem)
                     .member(member)
@@ -210,5 +206,13 @@ public class ProfileResponseDto {
     @AllArgsConstructor
     public static class DeleteEvaluationResponseDto {
         private String message;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class GetTechStackItemsResponseDto {
+        private List<TechStackItem> techStackItems;
     }
 }

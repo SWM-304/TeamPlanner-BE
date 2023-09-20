@@ -360,4 +360,14 @@ public class ProfileServiceImpl implements ProfileService {
             () -> new ApplicationException(ApplicationErrorType.NOT_FOUND)
         );
     }
+
+    @Override
+    @Transactional
+    public ProfileResponseDto.GetTechStackItemsResponseDto getTechStackItems(){
+        List<TechStackItem> techStackItems = techStackItemRepository.findByUserGeneratedFalse();
+
+        return ProfileResponseDto.GetTechStackItemsResponseDto.builder()
+                .techStackItems(techStackItems)
+                .build();
+    }
 }

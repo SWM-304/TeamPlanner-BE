@@ -22,12 +22,7 @@ public class TechStack extends BaseTimeEntity{
     @Column(name = "TECH_STACK_ID")
     private Long id;
 
-    private Integer experiencedYear;
-
-    private Integer experiencedMonth;
-
-    @Enumerated(EnumType.STRING)
-    private SkillLevel skillLevel;
+    private Integer skillLevel;
 
     @ManyToOne
     @JoinColumn(name = "TECH_STACK_ITEM_ID")
@@ -40,8 +35,6 @@ public class TechStack extends BaseTimeEntity{
     public ProfileResponseDto.TechStackResponseDto toDto(){
         return ProfileResponseDto.TechStackResponseDto.builder()
                 .id(id)
-                .experiencedYear(experiencedYear)
-                .experiencedMonth(experiencedMonth)
                 .skillLevel(skillLevel)
                 .techStackItem(techStackItem)
                 .build();

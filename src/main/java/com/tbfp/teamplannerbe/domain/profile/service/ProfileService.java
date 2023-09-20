@@ -28,4 +28,6 @@ public interface ProfileService {
     List<ProfileResponseDto.EvaluationResponseDto> getAllEvaluations(String username);
     
     BasicProfile getBasicProfile(String username);
+
+    ProfileResponseDto.GetTechStackItemsResponseDto getTechStackItems();
 }

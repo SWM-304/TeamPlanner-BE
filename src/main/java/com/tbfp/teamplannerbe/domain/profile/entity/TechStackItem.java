@@ -27,4 +27,5 @@ public class TechStackItem {
     @Column(columnDefinition = "bit default 0")
     private Boolean userGenerated;
 
+    private String imageUrl;
 }

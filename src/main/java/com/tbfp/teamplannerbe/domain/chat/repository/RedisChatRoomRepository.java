@@ -10,5 +10,5 @@ public interface RedisChatRoomRepository extends CrudRepository<RedisChatRoom, S
 
     List<RedisChatRoom> findByChatroomNo(Integer chatRoomNo);
 
-    Optional<RedisChatRoom> findByChatroomNoAndEmail(Integer chatRoomNo, String username);
+    Optional<RedisChatRoom> findByChatroomNoAndUsername(Integer chatRoomNo, String username);
 }

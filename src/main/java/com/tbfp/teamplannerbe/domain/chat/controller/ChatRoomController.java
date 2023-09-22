@@ -69,7 +69,7 @@ public class ChatRoomController {
     @PostMapping("/chatroom/{chatroomNo}")
     public ResponseEntity disconnectChat(@PathVariable("chatroomNo") Integer chatroomNo,
                                          Principal principal) {
-
+        System.out.println("채팅방 접속 끊기"+chatroomNo);
         redisChatRoomService.disconnectChatRoom(chatroomNo, principal.getName());
         return ResponseEntity.ok("채팅연결해제");
     }

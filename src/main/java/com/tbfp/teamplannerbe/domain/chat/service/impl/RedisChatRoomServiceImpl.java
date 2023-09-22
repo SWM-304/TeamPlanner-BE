@@ -1,20 +1,28 @@
 package com.tbfp.teamplannerbe.domain.chat.service.impl;
 
 import com.tbfp.teamplannerbe.domain.chat.dto.redis.RedisChatRoom;
+import com.tbfp.teamplannerbe.domain.chat.dto.request.ChatRoomRequestDto;
+import com.tbfp.teamplannerbe.domain.chat.dto.request.ChatRoomRequestDto.ChattingReqeust;
 import com.tbfp.teamplannerbe.domain.chat.dto.response.MemberResponse;
 import com.tbfp.teamplannerbe.domain.chat.entity.ChatMessage;
 import com.tbfp.teamplannerbe.domain.chat.repository.ChatRepository;
 import com.tbfp.teamplannerbe.domain.chat.repository.RedisChatRoomRepository;
 import com.tbfp.teamplannerbe.domain.chat.service.RedisChatRoomService;
+import com.tbfp.teamplannerbe.domain.chat.service.pobsub.RedisMessageListener;
+import com.tbfp.teamplannerbe.domain.chat.service.pobsub.RedisPublisher;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType.USER_NOT_FOUND;
@@ -25,30 +33,38 @@ import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorTyp
 @Slf4j
 public class RedisChatRoomServiceImpl implements RedisChatRoomService {
 
+    private static final Map<Long, ChannelTopic> TOPICS = new HashMap<>();
 
+
+    private final RedisPublisher redisPublisher;
+    private final RedisMessageListener redisMessageListener;
     private final RedisChatRoomRepository redisChatRoomRepository;
     private final MemberRepository memberRepository;
     private final ChatRepository chatRepository;
-
     @Override
     @Transactional
     public void connectChatRoom(Integer chatRoomNo, String username) {
         log.info("connectChatRoom");
-        RedisChatRoom redisChatRoom= RedisChatRoom.builder()
-                .username(username)
-                .chatroomNo(chatRoomNo)
-                .build();
+        Optional<RedisChatRoom> existingChatRoom = redisChatRoomRepository.findByChatroomNoAndUsername(chatRoomNo, username);
 
-        redisChatRoomRepository.save(redisChatRoom);
+        if (existingChatRoom.isEmpty()) {
+            // 저장된 데이터가 없으면 새로운 RedisChatRoom 객체를 생성하고 저장합니다.
+            RedisChatRoom redisChatRoom = RedisChatRoom.builder()
+                    .username(username)
+                    .chatroomNo(chatRoomNo)
+                    .build();
+
+            redisChatRoomRepository.save(redisChatRoom);
+        }
     }
 
     @Override
     @Transactional
-    public void disconnectChatRoom(Integer chatRoomNo, String username) {
+    public void disconnectChatRoom (Integer chatRoomNo, String username) {
 
         log.info("disconnectChatRoom");
 
-        RedisChatRoom redisChatRoom = redisChatRoomRepository.findByChatroomNoAndEmail(chatRoomNo, username)
+        RedisChatRoom redisChatRoom = redisChatRoomRepository.findByChatroomNoAndUsername(chatRoomNo, username)
                 .orElseThrow(IllegalStateException::new);
 
         redisChatRoomRepository.delete(redisChatRoom);
@@ -59,6 +75,7 @@ public class RedisChatRoomServiceImpl implements RedisChatRoomService {
         log.info("isAllConnected");
 
         List<RedisChatRoom> connectedList = redisChatRoomRepository.findByChatroomNo(chatRoomNo);
+        System.out.println("isAllConnectedSize"+connectedList.size());
         return connectedList.size() == 2;
     }
 
@@ -67,7 +84,7 @@ public class RedisChatRoomServiceImpl implements RedisChatRoomService {
         log.info("isConnected");
 
         List<RedisChatRoom> connectedList = redisChatRoomRepository.findByChatroomNo(chatRoomNo);
-        return connectedList.size() == 1;
+        return connectedList.size() >= 1;
     }
 
 
@@ -90,4 +107,17 @@ public class RedisChatRoomServiceImpl implements RedisChatRoomService {
         chatRepository.saveAllChatMessage(chatList);
     }
 
+    //현재 채팅방에 접속중인 회원이 있다면, 채팅 리스트 다시 서버에 요청해서 받도록 처리한다.
+
+    @Override
+    public void updateMessage(String username, Integer chatRoomNo) {
+        log.info("updateMessage");
+        Member member = memberRepository.findByUsername(username).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
+
+        ChattingReqeust message = ChattingReqeust.builder()
+                .senderId(member.getId())
+                .chattingRoomId(Long.valueOf(chatRoomNo))
+                .build();
+        redisPublisher.publish(redisMessageListener.getTopic(Long.valueOf(chatRoomNo)), message);
+    }
 }

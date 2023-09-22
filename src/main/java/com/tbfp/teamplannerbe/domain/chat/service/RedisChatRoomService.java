@@ -13,4 +13,6 @@ public interface RedisChatRoomService {
 
     void updateCountAllZero(Integer chatNo, String username);
 
+    void updateMessage(String username, Integer chatRoomNo);
+
 }

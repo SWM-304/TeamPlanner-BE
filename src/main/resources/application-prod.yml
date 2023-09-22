@@ -1,6 +1,6 @@
 spring:
   session:
-    store-type: none
+    store-type: redis
   config:
     activate:
       on-profile: prod

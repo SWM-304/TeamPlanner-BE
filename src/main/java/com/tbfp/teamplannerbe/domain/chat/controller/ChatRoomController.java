@@ -1,6 +1,7 @@
 package com.tbfp.teamplannerbe.domain.chat.controller;
 
 import com.tbfp.teamplannerbe.domain.auth.MemberDetails;
+import com.tbfp.teamplannerbe.domain.chat.service.RedisChatRoomService;
 import com.tbfp.teamplannerbe.domain.chat.service.impl.ChatRoomServiceImpl;
 import com.tbfp.teamplannerbe.domain.chat.dto.request.ChatRoomRequestDto;
 import lombok.RequiredArgsConstructor;
@@ -9,12 +10,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/chat")
 @Slf4j
 public class ChatRoomController {
     private final ChatRoomServiceImpl chatRoomService;
+    private final RedisChatRoomService redisChatRoomService;
 
     /**
      * 선택 한 채팅방에대한 채팅을 뿌려주는 곳!
@@ -59,6 +63,15 @@ public class ChatRoomController {
         return ResponseEntity.ok(
                 chatRoomService.readCountDecrease(chatId)
         );
+    }
+
+    // 채팅방 접속 끊기
+    @PostMapping("/chatroom/{chatroomNo}")
+    public ResponseEntity disconnectChat(@PathVariable("chatroomNo") Integer chatroomNo,
+                                         Principal principal) {
+        System.out.println("채팅방 접속 끊기"+chatroomNo);
+        redisChatRoomService.disconnectChatRoom(chatroomNo, principal.getName());
+        return ResponseEntity.ok("채팅연결해제");
     }
 
 //    /**

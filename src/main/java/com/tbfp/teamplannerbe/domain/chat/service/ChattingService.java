@@ -4,4 +4,5 @@ import com.tbfp.teamplannerbe.domain.chat.dto.request.ChatRoomRequestDto.Chattin
 
 public interface ChattingService {
     void sendMessage(Long chattingRoomId, ChattingReqeust chattingRequest);
+
 }

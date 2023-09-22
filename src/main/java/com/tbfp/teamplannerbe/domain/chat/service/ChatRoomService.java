@@ -15,5 +15,4 @@ public interface ChatRoomService {
     ChattingRoomCheckResponseDto chatRoomCheck(String nickname,String targetNickname);
 
     ChattingReadCountResponseDto readCountDecrease(String chatId);
-
 }

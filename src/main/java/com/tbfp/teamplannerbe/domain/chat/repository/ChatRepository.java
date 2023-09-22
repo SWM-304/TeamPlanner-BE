@@ -14,6 +14,8 @@ public interface ChatRepository {
 
     ChatMessage saveChatMessageForReadCount(ChatMessage chatMessage);
 
+    List<ChatMessage> findAllChatListByRoomId(Integer roomId);
+
 
 }
 

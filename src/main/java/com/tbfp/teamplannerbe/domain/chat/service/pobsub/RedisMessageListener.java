@@ -20,6 +20,7 @@ public class RedisMessageListener {
     private final RedisMessageListenerContainer redisMessageListenerContainer;
     private final RedisSubscriber redisSubscriber;
 
+
     public void enterChattingRoom(Long chattingRoomId) {
 
         log.info("채팅토픽 만든 적이 없으면 만들어 주는 곳");
@@ -30,6 +31,7 @@ public class RedisMessageListener {
             redisMessageListenerContainer.addMessageListener(redisSubscriber, topic);
             TOPICS.put(chattingRoomId, topic);
         }
+
         log.info("enter in chatting room '{}'", chattingRoomId);
     }
 

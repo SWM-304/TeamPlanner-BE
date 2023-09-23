@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
+@Order(Ordered.HIGHEST_PRECEDENCE + 99)
 @Component
 @Slf4j
 @RequiredArgsConstructor

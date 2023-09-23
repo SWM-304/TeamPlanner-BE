@@ -17,10 +17,10 @@ import org.springframework.web.socket.config.annotation.WebSocketTransportRegist
 @EnableWebSocketMessageBroker // WebSocket을 활성화하고 메시지 브로커 사용가능
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer { // (1)
 
-    private  StompHandler stompHandler;
+    private StompHandler stompHandler;
 
     @Autowired
-    public WebSocketConfig(@Lazy StompHandler stompHandler) {
+    public WebSocketConfig(StompHandler stompHandler) {
         this.stompHandler = stompHandler;
     }
 

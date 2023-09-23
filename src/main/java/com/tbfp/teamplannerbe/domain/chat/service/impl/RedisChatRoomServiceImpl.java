@@ -37,7 +37,6 @@ public class RedisChatRoomServiceImpl implements RedisChatRoomService {
 
 
     private final RedisPublisher redisPublisher;
-    private final RedisMessageListener redisMessageListener;
     private final RedisChatRoomRepository redisChatRoomRepository;
     private final MemberRepository memberRepository;
     private final ChatRepository chatRepository;
@@ -118,6 +117,12 @@ public class RedisChatRoomServiceImpl implements RedisChatRoomService {
                 .senderId(member.getId())
                 .chattingRoomId(Long.valueOf(chatRoomNo))
                 .build();
-        redisPublisher.publish(redisMessageListener.getTopic(Long.valueOf(chatRoomNo)), message);
+        ChannelTopic topic = TOPICS.get(Long.valueOf(chatRoomNo));
+        if (topic == null) {
+            topic = new ChannelTopic(String.valueOf(chatRoomNo));
+            TOPICS.put(Long.valueOf(chatRoomNo), topic);
+        }
+        System.out.println("토픽은:"+ TOPICS.get(Long.valueOf(chatRoomNo)));
+        redisPublisher.publish(TOPICS.get(Long.valueOf(chatRoomNo)), message);
     }
 }

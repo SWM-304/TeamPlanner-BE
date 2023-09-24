@@ -84,18 +84,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 //         채팅방번호로 채팅방에 있는 MemberList 를 전부 가져옴
         List<ChatMessage> chatMessages = chatRepository.readRoomWithChatMessageList(chattingRoomId);
 
-        // 내가 아닌 상대방이 해당 채팅방에 들어와 채팅을 확인하게 되면 ReadCount-=1
-//
-//        List<ChatMessage> updateChatReadCount = chatMessages.stream()
-//                .filter(chatMember -> !Objects.equals(chatMember.getSenderId(), member.getId()) && chatMember.getReadCount() > 0)
-//                .map(chatMember -> {
-//                    chatMember.decreaseReadCount();
-//                    return chatMember;
-//                })
-//                .collect(Collectors.toList());
-
-//
-//        chatRepository.saveAllChatMessage(updateChatReadCount);
 
         redisMessageListener.enterChattingRoom(chattingRoomId);
         ChatRoom chattingRoom = getChattingRoomById(chattingRoomId);
@@ -153,9 +141,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Transactional
     public ChattingReadCountResponseDto readCountDecrease(String chatId){
         ChatMessage chat = chatRepository.findAllChatMessageListByChatId(chatId);
-
-
-
         if(chat.getReadCount()>0){
             chat.decreaseReadCount();
             ChatMessage chatMessage = chatRepository.saveChatMessageForReadCount(chat);
@@ -167,7 +152,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .readCount(chat.getReadCount())
                 .build();
     }
-
 
     // 채팅 방이 존재하지는 여부
     public ChattingRoomCheckResponseDto chatRoomCheck(String nickname, String targetNickname) {
@@ -230,8 +214,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     }
     private List<ChattingResponse> getChattingResponses(Long chattingRoomId) {
         log.info("redis 토픽안에 담긴 메세지를 가져오는 곳");
-
-
         return chatRepository.readRoomWithChatMessageList(chattingRoomId)
                 .stream()
                 .sorted(Comparator.comparing(ChatMessage::getCreatedAt))

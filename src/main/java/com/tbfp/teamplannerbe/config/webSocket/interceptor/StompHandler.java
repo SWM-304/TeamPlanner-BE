@@ -37,7 +37,6 @@ public class StompHandler implements ChannelInterceptor {
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         if(accessor.getCommand() == StompCommand.CONNECT) {
-            System.out.println("hello world"+accessor.getFirstNativeHeader("Authorization").replace("Bearer ",""));
             jwtProvider.verifyToken(accessor.getFirstNativeHeader("Authorization").replace("Bearer ",""));
             String username = jwtProvider.getUsernameFromToken(accessor.getFirstNativeHeader("Authorization").replace("Bearer ",""));
             handleMessage(accessor.getCommand(), accessor, username);
@@ -46,10 +45,7 @@ public class StompHandler implements ChannelInterceptor {
     }
 
     private void handleMessage(StompCommand stompCommand, StompHeaderAccessor accessor, String username) {
-
-        log.info("handleMessage");
         switch (stompCommand) {
-
             case CONNECT:
                 connectToChatRoom(accessor, username);
                 break;
@@ -61,10 +57,8 @@ public class StompHandler implements ChannelInterceptor {
     }
 
     private void connectToChatRoom(StompHeaderAccessor accessor, String email) {
-//        // 채팅방 번호를 가져온다.
         log.info("connectToChatRoom");
         Integer chatRoomNo = getChatRoomNo(accessor);
-        log.info("헤더에서 채팅방 번호 get"+chatRoomNo);
 
         // 채팅방 입장 처리 -> Redis에 입장 내역 저장
         redisChatRoomService.connectChatRoom(chatRoomNo, email);
@@ -76,7 +70,6 @@ public class StompHandler implements ChannelInterceptor {
 
         // 현재 채팅방에 접속중인 인원이 있는지 확인한다.
         boolean isAllConnected = redisChatRoomService.isAllConnected(chatRoomNo);
-        System.out.println("isConnected"+isAllConnected);
         if (isAllConnected) {
             redisChatRoomService.updateMessage(email, chatRoomNo);
         }

@@ -28,32 +28,24 @@ import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorTyp
 @Transactional
 @Service
 public class ChattingServiceImpl implements ChattingService {
-    private static final String CHATTING_ROOM = "CHATTING_ROOM";
-    private static final String DELIMITER = ":";
 
     private final RedisPublisher redisPublisher;
     private final RedisMessageListener redisMessageListener;
     private final ChatRepository chatRepository;
-    private final MemberRepository memberRepository;
     private final RedisChatRoomService redisChatRoomService;
 
     @Override
     public void sendMessage(Long chattingRoomId, ChattingReqeust chattingRequest) {
         log.info("[Service] sendMessage in");
-
         // 2명 다 있어 ?
         boolean isConnectedAll = redisChatRoomService.isAllConnected(Math.toIntExact(chattingRoomId));
-        System.out.println("isConnectedAll"+isConnectedAll);
         Integer readCount = isConnectedAll ? 0 : 1;
-
-
         chattingRequest.setReadCount(readCount);
         String createdUUID = chatRepository.saveChatMessage(chattingRequest.toChatting());
         chattingRequest.setId(createdUUID);
         redisPublisher.publish(redisMessageListener.getTopic(chattingRoomId), chattingRequest);
         log.info("chatting is published to chatting room: {}", chattingRoomId);
         // CHATTING_ROOM과 DELIMITER를 합쳐서 특정 포맷의 키를 생성하고, 이 키를 사용하여 chattingRequest의 내용을 Redis에 저장
-//        redisConnector.saveChatting(CHATTING_ROOM + DELIMITER + chattingRoomId, chattingRequest.toChatting());
         log.info("chatting is saved");
     }
 }

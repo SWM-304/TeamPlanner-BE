@@ -49,7 +49,8 @@ spring:
             client-secret: ENC(Fvhw9WH3FB30IohjJ+hrfbLT+7FfZGXjnma0jgO0BNeuXVDQrAGMiiY7V11P0IzU)
             scope: profile_nickname, profile_image, account_email
             authorization-grant-type: authorization_code
-            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+#            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            redirect-uri: "https://api.teamplanner.co.kr/login/oauth2/code/{registrationId}"
             client-authentication-method: POST
             client-name: kakao
           naver:

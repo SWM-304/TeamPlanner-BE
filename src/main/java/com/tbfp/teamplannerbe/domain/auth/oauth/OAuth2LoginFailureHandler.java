@@ -16,6 +16,8 @@ public class OAuth2LoginFailureHandler implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
         log.info("OAuth2LoginFailureHandler.onAuthenticationFailure");
+        log.info("full url = " + request.getRequestURL().toString() + "?" + request.getQueryString());
+        
         exception.printStackTrace();
     }
 }

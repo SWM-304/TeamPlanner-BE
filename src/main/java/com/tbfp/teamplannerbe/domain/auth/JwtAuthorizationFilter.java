@@ -34,6 +34,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         log.info("JwtAuthorizationFilter.doFilterInternal");
         String path = request.getServletPath();
         System.out.println("path = " + path);
+        log.info("full url = " + request.getRequestURL().toString() + "?" + request.getQueryString());
+        
         String header = jwtProvider.getHeader(request);
         if (header == null) {
             chain.doFilter(request, response);

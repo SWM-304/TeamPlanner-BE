@@ -25,6 +25,11 @@ public class GlobalExceptionHandlerFilter extends OncePerRequestFilter {
             response.setContentType("application/json");
             response.setCharacterEncoding("utf-8");
             ApplicationErrorType errorType = ex.getErrorType();
+            log.info("errorType.getHttpStatus() = " + errorType.getHttpStatus());
+            log.info("errorType.getMessage() = " + errorType.getMessage());
+            log.info("errorType.getCode() = " + errorType.getCode());
+            log.info("full url = " + request.getRequestURL().toString() + "?" + request.getQueryString());
+
             response.setStatus(errorType.getHttpStatus().value());
             response.getWriter().write(new ObjectMapper().writeValueAsString(errorType));
         } catch (NestedServletException exx) {

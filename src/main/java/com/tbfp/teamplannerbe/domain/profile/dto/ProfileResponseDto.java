@@ -145,7 +145,6 @@ public class ProfileResponseDto {
         private List<ActivityResponseDto> activities;
         private List<CertificationResponseDto> certifications;
         private List<EvaluationResponseDto> evaluations;
-        private Boolean evaluationPublic;
     }
 
     @Getter
@@ -158,6 +157,7 @@ public class ProfileResponseDto {
         private List<ActivityResponseDto> activities;
         private List<CertificationResponseDto> certifications;
         private List<EvaluationResponseDto> evaluations;
+        private String nickname;
     }
 
     @Getter

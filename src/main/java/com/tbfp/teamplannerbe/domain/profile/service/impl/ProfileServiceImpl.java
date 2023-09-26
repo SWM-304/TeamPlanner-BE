@@ -74,18 +74,21 @@ public class ProfileServiceImpl implements ProfileService {
         if(!member.isPresent()) throw new ApplicationException(ApplicationErrorType.USER_NOT_FOUND);
 
         Long memberId = member.get().getId();
+        String nickname = member.get().getNickname();
 
         ProfileResponseDto.BasicProfileResponseDto basicProfileResponseDto = basicProfileRepository.findByMemberId(memberId).orElseThrow(()->new ApplicationException(ApplicationErrorType.PROFILE_NOT_EXIST)).toDto();
         List<ProfileResponseDto.TechStackResponseDto> techStackResponseDtos = techStackRepository.findAllByMemberId(memberId).orElse(null).stream().map(TechStack::toDto).collect(Collectors.toList());
         List<ProfileResponseDto.ActivityResponseDto> activityResponseDtos = activityRepository.findAllByMemberId(memberId).orElse(null).stream().map(Activity::toDto).collect(Collectors.toList());
         List<ProfileResponseDto.CertificationResponseDto> certificationResponseDtos = certificationRepository.findAllByMemberId(memberId).orElse(null).stream().map(Certification::toDto).collect(Collectors.toList());
         List<ProfileResponseDto.EvaluationResponseDto> evaluationResponseDtos = evaluationRepository.findAllBySubjectMemberId(memberId).orElse(null).stream().map(Evaluation::toDto).collect(Collectors.toList());
+
         return ProfileResponseDto.GetProfileResponseDto.builder()
                 .basicProfile(basicProfileResponseDto)
                 .techStacks(techStackResponseDtos)
                 .activities(activityResponseDtos)
                 .certifications(certificationResponseDtos)
                 .evaluations(evaluationResponseDtos)
+                .nickname(nickname)
                 .build();
     }
 

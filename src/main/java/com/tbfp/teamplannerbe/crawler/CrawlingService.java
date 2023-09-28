@@ -1,9 +1,6 @@
 package com.tbfp.teamplannerbe.crawler;
-
-import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.board.service.BoardService;
-import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -11,15 +8,17 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
+import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -33,37 +32,38 @@ import java.util.regex.Pattern;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class CrawlingTest {
+public class CrawlingService {
+
+    @Value("${web.chromedriver}")
+    private String CHROME_DRIVER_PATH;
 
     private final BoardService boardService;
     SimpleDateFormat format = new SimpleDateFormat("yy.M.d");
 
     // 현재 날짜와 시간 가져오기
-    LocalDateTime now = LocalDateTime.now(  );
+    LocalDateTime now = LocalDateTime.now();
 
     // 형식 지정
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.MM.dd");
 
     // 날짜 형식 변환
     String currentDate = now.format(formatter);
-    private final String CHROME_DRIVER_PATH = "/Users/minwookim/Downloads/chromedriver-mac-arm64/chromedriver";
-
     /**
      *
      * 몇페이지를 가지고 올 것이고 스케줄링을 몇 일 주기로 돌릴 것인지 설정
      */
+
     @Scheduled(fixedDelay = 7 * 24 * 60 * 60 * 1000) // 1 week
     public void searchXml() throws IOException {
         System.setProperty("webdriver.chrome.driver", CHROME_DRIVER_PATH);
-
         int maxNumber = maxNumberXml();
         String baseUrl = "https://linkareer.com/sitemap/activities/%s.xml";
 
-        for (int i = maxNumber; i > maxNumber - 5; i--) {
-            String url = String.format(baseUrl, maxNumber);
+        for (int i = maxNumber; i > maxNumber - 2; i--) {
+            String url = String.format(baseUrl, i);
             Document doc = Jsoup.connect(url).get();
             Elements locElements = doc.select("loc");
-            for (Element locElement : locElements) {
+            for (Element locElement : locElements) { // 주석 해제
                 String link = locElement.text();
                 if (link.startsWith("https")) {
                     searchActivity(link);
@@ -71,18 +71,15 @@ public class CrawlingTest {
             }
         }
     }
-
     /**
      * xml 에서 최신 xmlNumber은 추출하는해옴
      */
-
     public int maxNumberXml(){
         int maxActivityNum = -1;
         try {
             Document doc = Jsoup.connect("https://linkareer.com/sitemap/sitemapindex.xml").get();
             String robotsTxt = doc.text();
             // Find the sitemap URLs
-            System.out.println(robotsTxt);
 
             String[] text = robotsTxt.split(" ");
 
@@ -122,24 +119,30 @@ public class CrawlingTest {
      */
 
     private void searchActivity(String link) throws IOException {
+        System.out.println("링크:"+ link);
         ChromeOptions options = configureChromeOptions();
         WebDriver driver = new ChromeDriver(options);
 
-        driver.get(link);
-        try { Thread.sleep(1000); } catch (InterruptedException e) {}
+        try {
+            driver.get(link);
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10)); // Adjust the timeout as needed
 
-        List<WebElement> elements = driver.findElements(By.cssSelector(".nav-menu-list [data-active='true']"));
-        for (WebElement element : elements) {
-            if (element.getText().equals("공모전")) {
-                processContestActivity(driver, link);
-            } else if (element.getText().equals("대외활동")) {
-                processExternalActivity(driver, link);
-            } else if (element.getText().equals("동아리")) {
-                processClubActivity(driver, link);
+            // Wait for elements to load
+            WebElement activityElement = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".nav-menu-list [data-active='true']")));
+
+            if (activityElement != null) {
+                String activityType = activityElement.getText();
+                if ("공모전".equals(activityType)) {
+                    processContestActivity(driver,link);
+                } else if ("대외활동".equals(activityType)) {
+                    processExternalActivity(driver,link);
+                } else if ("동아리".equals(activityType)) {
+                    processClubActivity(driver,link);
+                }
             }
+        } finally {
+            driver.quit(); // Always quit the driver to avoid memory leaks
         }
-
-        driver.quit();
     }
 
     /**

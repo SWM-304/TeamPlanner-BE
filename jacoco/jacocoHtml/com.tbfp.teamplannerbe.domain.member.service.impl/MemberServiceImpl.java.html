@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MemberServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TeamPlanner-BE</a> &gt; <a href="index.source.html" class="el_package">com.tbfp.teamplannerbe.domain.member.service.impl</a> &gt; <span class="el_source">MemberServiceImpl.java</span></div><h1>MemberServiceImpl.java</h1><pre class="source lang-java linenums">package com.tbfp.teamplannerbe.domain.member.service.impl;
+
+import com.tbfp.teamplannerbe.config.redis.util.EmailRedisUtil;
+import com.tbfp.teamplannerbe.domain.auth.JwtProvider;
+import com.tbfp.teamplannerbe.domain.auth.entity.RefreshToken;
+import com.tbfp.teamplannerbe.domain.auth.repository.RefreshTokenRepository;
+import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
+import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
+import com.tbfp.teamplannerbe.domain.member.*;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberRequestDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.RecruitmentApplicantResponseDto;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto.getMemberInfoDto;
+import com.tbfp.teamplannerbe.domain.member.entity.Member;
+import com.tbfp.teamplannerbe.domain.profile.entity.BasicProfile;
+import com.tbfp.teamplannerbe.domain.profile.repository.BasicProfileRepository;
+import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
+import com.tbfp.teamplannerbe.domain.member.service.MailSenderService;
+import com.tbfp.teamplannerbe.domain.member.service.MemberService;
+import com.tbfp.teamplannerbe.domain.profile.service.ProfileService;
+import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
+import static com.tbfp.teamplannerbe.domain.board.entity.QBoard.board;
+import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType.*;
+import static com.tbfp.teamplannerbe.domain.member.entity.QMember.member;
+import static com.tbfp.teamplannerbe.domain.recruitment.entity.QRecruitment.recruitment;
+
+@Service
+<span class="nc" id="L41">@RequiredArgsConstructor</span>
+<span class="nc" id="L42">@Slf4j</span>
+@Transactional(readOnly = true)
+public class MemberServiceImpl implements MemberService {
+
+    private final MemberRepository memberRepository;
+    private final BasicProfileRepository basicProfileRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtProvider jwtProvider;
+    private final MailSenderService mailSenderService;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final ProfileService profileService;
+    private final EmailRedisUtil emailRedisUtil;
+    @Override
+    public Optional&lt;Member&gt; findMemberByUsername(String username) {
+<span class="nc" id="L56">        return memberRepository.findMemberByUsername(username);</span>
+    }
+
+    @Override
+    public List&lt;Member&gt; members() {
+<span class="nc" id="L61">        return memberRepository.basicSelect();</span>
+    }
+
+
+    @Override
+    @Transactional
+    public String renewAccessToken(String refreshToken) {
+<span class="nc" id="L68">        log.info(&quot;MemberServiceImpl.renewAccessToken&quot;);</span>
+<span class="nc" id="L69">        log.info(&quot;refreshToken = &quot; + refreshToken);</span>
+
+        // check refreshToken is valid ( expired?..)
+<span class="nc bnc" id="L72" title="All 2 branches missed.">        if (!jwtProvider.verifyToken(refreshToken)) {</span>
+<span class="nc" id="L73">            throw new ApplicationException(ApplicationErrorType.INVALID_REFRESH_TOKEN);</span>
+            // should re-login
+        }
+
+        // get user
+<span class="nc" id="L78">        String username = jwtProvider.getUsernameFromToken(refreshToken);</span>
+<span class="nc" id="L79">        RefreshToken refreshTokenFound = refreshTokenRepository.findById(username).orElseThrow(() -&gt; new ApplicationException(REFRESH_TOKEN_FOR_USER_NOT_FOUND));</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">        if (!refreshTokenFound.getToken().equals(refreshToken)) {</span>
+<span class="nc" id="L81">            throw new RuntimeException(&quot;not matching refreshToken&quot;);</span>
+        }
+
+<span class="nc" id="L84">        return jwtProvider.generateAccessToken(username);</span>
+    }
+
+    @Override
+    @Transactional
+    public MemberResponseDto.SignUpResponseDto buildSignUpResponse(MemberRequestDto.SignUpRequestDto signUpRequestDto) {
+
+<span class="nc" id="L91">        String username = signUpRequestDto.getUsername();</span>
+        //Id 중복
+<span class="nc bnc" id="L93" title="All 2 branches missed.">        if(findMemberByUsername(username).isPresent()){</span>
+<span class="nc" id="L94">            throw new ApplicationException(DUPLICATE_USERNAME);</span>
+        }
+
+<span class="nc" id="L97">        String nickname = signUpRequestDto.getNickname();</span>
+        //닉네임 중복
+<span class="nc bnc" id="L99" title="All 2 branches missed.">        if(memberRepository.findByNickname(nickname).isPresent()){</span>
+<span class="nc" id="L100">            throw new ApplicationException(DUPLICATE_NICKNAME);</span>
+        }
+<span class="nc" id="L102">        registerMember(signUpRequestDto);</span>
+
+<span class="nc" id="L104">        return MemberResponseDto.SignUpResponseDto.builder().</span>
+<span class="nc" id="L105">                message(&quot;회원가입이 완료되었습니다.&quot;).</span>
+<span class="nc" id="L106">                build();</span>
+    }
+
+    @Override
+    @Transactional
+    public void registerMember(MemberRequestDto.SignUpRequestDto signUpRequestDto){
+        try {
+<span class="nc" id="L113">            signUpRequestDto.setPassword(bCryptPasswordEncoder.encode(signUpRequestDto.getPassword()));</span>
+<span class="nc" id="L114">            Member member = signUpRequestDto.toMember();</span>
+<span class="nc" id="L115">            memberRepository.save(member);</span>
+<span class="nc" id="L116">            BasicProfile basicProfile = signUpRequestDto.toBasicProfile(member);</span>
+<span class="nc" id="L117">            basicProfileRepository.save(basicProfile);</span>
+<span class="nc" id="L118">        } catch (Exception e){</span>
+<span class="nc" id="L119">            throw new ApplicationException(MEMBER_REGISTER_FAIL);</span>
+<span class="nc" id="L120">        }</span>
+<span class="nc" id="L121">    }</span>
+
+    @Override
+    @Transactional
+    public Map&lt;String, List&lt;Map&lt;String, String&gt;&gt;&gt; getEnums(){
+<span class="nc" id="L126">        Map&lt;String, List&lt;Map&lt;String, String&gt;&gt;&gt; enumsMap = new HashMap&lt;&gt;();</span>
+
+<span class="nc" id="L128">        enumsMap.put(&quot;job&quot;, Arrays.stream(Job.values())</span>
+<span class="nc" id="L129">                .map(job -&gt; mapEntry(job.name(), job.getLabel()))</span>
+<span class="nc" id="L130">                .collect(Collectors.toList()));</span>
+
+<span class="nc" id="L132">        enumsMap.put(&quot;education&quot;, Arrays.stream(Education.values())</span>
+<span class="nc" id="L133">                .map(education -&gt; mapEntry(education.name(), education.getLabel()))</span>
+<span class="nc" id="L134">                .collect(Collectors.toList()));</span>
+
+<span class="nc" id="L136">        enumsMap.put(&quot;gender&quot;, Arrays.stream(Gender.values())</span>
+<span class="nc" id="L137">                .map(gender -&gt; mapEntry(gender.name(), gender.getLabel()))</span>
+<span class="nc" id="L138">                .collect(Collectors.toList()));</span>
+
+<span class="nc" id="L140">        return enumsMap;</span>
+    }
+
+    private static Map&lt;String, String&gt; mapEntry(String name, String label) {
+<span class="nc" id="L144">        Map&lt;String, String&gt; entry = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L145">        entry.put(&quot;name&quot;, name);</span>
+<span class="nc" id="L146">        entry.put(&quot;label&quot;, label);</span>
+<span class="nc" id="L147">        return entry;</span>
+    }
+
+    @Override
+    @Transactional
+    public MemberResponseDto.CheckDuplicateUsernameResponseDto checkDuplicateUsername(MemberRequestDto.CheckDuplicateUsernameRequestDto checkDuplicateUsernameRequestDto){
+<span class="nc" id="L153">        String username = checkDuplicateUsernameRequestDto.getUsername();</span>
+<span class="nc bnc" id="L154" title="All 2 branches missed.">        if(findMemberByUsername(username).isPresent()){</span>
+<span class="nc" id="L155">            throw new ApplicationException(DUPLICATE_USERNAME);</span>
+        }
+<span class="nc" id="L157">        return MemberResponseDto.CheckDuplicateUsernameResponseDto.builder().</span>
+<span class="nc" id="L158">                message(&quot;사용 가능한 아이디입니다.&quot;).</span>
+<span class="nc" id="L159">                build();</span>
+    }
+
+
+    @Override
+    @Transactional
+    public MemberResponseDto.CheckDuplicateNicknameResponseDto checkDuplicateNickname(MemberRequestDto.CheckDuplicateNicknameRequestDto checkDuplicateNicknameRequestDto){
+<span class="nc" id="L166">        String nickname = checkDuplicateNicknameRequestDto.getNickname();</span>
+<span class="nc bnc" id="L167" title="All 2 branches missed.">        if(memberRepository.findByNickname(nickname).isPresent()){</span>
+<span class="nc" id="L168">            throw new ApplicationException(DUPLICATE_NICKNAME);</span>
+        }
+<span class="nc" id="L170">        return MemberResponseDto.CheckDuplicateNicknameResponseDto.builder().</span>
+<span class="nc" id="L171">                message(&quot;사용 가능한 닉네임입니다.&quot;).</span>
+<span class="nc" id="L172">                build();</span>
+    }
+
+
+//    private ConcurrentHashMap&lt;String, Map&lt;String,Object&gt;&gt; authenticateMap = new ConcurrentHashMap&lt;&gt;();
+
+
+    @Override
+    @Transactional
+    public MemberResponseDto.EmailResponseDto sendVerificationEmail(MemberRequestDto.EmailRequestDto emailRequestDto) {//인증번호 발급, 재발급
+
+<span class="nc" id="L183">        String email = emailRequestDto.getEmail();</span>
+<span class="nc" id="L184">        VerifyPurpose verifyPurpose = emailRequestDto.getVerifyPurpose();</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">        if (emailRedisUtil.existData(email)) emailRedisUtil.deleteData(email);</span>
+
+
+        try {
+
+
+
+<span class="nc" id="L192">            Integer verificationCode = mailSenderService.getVerificationNumber();</span>
+<span class="nc" id="L193">            String mailSubject = &quot;TeamPlanner &quot; + verifyPurpose.getLabel() + &quot; 인증번호입니다.&quot;;</span>
+<span class="nc" id="L194">            String mailBody = mailSubject + &quot;\n&quot; + verificationCode.toString();</span>
+<span class="nc" id="L195">            mailSenderService.sendEmail(email, mailSubject, mailBody);</span>
+
+            //Concurrent에 이메일주소, 인증번호, 만료시간 저장
+//            LocalDateTime expireDateTime = LocalDateTime.now().plusSeconds(180);
+//            Map&lt;String,Object&gt; innerMap = new ConcurrentHashMap&lt;&gt;();
+//            innerMap.put(&quot;verificationCode&quot;,verificationCode);
+//            innerMap.put(&quot;expireDateTime&quot;,expireDateTime);
+//            innerMap.put(&quot;verifyPurpose&quot;,verifyPurpose);
+<span class="nc" id="L203">            emailRedisUtil.setListData(email,verificationCode,verifyPurpose,60*3L);</span>
+//            authenticateMap.put(emailAddress,innerMap);
+
+
+<span class="nc" id="L207">            return MemberResponseDto.EmailResponseDto.builder().</span>
+<span class="nc" id="L208">                    message(&quot;이메일로 인증번호 발송에 성공했습니다.&quot;).</span>
+<span class="nc" id="L209">                    build();</span>
+<span class="nc" id="L210">        } catch (Exception e) {</span>
+<span class="nc" id="L211">            throw new ApplicationException(MAIL_ERROR);</span>
+        }
+    }
+
+    public VerificationStatus getVerificationStatus(String email, String userInputCode, VerifyPurpose verifyPurpose){
+
+
+
+
+<span class="nc bnc" id="L220" title="All 2 branches missed.">        if(!emailRedisUtil.existData(email))  return VerificationStatus.UNPROVIDED;;</span>
+
+
+<span class="nc" id="L223">        List&lt;String&gt; info = emailRedisUtil.getData(email);</span>
+<span class="nc bnc" id="L224" title="All 4 branches missed.">        if(info.isEmpty() || info.get(0)==null){</span>
+<span class="nc" id="L225">            return VerificationStatus.UNPROVIDED;</span>
+        }
+
+<span class="nc" id="L228">        String[] splitInfo = info.get(0).split(&quot;\\|&quot;);</span>
+<span class="nc" id="L229">        String verificationCode = splitInfo[0];</span>
+<span class="nc" id="L230">        VerifyPurpose verifyPurposeInMap = VerifyPurpose.valueOf(splitInfo[1]);</span>
+
+        //다른 타입의 인증번호
+<span class="nc bnc" id="L233" title="All 2 branches missed.">        if(!verifyPurposeInMap.equals(verifyPurpose)){</span>
+<span class="nc" id="L234">            sendVerificationEmail(</span>
+<span class="nc" id="L235">                    MemberRequestDto.EmailRequestDto.builder().</span>
+<span class="nc" id="L236">                            email(email).</span>
+<span class="nc" id="L237">                            verifyPurpose(verifyPurpose).</span>
+<span class="nc" id="L238">                            build()</span>
+            );
+<span class="nc" id="L240">            return VerificationStatus.UNPROVIDED;</span>
+        }
+        //인증번호 기한 만료
+
+        //redis 는 만료시간되면 자동으로 삭제됨
+//        if (expireDateTime.isBefore(LocalDateTime.now())){//인증번호 만료시
+//            authenticateMap.remove(emailAddress);
+//            //인증번호 재발급
+//            sendVerificationEmail(
+//                    MemberRequestDto.EmailAddressRequestDto.builder().
+//                            emailAddress(emailAddress).
+//                            verifyPurpose(verifyPurpose).
+//                            build()
+//            );
+//            return VerificationStatus.EXPIRED;
+//        }
+        //인증번호 일치
+<span class="nc bnc" id="L257" title="All 2 branches missed.">        if (userInputCode.equals(verificationCode)){</span>
+<span class="nc" id="L258">            emailRedisUtil.deleteData(email);</span>
+<span class="nc" id="L259">            return VerificationStatus.MATCHED;</span>
+        }
+        //인증번호 불일치
+<span class="nc" id="L262">        return VerificationStatus.UNMATCHED;</span>
+    }
+
+    @Override
+    @Transactional
+    public MemberResponseDto.VerificationResponseDto verifyCode(MemberRequestDto.VerificationRequestDto verificationRequestDto){
+<span class="nc" id="L268">        VerificationStatus verificationStatus = getVerificationStatus(</span>
+<span class="nc" id="L269">                verificationRequestDto.getEmail(),</span>
+<span class="nc" id="L270">                verificationRequestDto.getCode(),</span>
+<span class="nc" id="L271">                verificationRequestDto.getVerifyPurpose()</span>
+        );
+
+<span class="nc bnc" id="L274" title="All 5 branches missed.">        switch (verificationStatus) {</span>
+            case MATCHED:
+<span class="nc" id="L276">                return MemberResponseDto.VerificationResponseDto.builder().</span>
+<span class="nc" id="L277">                        message(&quot;이메일 인증에 성공했습니다.&quot;).</span>
+<span class="nc" id="L278">                        build();</span>
+            case UNMATCHED:
+<span class="nc" id="L280">                throw new ApplicationException(VERIFICATION_CODE_UNMATCHED);</span>
+            case EXPIRED:
+<span class="nc" id="L282">                throw new ApplicationException(VERIFICATION_CODE_EXPIRED);</span>
+            case UNPROVIDED:
+<span class="nc" id="L284">                throw new ApplicationException(VERIFICATION_CODE_UNPROVIDED);</span>
+            default:
+<span class="nc" id="L286">                throw new RuntimeException(&quot;이메일 인증에 예기치 못한 오류가 발생했습니다.&quot;);</span>
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deleteMember(String username){
+<span class="nc bnc" id="L293" title="All 2 branches missed.">        if(!findMemberByUsername(username).isPresent()){</span>
+<span class="nc" id="L294">            throw new ApplicationException(USER_NOT_FOUND);</span>
+        }
+<span class="nc" id="L296">        memberRepository.updateMemberStateFalseByUsername(username);</span>
+<span class="nc" id="L297">    }</span>
+
+    @Override
+    @Transactional
+    public MemberResponseDto.ForgotUsernameResponseDto findForgotUsername(MemberRequestDto.ForgotUsernameRequestDto forgotUsernameRequestDto){
+<span class="nc" id="L302">        String email = forgotUsernameRequestDto.getEmail();</span>
+//        String code = forgotUsernameRequestDto.getCode();
+//        VerificationStatus verificationStatus = getVerificationStatus(email,code,VerifyPurpose.FORGOT_ID);
+//
+//        Boolean emailChecked = true;
+//        if(verificationStatus!=VerificationStatus.MATCHED) emailChecked = false;
+//
+//        if(!emailChecked) throw new ApplicationException(UNVERIFIED_EMAIL);
+
+<span class="nc" id="L311">        List&lt;String&gt; usernameList = memberRepository.findUsernamesByEmail(forgotUsernameRequestDto.getEmail()).orElseThrow(() -&gt; new ApplicationException(USER_NOT_FOUND));</span>
+<span class="nc bnc" id="L312" title="All 2 branches missed.">        if(usernameList.isEmpty()) throw new ApplicationException(USER_NOT_FOUND);</span>
+
+        try {
+<span class="nc" id="L315">            String mailSubject = &quot;TeamPlanner 아이디 안내: &quot; + forgotUsernameRequestDto.getEmail();</span>
+
+<span class="nc" id="L317">            StringBuilder mailBodyBuilder = new StringBuilder();</span>
+<span class="nc" id="L318">            mailBodyBuilder.append(&quot;&lt;html&gt;&lt;body style=\&quot;font-family: Arial, sans-serif;\&quot;&gt;&quot;);</span>
+<span class="nc" id="L319">            mailBodyBuilder.append(&quot;&lt;div style=\&quot;background-color: #f4f4f4; padding: 20px;\&quot;&gt;&quot;);</span>
+<span class="nc" id="L320">            mailBodyBuilder.append(&quot;&lt;h2 style=\&quot;color: #333;\&quot;&gt;안녕하세요, TeamPlanner 계정 관련 안내 메일입니다.&lt;/h2&gt;&quot;);</span>
+<span class="nc" id="L321">            mailBodyBuilder.append(&quot;&lt;p style=\&quot;color: #555;\&quot;&gt;요청하신 이메일(&quot;).append(forgotUsernameRequestDto.getEmail()).append(&quot;)에 연동된 아이디는 다음과 같습니다:&lt;/p&gt;&quot;);</span>
+<span class="nc" id="L322">            mailBodyBuilder.append(&quot;&lt;ul&gt;&quot;);</span>
+<span class="nc bnc" id="L323" title="All 2 branches missed.">            for (String username : usernameList) {</span>
+<span class="nc" id="L324">                mailBodyBuilder.append(&quot;&lt;li style=\&quot;color: #777;\&quot;&gt;&quot;).append(username).append(&quot;&lt;/li&gt;&quot;);</span>
+<span class="nc" id="L325">            }</span>
+<span class="nc" id="L326">            mailBodyBuilder.append(&quot;&lt;/ul&gt;&quot;);</span>
+<span class="nc" id="L327">            mailBodyBuilder.append(&quot;&lt;p style=\&quot;color: #555;\&quot;&gt;더 궁금한 사항이 있으시면 언제든지 문의해주세요.&lt;/p&gt;&quot;);</span>
+<span class="nc" id="L328">            mailBodyBuilder.append(&quot;&lt;p style=\&quot;color: #555;\&quot;&gt;감사합니다,&lt;br&gt;TeamPlanner 드림&lt;/p&gt;&quot;);</span>
+<span class="nc" id="L329">            mailBodyBuilder.append(&quot;&lt;/div&gt;&quot;);</span>
+<span class="nc" id="L330">            mailBodyBuilder.append(&quot;&lt;/body&gt;&lt;/html&gt;&quot;);</span>
+
+<span class="nc" id="L332">            String mailBody = mailBodyBuilder.toString();</span>
+<span class="nc" id="L333">            mailSenderService.sendEmail(email, mailSubject, mailBody);</span>
+<span class="nc" id="L334">        }catch (Exception e) {</span>
+<span class="nc" id="L335">            throw new ApplicationException(MAIL_ERROR);</span>
+<span class="nc" id="L336">        }</span>
+
+
+<span class="nc" id="L339">        return MemberResponseDto.ForgotUsernameResponseDto.builder().</span>
+<span class="nc" id="L340">                usernames(usernameList).</span>
+<span class="nc" id="L341">                message(&quot;아이디 조회에 성공했습니다.&quot;).</span>
+<span class="nc" id="L342">                build();</span>
+    }
+
+    @Override
+    @Transactional
+    public MemberResponseDto.ForgotPasswordResponseDto findForgotPassword(MemberRequestDto.ForgotPasswordRequestDto forgotPasswordRequestDto) {
+<span class="nc" id="L348">        String username = forgotPasswordRequestDto.getUsername();</span>
+<span class="nc" id="L349">        String email = forgotPasswordRequestDto.getEmail();</span>
+<span class="nc" id="L350">        String code = forgotPasswordRequestDto.getCode();</span>
+<span class="nc" id="L351">        VerificationStatus verificationStatus = getVerificationStatus(email,code,VerifyPurpose.FORGOT_PASSWORD);</span>
+
+<span class="nc" id="L353">        Boolean emailChecked = true;</span>
+<span class="nc bnc" id="L354" title="All 2 branches missed.">        if(verificationStatus!=VerificationStatus.MATCHED) emailChecked = false;</span>
+
+<span class="nc bnc" id="L356" title="All 2 branches missed.">        if (!emailChecked) throw new ApplicationException(UNVERIFIED_EMAIL);</span>
+
+<span class="nc bnc" id="L358" title="All 2 branches missed.">        if(!memberRepository.findUsernamesByEmail(email).orElse(Collections.emptyList()).contains(username)){</span>
+<span class="nc" id="L359">            throw new ApplicationException(INVALID_CONTACT_EMAIL);</span>
+        }
+
+<span class="nc" id="L362">        Optional&lt;Member&gt; optionalMember = memberRepository.findMemberByUsername(username);</span>
+<span class="nc bnc" id="L363" title="All 2 branches missed.">        if(!optionalMember.isPresent()) throw new ApplicationException(USER_NOT_FOUND);</span>
+
+        //임시 비밀번호 전송
+<span class="nc" id="L366">        Member member = optionalMember.get();</span>
+        try {
+<span class="nc" id="L368">            String newPassword = mailSenderService.getRandomPassword();</span>
+<span class="nc" id="L369">            String mailSubject = &quot;TeamPlanner 임시 발급된 비밀번호입니다.&quot;;</span>
+<span class="nc" id="L370">            String mailBody = mailSubject + &quot;\n반드시 접속 후 비밀번호를 재설정 하시길 바랍니다.\n&quot; + newPassword.toString();</span>
+<span class="nc" id="L371">            mailSenderService.sendEmail(email, mailSubject, mailBody);</span>
+
+<span class="nc" id="L373">            String encodedPassword = bCryptPasswordEncoder.encode(newPassword);</span>
+<span class="nc" id="L374">            memberRepository.updateMemberPassword(member, encodedPassword);</span>
+
+<span class="nc" id="L376">            return MemberResponseDto.ForgotPasswordResponseDto.builder().</span>
+<span class="nc" id="L377">                    message(&quot;임시 비밀번호를 이메일로 보냈습니다. 반드시 접속 후 재설정해주세요&quot;).</span>
+<span class="nc" id="L378">                    build();</span>
+
+<span class="nc" id="L380">        } catch (Exception e) {</span>
+<span class="nc" id="L381">            throw new ApplicationException(MAIL_ERROR);</span>
+        }
+    }
+
+    @Override
+    public Member findMemberByUsernameOrElseThrowApplicationException(String username) {
+<span class="nc" id="L387">        return memberRepository.findMemberByUsername(username).orElseThrow(() -&gt; new ApplicationException(USER_NOT_FOUND));</span>
+    }
+
+    @Override
+    public List&lt;RecruitmentApplicantResponseDto&gt; findApplicantList(String username) {
+<span class="nc" id="L392">        List&lt;Recruitment&gt; applicantList = memberRepository.getApplicantList(username);</span>
+
+
+<span class="nc" id="L395">        List&lt;RecruitmentApplicantResponseDto&gt; result = applicantList.stream().map(i -&gt; new RecruitmentApplicantResponseDto(i)).collect(Collectors.toList());</span>
+<span class="nc" id="L396">        return result;</span>
+    }
+
+    @Override
+    public getMemberInfoDto getMemberInfo(String username) {
+<span class="nc" id="L401">        BasicProfile basicProfile = profileService.getBasicProfile(username);</span>
+<span class="nc" id="L402">        Member member = memberRepository.findMemberByUsername(username).orElseThrow(() -&gt; new ApplicationException(USER_NOT_FOUND));</span>
+<span class="nc" id="L403">        return getMemberInfoDto.builder()</span>
+<span class="nc" id="L404">                .username(username)</span>
+<span class="nc" id="L405">                .nickname(member.getNickname())</span>
+<span class="nc" id="L406">                .memberId(member.getId())</span>
+<span class="nc" id="L407">                .profileImg(basicProfile.getProfileImage())</span>
+<span class="nc" id="L408">                .build();</span>
+    }
+
+    @Override
+    public MemberResponseDto.idAndEmailVerifyResponseDto verifyIdAndEmail(MemberRequestDto.IdAndEmailVerifyRequestDto verifyRequestDto) {
+
+<span class="nc" id="L414">        memberRepository.findByUsernameAndEmail(verifyRequestDto.getUsername(),verifyRequestDto.getEmail())</span>
+<span class="nc" id="L415">                .orElseThrow(() -&gt; new ApplicationException(USER_NOT_FOUND));</span>
+
+
+<span class="nc" id="L418">        return MemberResponseDto.idAndEmailVerifyResponseDto.builder()</span>
+<span class="nc" id="L419">                .message(&quot;사용자 정보가 일치합니다&quot;)</span>
+<span class="nc" id="L420">                .build();</span>
+    }
+
+    @Override
+    public MemberResponseDto.NickNameAndEmailVerifyResponseDto verifyNicknameAndEmail(MemberRequestDto.NickNameAndEmailVerifyRequestDto verifyRequestDto) {
+
+<span class="nc" id="L426">        memberRepository.findByNicknameAndEmail(verifyRequestDto.getNickname(),verifyRequestDto.getEmail())</span>
+<span class="nc" id="L427">                .orElseThrow(() -&gt; new ApplicationException(USER_NOT_FOUND));</span>
+
+
+<span class="nc" id="L430">        return MemberResponseDto.NickNameAndEmailVerifyResponseDto.builder()</span>
+<span class="nc" id="L431">                .message(&quot;사용자 정보가 일치합니다&quot;)</span>
+<span class="nc" id="L432">                .build();</span>
+
+    }
+    @Override
+    public Member findMemberByNicknameOrElseThrowApplicationException(String nickname) {
+<span class="nc" id="L437">        return memberRepository.findByNickname(nickname).orElseThrow(() -&gt; new ApplicationException(USER_NOT_FOUND));</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

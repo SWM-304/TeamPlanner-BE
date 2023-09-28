@@ -113,3 +113,6 @@ permitUrls:
   delete:
   put:
   patch:
+
+web:
+  chromedriver: /Users/minwookim/Downloads/chromedriver-mac-arm64/chromedriver

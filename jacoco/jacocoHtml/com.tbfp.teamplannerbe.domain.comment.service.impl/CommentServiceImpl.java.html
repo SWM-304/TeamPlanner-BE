@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CommentServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TeamPlanner-BE</a> &gt; <a href="index.source.html" class="el_package">com.tbfp.teamplannerbe.domain.comment.service.impl</a> &gt; <span class="el_source">CommentServiceImpl.java</span></div><h1>CommentServiceImpl.java</h1><pre class="source lang-java linenums">package com.tbfp.teamplannerbe.domain.comment.service.impl;
+
+
+import com.tbfp.teamplannerbe.domain.board.repository.BoardRepository;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CreateCommentRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.UpdateCommentRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentRequestDto.CommentToCommentCreateRequestDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.CreatedCommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.CreatedchildCommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto.UpdatedCommentResponseDto;
+import com.tbfp.teamplannerbe.domain.comment.entity.Comment;
+import com.tbfp.teamplannerbe.domain.comment.repository.CommentRepository;
+import com.tbfp.teamplannerbe.domain.comment.service.CommentService;
+import com.tbfp.teamplannerbe.domain.board.entity.Board;
+import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
+import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
+import com.tbfp.teamplannerbe.domain.member.entity.Member;
+import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType.*;
+
+@Service
+<span class="nc" id="L32">@RequiredArgsConstructor</span>
+<span class="nc" id="L33">@Slf4j</span>
+@Transactional(readOnly = true)
+public class CommentServiceImpl implements CommentService {
+
+    private final BoardRepository boardRepository;
+    private final MemberRepository memberRepository;
+    private final CommentRepository commentRepository;
+//
+//    @PersistenceContext
+//    private EntityManager em;
+
+    /**
+     *
+     * @param
+     * {
+     *     &quot;boardId&quot;:&quot;1&quot;,
+     *     &quot;content&quot;:&quot;안녕&quot;,
+     *     &quot;memberId&quot;:&quot;test2&quot;
+     * }
+     * @return
+     * commnetId 예) 1
+     */
+    @Override
+    @Transactional
+    public CreatedCommentResponseDto sendComment(CreateCommentRequestDto createCommentRequestDto) {
+<span class="nc" id="L58">        Member member = memberRepository.findMemberByUsername(createCommentRequestDto.getMemberId())</span>
+<span class="nc" id="L59">                .orElseThrow(() -&gt; new ApplicationException(USER_NOT_FOUND));</span>
+
+<span class="nc" id="L61">        Board board = boardRepository.findById(createCommentRequestDto.getBoardId())</span>
+<span class="nc" id="L62">                .orElseThrow(() -&gt; new ApplicationException(BOARD_NOT_FOUND));</span>
+
+<span class="nc" id="L64">        Comment comment = Comment.builder()</span>
+<span class="nc" id="L65">                .content(createCommentRequestDto.getContent())</span>
+<span class="nc" id="L66">                .state(true)  // 막 생성 된거니 state true</span>
+<span class="nc" id="L67">                .board(board)</span>
+<span class="nc" id="L68">                .depth(1)</span>
+<span class="nc" id="L69">                .member(member)</span>
+<span class="nc" id="L70">                .isConfidential(createCommentRequestDto.getIsConfidential())</span>
+<span class="nc" id="L71">                .build();</span>
+
+<span class="nc" id="L73">        Comment savedComment = commentRepository.save(comment);</span>
+
+<span class="nc" id="L75">        CreatedCommentResponseDto commentResponseDto = savedComment.toDto();</span>
+<span class="nc" id="L76">        return commentResponseDto;</span>
+    }
+
+
+    /**
+     *
+     * localhost:8080/api/v1/comment/delete/1/comment/1
+     */
+
+    @Override
+    @Transactional
+    public void deleteComment(Long boardId, Long commentId) {
+<span class="nc" id="L88">        boardRepository.findById(boardId)</span>
+<span class="nc" id="L89">                .orElseThrow(() -&gt; new ApplicationException(BOARD_NOT_FOUND));</span>
+
+<span class="nc" id="L91">        Comment findComment=commentRepository.findById(commentId).</span>
+<span class="nc" id="L92">                orElseThrow(()-&gt;new ApplicationException(COMMENT_NOT_FOUND));</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">        if(findComment.isState()){</span>
+<span class="nc" id="L94">            findComment.changeState(false);</span>
+<span class="nc" id="L95">            commentRepository.save(findComment);</span>
+        }
+
+<span class="nc" id="L98">    }</span>
+
+
+    /**
+     *
+     * @param updateCommentRequestDto
+     * {
+     *     &quot;boardId&quot;:&quot;1&quot;,
+     *     &quot;content&quot;:&quot;수정된 글 입니다&quot;,
+     *     &quot;commentId&quot;:&quot;3&quot;
+     * }
+     * @return
+     * comment.getId()
+     */
+    @Override
+    @Transactional
+    public UpdatedCommentResponseDto updateComment(UpdateCommentRequestDto updateCommentRequestDto) {
+
+<span class="nc" id="L116">        Comment findComment = commentRepository.findByIdAndStateIsTrue(</span>
+<span class="nc" id="L117">                updateCommentRequestDto.getCommentId());</span>
+
+<span class="nc bnc" id="L119" title="All 2 branches missed.">        if(findComment==null){</span>
+<span class="nc" id="L120">            throw new ApplicationException(COMMENT_NOT_FOUND);</span>
+        }
+
+<span class="nc" id="L123">        findComment.updateContent(updateCommentRequestDto.getContent());</span>
+
+<span class="nc" id="L125">        Comment savedComment = commentRepository.save(findComment);</span>
+
+<span class="nc" id="L127">        UpdatedCommentResponseDto commentResponseDto = UpdatedCommentResponseDto.builder()</span>
+<span class="nc" id="L128">                .content(savedComment.getContent())</span>
+<span class="nc" id="L129">                .boardId(savedComment.getBoard().getId())</span>
+<span class="nc" id="L130">                .memberId(savedComment.getMember().getUsername())</span>
+<span class="nc" id="L131">                .build();</span>
+
+<span class="nc" id="L133">        return commentResponseDto;</span>
+
+    }
+
+
+
+
+    /**
+     *
+     * @param
+     * {
+     *     &quot;parentCommentId&quot;:5,
+     *     &quot;boardId&quot;:&quot;1&quot;,
+     *     &quot;content&quot;:&quot;나는 자식댓글4&quot;,
+     *     &quot;memberId&quot;:&quot;test2&quot;,
+     *     &quot;isConfidential&quot;: true
+     * }
+     *
+     *
+     */
+    // 대댓글 달 수 있는 조건?
+    // 내가 그 댓글 볼 수 있어야함 ( 내가 쓴 댓글이거나 남이 썻는데 confidential 이 아님)
+    // 또는 내가 모집글의 작성자임
+    @Transactional
+    public CreatedchildCommentResponseDto sendCommentToComment(CommentToCommentCreateRequestDto commentToCommentCreateRequestDto, String username) {
+<span class="nc" id="L158">        Comment childComment=null;</span>
+<span class="nc" id="L159">        Member member = memberRepository.findMemberByUsername(username)</span>
+<span class="nc" id="L160">                .orElseThrow(() -&gt; new ApplicationException(USER_NOT_FOUND));</span>
+
+<span class="nc" id="L162">        Board board = boardRepository.findById(commentToCommentCreateRequestDto.getBoardId())</span>
+<span class="nc" id="L163">                .orElseThrow(() -&gt; new ApplicationException(BOARD_NOT_FOUND));</span>
+<span class="nc" id="L164">        Optional&lt;Comment&gt; findParentComment = commentRepository.findById(commentToCommentCreateRequestDto.getParentCommentId());</span>
+
+        //비밀댓글이 아니여야하고
+        //isAccessible 변수는 다음 조건 중 하나를 만족할 때 true로 설정
+        //현재 사용자가 게시판을 작성한 사용자와 동일한 경우.
+        //댓글이 비밀 댓글이 아닌 경우.
+        //현재 사용자가 해당 댓글을 작성한 사용자와 동일한 경우.
+<span class="nc" id="L171">        commentToCommentValidation(username, member, board, findParentComment);</span>
+
+<span class="nc bnc" id="L173" title="All 2 branches missed.">        if (commentToCommentCreateRequestDto.getParentCommentId() != null) {</span>
+<span class="nc" id="L174">            Comment parentComment = commentRepository.findById(commentToCommentCreateRequestDto.getParentCommentId())</span>
+<span class="nc" id="L175">                    .orElseThrow(() -&gt; new RuntimeException(&quot;부모 댓글을 찾을 수 없습니다&quot;));</span>
+<span class="nc" id="L176">            childComment = Comment.builder()</span>
+<span class="nc" id="L177">                    .content(commentToCommentCreateRequestDto.getContent())</span>
+<span class="nc" id="L178">                    .state(true)</span>
+<span class="nc" id="L179">                    .board(board)</span>
+<span class="nc" id="L180">                    .member(member)</span>
+<span class="nc" id="L181">                    .isConfidential(commentToCommentCreateRequestDto.getIsConfidential())</span>
+<span class="nc" id="L182">                    .build();</span>
+
+<span class="nc" id="L184">            childComment.setParentComment(parentComment);</span>
+            //부모댓글 카운트 동기화
+<span class="nc" id="L186">            parentComment.incrementchildCommentCount();</span>
+<span class="nc" id="L187">            commentRepository.save(childComment);  // 대댓글 저장</span>
+
+
+        }
+<span class="nc" id="L191">        CreatedchildCommentResponseDto commentToComment = CreatedchildCommentResponseDto.builder()</span>
+<span class="nc" id="L192">                .boardId(childComment.getBoard().getId())</span>
+<span class="nc" id="L193">                .commentId(childComment.getId())</span>
+<span class="nc" id="L194">                .parentId(childComment.getParentComment().getId())</span>
+<span class="nc" id="L195">                .createdDate(childComment.getCreatedAt())</span>
+<span class="nc" id="L196">                .content(childComment.getContent())</span>
+<span class="nc" id="L197">                .username(childComment.getMember().getUsername())</span>
+<span class="nc" id="L198">                .isConfidential(String.valueOf(childComment.isConfidential()))</span>
+<span class="nc" id="L199">                .build();</span>
+<span class="nc" id="L200">        return commentToComment;</span>
+    }
+
+    private static void commentToCommentValidation(String username, Member member, Board board, Optional&lt;Comment&gt; findParentComment) {
+<span class="nc bnc" id="L204" title="All 2 branches missed.">        if(board.getMember()==null){</span>
+<span class="nc bnc" id="L205" title="All 4 branches missed.">            boolean isAccessible=(!findParentComment.get().isConfidential() || findParentComment.get().getMember().getUsername().equals(username));</span>
+<span class="nc bnc" id="L206" title="All 2 branches missed.">            if (!isAccessible){</span>
+<span class="nc" id="L207">                throw new ApplicationException(ApplicationErrorType.UNAUTHORIZED);</span>
+            }
+        }
+<span class="nc bnc" id="L210" title="All 2 branches missed.">        if(board.getMember()!=null){</span>
+<span class="nc bnc" id="L211" title="All 2 branches missed.">            boolean isAccessible = board.getMember().getUsername().equals(member.getUsername())</span>
+<span class="nc bnc" id="L212" title="All 4 branches missed.">                    || (!findParentComment.get().isConfidential() || findParentComment.get().getMember().getUsername().equals(username));</span>
+<span class="nc bnc" id="L213" title="All 2 branches missed.">            if (!isAccessible){</span>
+<span class="nc" id="L214">                throw new ApplicationException(ApplicationErrorType.UNAUTHORIZED);</span>
+            }
+        }
+<span class="nc" id="L217">    }</span>
+
+    @Override
+    public List&lt;CommentResponseDto.commentToCommentListResponseDto&gt; getCommentToCommentList(Long boardId, Long commentId) {
+<span class="nc" id="L221">        List&lt;Comment&gt; childCommentList = commentRepository.findAllByBoard_IdAndParentCommentId(boardId, commentId);</span>
+
+<span class="nc" id="L223">        List&lt;CommentResponseDto.commentToCommentListResponseDto&gt; result = childCommentList.stream().map(comment -&gt; new CommentResponseDto.commentToCommentListResponseDto(comment))</span>
+<span class="nc" id="L224">                .collect(Collectors.toList());</span>
+
+<span class="nc" id="L226">        return result;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

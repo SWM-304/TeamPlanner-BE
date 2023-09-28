@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RecruitmentCommentService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TeamPlanner-BE</a> &gt; <a href="index.source.html" class="el_package">com.tbfp.teamplannerbe.domain.recruitmentComment.service</a> &gt; <span class="el_source">RecruitmentCommentService.java</span></div><h1>RecruitmentCommentService.java</h1><pre class="source lang-java linenums">package com.tbfp.teamplannerbe.domain.recruitmentComment.service;
+
+import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
+import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
+import com.tbfp.teamplannerbe.domain.member.entity.Member;
+import com.tbfp.teamplannerbe.domain.member.service.MemberService;
+import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
+import com.tbfp.teamplannerbe.domain.recruitment.service.RecruitmentService;
+import com.tbfp.teamplannerbe.domain.recruitmentComment.dto.RecruitmentCommentRequestDto.*;
+import com.tbfp.teamplannerbe.domain.recruitmentComment.dto.RecruitmentCommentResponseDto.*;
+import com.tbfp.teamplannerbe.domain.recruitmentComment.entity.RecruitmentComment;
+import com.tbfp.teamplannerbe.domain.recruitmentComment.repository.RecruitmentCommentRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+<span class="nc" id="L18">@RequiredArgsConstructor</span>
+@Transactional(readOnly = true)
+public class RecruitmentCommentService {
+    private final RecruitmentCommentRepository recruitmentCommentRepository;
+    private final MemberService memberService;
+    private final RecruitmentService recruitmentService;
+
+    @Transactional
+    public CreateResponseDto createComment(String username, CreateRequestDto createRequestDto) {
+<span class="nc" id="L27">        Member member = memberService.findMemberByUsernameOrElseThrowApplicationException(username);</span>
+<span class="nc" id="L28">        Recruitment recruitment = recruitmentService.findByIdOrElseThrowApplicationException(createRequestDto.getRecruitmentId());</span>
+
+
+<span class="nc" id="L31">        return CreateResponseDto.builder()</span>
+<span class="nc" id="L32">                .recruitmentCommentId(</span>
+<span class="nc" id="L33">                        recruitmentCommentRepository.save(</span>
+<span class="nc" id="L34">                                RecruitmentComment.builder()</span>
+<span class="nc" id="L35">                                        .content(createRequestDto.getContent())</span>
+<span class="nc" id="L36">                                        .member(member)</span>
+<span class="nc" id="L37">                                        .recruitment(recruitment)</span>
+<span class="nc" id="L38">                                        .isConfidential(createRequestDto.getIsConfidential())</span>
+<span class="nc" id="L39">                                        .isDeleted(false)</span>
+<span class="nc" id="L40">                                        .parentComment(null)</span>
+<span class="nc" id="L41">                                        .build()</span>
+<span class="nc" id="L42">                        ).getId()</span>
+                )
+<span class="nc" id="L44">                .build();</span>
+    }
+
+    @Transactional
+    public UpdateResponseDto updateComment(String username, Long recruitmentCommentId, UpdateRequestDto updateRequestDto) {
+<span class="nc" id="L49">        RecruitmentComment recruitmentComment = checkPrincipalAuthorizedAndReturnRecruitmentComment(username, recruitmentCommentId);</span>
+<span class="nc" id="L50">        recruitmentComment.updateContent(updateRequestDto.getNewContent());</span>
+<span class="nc" id="L51">        return UpdateResponseDto.builder()</span>
+<span class="nc" id="L52">                .recruitmentCommentId(recruitmentComment.getId())</span>
+<span class="nc" id="L53">                .build();</span>
+    }
+
+
+    private RecruitmentComment checkPrincipalAuthorizedAndReturnRecruitmentComment(String username, Long recruitmentCommentId) {
+<span class="nc" id="L58">        Member member = memberService.findMemberByUsernameOrElseThrowApplicationException(username);</span>
+
+        // check comment is written by member
+<span class="nc" id="L61">        RecruitmentComment recruitmentComment = recruitmentCommentRepository.findByIdFetchMember(recruitmentCommentId).orElseThrow(() -&gt; new ApplicationException(ApplicationErrorType.NOT_FOUND));</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if (!recruitmentComment.getMember().getUsername().equals(member.getUsername()))</span>
+<span class="nc" id="L63">            throw new ApplicationException(ApplicationErrorType.UNAUTHORIZED);</span>
+<span class="nc" id="L64">        return recruitmentComment;</span>
+    }
+
+    @Transactional
+    public DeleteResponseDto deleteComment(String username, Long recruitmentCommentId) {
+<span class="nc" id="L69">        RecruitmentComment recruitmentComment = checkPrincipalAuthorizedAndReturnRecruitmentComment(username, recruitmentCommentId);</span>
+<span class="nc" id="L70">        recruitmentComment.makeDeleted();</span>
+<span class="nc" id="L71">        return DeleteResponseDto.builder()</span>
+<span class="nc" id="L72">                .recruitmentCommentId(recruitmentComment.getId())</span>
+<span class="nc" id="L73">                .build();</span>
+    }
+
+    // 대댓글 달 수 있는 조건?
+    // 내가 그 댓글 볼 수 있어야함 ( 내가 쓴 댓글이거나 남이 썻는데 confidential 이 아님)
+    // 또는 내가 모집글의 작성자임
+    @Transactional
+    public CreateCoCommentResponseDto createCommentToComment(String username, Long parentRecruitmentCommentId, CreateCoCommentRequestDto createCoCommentRequestDto) {
+<span class="nc" id="L81">        Recruitment recruitment = recruitmentService.findByIdOrElseThrowApplicationException(createCoCommentRequestDto.getRecruitmentId());</span>
+<span class="nc" id="L82">        Member member = memberService.findMemberByUsernameOrElseThrowApplicationException(username);</span>
+<span class="nc" id="L83">        RecruitmentComment parentRecruitmentComment = recruitmentCommentRepository.findById(parentRecruitmentCommentId).orElseThrow(() -&gt; new ApplicationException(ApplicationErrorType.RECRUITMENT_COMMENT_NOT_FOUND));</span>
+
+
+
+        // condition check
+<span class="nc" id="L88">        if ( !</span>
+                (
+<span class="nc bnc" id="L90" title="All 2 branches missed.">                        recruitment.getAuthor().getUsername().equals(member.getUsername())</span>
+<span class="nc bnc" id="L91" title="All 4 branches missed.">                    || (!parentRecruitmentComment.isConfidential() || parentRecruitmentComment.getMember().getUsername().equals(username))</span>
+                )
+            )
+<span class="nc" id="L94">            throw new ApplicationException(ApplicationErrorType.UNAUTHORIZED);</span>
+
+        // can comment to this comment
+<span class="nc" id="L97">        return CreateCoCommentResponseDto.builder()</span>
+<span class="nc" id="L98">                .recruitmentCommentId(</span>
+<span class="nc" id="L99">                        recruitmentCommentRepository.save(</span>
+<span class="nc" id="L100">                                RecruitmentComment.builder()</span>
+<span class="nc" id="L101">                                        .content(createCoCommentRequestDto.getContent())</span>
+<span class="nc" id="L102">                                        .member(member)</span>
+<span class="nc" id="L103">                                        .recruitment(recruitment)</span>
+<span class="nc" id="L104">                                        .isConfidential(createCoCommentRequestDto.getIsConfidential())</span>
+<span class="nc" id="L105">                                        .isDeleted(false)</span>
+<span class="nc" id="L106">                                        .parentComment(parentRecruitmentComment)</span>
+<span class="nc" id="L107">                                        .build()</span>
+<span class="nc" id="L108">                        ).getId()</span>
+                )
+<span class="nc" id="L110">                .build();</span>
+    }
+
+    private RecruitmentComment checkPrincipalAuthorizedAndReturnRecruitmentComment(Member member, Long recruitmentCommentId) {
+<span class="nc" id="L114">        RecruitmentComment recruitmentComment = recruitmentCommentRepository.findByIdFetchMember(recruitmentCommentId).orElseThrow(() -&gt; new ApplicationException(ApplicationErrorType.NOT_FOUND));</span>
+<span class="nc bnc" id="L115" title="All 2 branches missed.">        if (!recruitmentComment.getMember().getUsername().equals(member.getUsername()))</span>
+<span class="nc" id="L116">            throw new ApplicationException(ApplicationErrorType.UNAUTHORIZED);</span>
+<span class="nc" id="L117">        return recruitmentComment;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

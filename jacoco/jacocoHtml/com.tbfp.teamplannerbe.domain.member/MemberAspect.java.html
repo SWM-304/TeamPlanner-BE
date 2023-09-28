@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MemberAspect.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TeamPlanner-BE</a> &gt; <a href="index.source.html" class="el_package">com.tbfp.teamplannerbe.domain.member</a> &gt; <span class="el_source">MemberAspect.java</span></div><h1>MemberAspect.java</h1><pre class="source lang-java linenums">package com.tbfp.teamplannerbe.domain.member;
+
+import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
+import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
+import lombok.RequiredArgsConstructor;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.stereotype.Component;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+
+<span class="nc" id="L14">@RequiredArgsConstructor</span>
+@Component
+@Aspect
+public class MemberAspect {
+
+//    private final Validator validator;
+//    @Pointcut(&quot;within(com.tbfp.teamplannerbe.domain.member.service.MemberService) &amp;&amp; @args(javax.validation.Valid)&quot;)
+//    public void validationPointcut(){ }
+//    @Before(&quot;validationPointcut() &amp;&amp; args(param)&quot;)
+//    public void validateMember(Object param){
+//        ConstraintViolation&lt;Object&gt; firstViolation = validator.validate(param).stream().findFirst().orElse(null);
+//        if(firstViolation!=null){
+//            firstViolation.getPropertyPath().toString();
+//            String errorCode = &quot;SIGNUP_REQUEST_INVALID_&quot; + firstViolation.getPropertyPath().toString().toUpperCase();
+//            throw new ApplicationException(ApplicationErrorType.valueOf(errorCode));
+//        }
+//    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

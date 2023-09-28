@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ImageServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TeamPlanner-BE</a> &gt; <a href="index.source.html" class="el_package">com.tbfp.teamplannerbe.domain.image.service.impl</a> &gt; <span class="el_source">ImageServiceImpl.java</span></div><h1>ImageServiceImpl.java</h1><pre class="source lang-java linenums">package com.tbfp.teamplannerbe.domain.image.service.impl;
+
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.HttpMethod;
+import com.amazonaws.services.s3.AmazonS3;
+import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
+import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
+import com.tbfp.teamplannerbe.domain.image.dto.ImageResponseDto;
+import com.tbfp.teamplannerbe.domain.image.service.ImageService;
+import com.tbfp.teamplannerbe.domain.member.entity.Member;
+import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
+import com.tbfp.teamplannerbe.domain.profile.repository.BasicProfileRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Optional;
+
+@Service
+<span class="nc" id="L24">@RequiredArgsConstructor</span>
+<span class="nc" id="L25">@Slf4j</span>
+public class ImageServiceImpl implements ImageService {
+    private final AmazonS3 amazonS3;
+
+    @Value(&quot;${amazon.aws.bucket}&quot;)
+    private String bucketName;
+
+    private final MemberRepository memberRepository;
+
+    private final BasicProfileRepository basicProfileRepository;
+
+    @Override
+    @Transactional
+    public ImageResponseDto.GetPreSignedUrlResponseDto getPreSignedUrl(String username, String extension){
+<span class="nc" id="L39">        String url = generatePreSignedUrl(bucketName, username + &quot;.&quot; + extension, HttpMethod.PUT);</span>
+<span class="nc" id="L40">        return ImageResponseDto.GetPreSignedUrlResponseDto.builder()</span>
+<span class="nc" id="L41">                .preSignedUrl(url)</span>
+<span class="nc" id="L42">                .build();</span>
+    }
+
+    public String generatePreSignedUrl(String bucketName, String filePath, HttpMethod httpMethod){
+<span class="nc" id="L46">        Calendar calendar= Calendar.getInstance();</span>
+<span class="nc" id="L47">        calendar.setTime(new Date());</span>
+<span class="nc" id="L48">        calendar.add(Calendar.MINUTE,10);</span>
+<span class="nc" id="L49">        return amazonS3.generatePresignedUrl(bucketName, filePath, calendar.getTime(),httpMethod).toString();</span>
+    }
+
+    @Override
+    @Transactional
+    public void deleteProfileImage(String username, String filename){
+<span class="nc" id="L55">        Optional&lt;Member&gt; member = memberRepository.findMemberByUsername(username);</span>
+<span class="nc bnc" id="L56" title="All 2 branches missed.">        if(!member.isPresent()) throw new ApplicationException(ApplicationErrorType.USER_NOT_FOUND);</span>
+
+<span class="nc" id="L58">        Long memberId = member.get().getId();</span>
+
+<span class="nc" id="L60">        System.out.println(filename+memberId);</span>
+
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if(!basicProfileRepository.findByProfileImageAndMemberId(filename,memberId).isPresent()){</span>
+<span class="nc" id="L63">            throw new ApplicationException(ApplicationErrorType.IMAGE_DELETION_UNAUTHORIZED);</span>
+        }
+
+        try {
+<span class="nc" id="L67">            amazonS3.deleteObject(bucketName, filename);</span>
+<span class="nc" id="L68">        } catch (AmazonServiceException e){</span>
+<span class="nc" id="L69">            throw new ApplicationException(ApplicationErrorType.IMAGE_DOESNT_EXIST);</span>
+<span class="nc" id="L70">        }</span>
+<span class="nc" id="L71">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

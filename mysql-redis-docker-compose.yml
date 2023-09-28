@@ -1,0 +1,31 @@
+services:
+  db-mysql:
+    restart: always
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_HOST: ${MYSQL_ROOT_HOST}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - 3306:3306
+    command:
+      - "mysqld"
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_unicode_ci"
+
+    volumes:
+      - ./db:/var/lib/mysql
+
+  redis:
+    hostname: ${REDIS_HOSTNAME}
+    container_name: redis
+    image: redis
+    command: redis-server --requirepass ${REDIS_PASSWORD} --port 6379
+    ports:
+      - 6379:6379
+    restart: always
+    environment:
+      - REDIS_BIND=0.0.0.0
+      - REDIS_BIND=127.0.0.1
+    volumes:
+      - ./redis-data:/data

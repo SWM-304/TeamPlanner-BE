@@ -1,16 +1,11 @@
+# version v2
+
 version: "3.7"
 
 services:
-  redis:
-    image: redis
-    ports:
-      - 6379:6379
-    networks:
-      - springboot-mysql-net
-
   test-app:
     image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:latest
-    restart: on-failure
+    restart: always
     ports:
       - 8080:8080
     environment:
@@ -19,8 +14,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
       jasypt.encryptor.password: ${JASYPT_KEY}
-    depends_on:
-      - redis
+      SPRING_REDIS_HOST: ${SPRING_REDIS_HOST} # Redis 서버 호스트 이름은 'redis'로 지정
+      SPRING_REDIS_PORT: ${SPRING_REDIS_PORT} # Redis 서버 포트는 6379로 지정
+      SPRING_REDIS_PASSWORD: ${SPRING_REDIS_PASSWORD}
     networks:
       - springboot-mysql-net
 

@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ChatRoomServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TeamPlanner-BE</a> &gt; <a href="index.source.html" class="el_package">com.tbfp.teamplannerbe.domain.chat.service.impl</a> &gt; <span class="el_source">ChatRoomServiceImpl.java</span></div><h1>ChatRoomServiceImpl.java</h1><pre class="source lang-java linenums">package com.tbfp.teamplannerbe.domain.chat.service.impl;
+
+import com.tbfp.teamplannerbe.config.redis.util.ChattingRedisUtil;
+import com.tbfp.teamplannerbe.domain.chat.dto.redis.RedisChatRoom;
+import com.tbfp.teamplannerbe.domain.chat.dto.response.*;
+import com.tbfp.teamplannerbe.domain.chat.entity.ChatMessage;
+import com.tbfp.teamplannerbe.domain.chat.entity.ChatRoomMember;
+import com.tbfp.teamplannerbe.domain.chat.entity.ChatRoom;
+import com.tbfp.teamplannerbe.domain.chat.repository.ChatRepository;
+import com.tbfp.teamplannerbe.domain.chat.repository.ChatRoomMemberRepository;
+import com.tbfp.teamplannerbe.domain.chat.repository.ChatRoomRepository;
+import com.tbfp.teamplannerbe.domain.chat.repository.RedisChatRoomRepository;
+import com.tbfp.teamplannerbe.domain.chat.service.ChatRoomService;
+import com.tbfp.teamplannerbe.domain.chat.service.pobsub.RedisMessageListener;
+import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
+import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
+import com.tbfp.teamplannerbe.domain.member.entity.Member;
+import com.tbfp.teamplannerbe.domain.member.service.MemberService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Service
+<span class="nc" id="L29">@Slf4j</span>
+<span class="nc" id="L30">@RequiredArgsConstructor</span>
+@Transactional(readOnly = true)
+public class ChatRoomServiceImpl implements ChatRoomService {
+
+    private static final String dot = &quot;.&quot;;
+    private static final String TIME_DELIMITER = &quot;:&quot;;
+
+
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatRoomMemberRepository chatRoomMemberRepository;
+    private final MemberService memberService;
+    private final RedisMessageListener redisMessageListener;
+    private final ChatRepository chatRepository;
+
+
+    /**
+     * 채팅방 번호만 불러와줌
+     */
+
+    public List&lt;ChatRoomResponseDto.ChatRoomListDto&gt; getRoomList(String nickname) {
+<span class="nc" id="L50">        log.info(&quot;모든 채팅방 리스트를 가져오는 곳&quot;);</span>
+//        redisMessageListener.enterChattingRoom(chattingRoomId);
+<span class="nc" id="L52">        Member member = memberService.findMemberByNicknameOrElseThrowApplicationException(nickname);</span>
+<span class="nc" id="L53">        List&lt;ChatRoomMember&gt; chatRoomMemberList = member.getChatRoomMemberList();</span>
+<span class="nc" id="L54">        Map&lt;Long, ChatRoomResponseDto.ChatRoomListDto&gt; roomMap = new HashMap&lt;&gt;();</span>
+
+<span class="nc" id="L56">        chatRoomMemberList.forEach(chatRoomMember -&gt; {</span>
+<span class="nc" id="L57">            Long roomId = chatRoomMember.getChatRoom().getId();</span>
+<span class="nc" id="L58">            List&lt;ChatMessage&gt; messages = chatRepository.readRoomWithChatMessageList(roomId);</span>
+<span class="nc bnc" id="L59" title="All 2 branches missed.">            if (!messages.isEmpty()) {</span>
+<span class="nc" id="L60">                ChatMessage latestMessage = findLatestMessage(messages);</span>
+
+<span class="nc bnc" id="L62" title="All 2 branches missed.">                if (latestMessage != null) {</span>
+<span class="nc" id="L63">                    List&lt;Map&lt;String, String&gt;&gt; memberInfoList = extractMemberInfoList(chatRoomMemberList, roomId);</span>
+
+<span class="nc" id="L65">                    ChatRoomResponseDto.ChatRoomListDto roomDto = createChatRoomListDto(roomId, memberInfoList, latestMessage);</span>
+<span class="nc" id="L66">                    roomMap.put(roomId, roomDto);</span>
+                }
+            }
+<span class="nc" id="L69">        });</span>
+
+<span class="nc" id="L71">        return new ArrayList&lt;&gt;(roomMap.values());</span>
+    }
+
+    /**
+     * 해당하는 채팅방에 대한 메세지까지 다 보여줌
+     */
+
+
+    public ChattingRoomDetailResponse getMyRoom(String nickname, Long chattingRoomId) {
+<span class="nc" id="L80">        log.info(&quot;선택한 채팅방 정보를 보여주는 서비스 로직&quot;);</span>
+
+
+<span class="nc" id="L83">        Member member = memberService.findMemberByNicknameOrElseThrowApplicationException(nickname);</span>
+//         채팅방번호로 채팅방에 있는 MemberList 를 전부 가져옴
+<span class="nc" id="L85">        List&lt;ChatMessage&gt; chatMessages = chatRepository.readRoomWithChatMessageList(chattingRoomId);</span>
+
+
+<span class="nc" id="L88">        redisMessageListener.enterChattingRoom(chattingRoomId);</span>
+<span class="nc" id="L89">        ChatRoom chattingRoom = getChattingRoomById(chattingRoomId);</span>
+<span class="nc" id="L90">        return ChattingRoomDetailResponse.builder()</span>
+<span class="nc" id="L91">                .members(getMemberResponses(chattingRoom))</span>
+<span class="nc" id="L92">                .chattings(getChattingResponses(chattingRoomId))</span>
+<span class="nc" id="L93">                .build();</span>
+    }
+
+    @Transactional
+    public Long createRoom(String nickname, String targetNickname) {
+<span class="nc" id="L98">        log.info(&quot;ChatRoomService.createRoom&quot;);</span>
+<span class="nc" id="L99">        Member member = memberService.findMemberByNicknameOrElseThrowApplicationException(nickname);</span>
+<span class="nc" id="L100">        Member targetMember = memberService.findMemberByNicknameOrElseThrowApplicationException(targetNickname);</span>
+
+        // 자기자신과 target이 같을 수 없다.
+<span class="nc bnc" id="L103" title="All 2 branches missed.">        if (member == targetMember) throw new ApplicationException(ApplicationErrorType.BAD_REQUEST);</span>
+        // 이미 존재하는 채팅방인지 확인
+<span class="nc" id="L105">        boolean chatRoomExists = member.getChatRoomMemberList().stream()</span>
+<span class="nc" id="L106">                .anyMatch(chatRoomMember -&gt; {</span>
+<span class="nc" id="L107">                    ChatRoom chatRoom = chatRoomMember.getChatRoom();</span>
+<span class="nc" id="L108">                    List&lt;ChatRoomMember&gt; chatRoomMemberList = chatRoom.getChatRoomMemberList();</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">                    return chatRoomMemberList.size() == 2</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">                            &amp;&amp; chatRoomMemberList.stream().allMatch(</span>
+<span class="nc bnc" id="L111" title="All 4 branches missed.">                            crm -&gt; crm.getMember().equals(member) || crm.getMember().equals(targetMember)</span>
+                    );
+                });
+
+<span class="nc bnc" id="L115" title="All 2 branches missed.">        if (chatRoomExists) {</span>
+<span class="nc" id="L116">            throw new ApplicationException(ApplicationErrorType.BAD_REQUEST);</span>
+        }
+
+<span class="nc" id="L119">        ChatRoom chatRoom = ChatRoom.builder()</span>
+<span class="nc" id="L120">                .build();</span>
+<span class="nc" id="L121">        chatRoomRepository.save(</span>
+                chatRoom
+        );
+
+<span class="nc" id="L125">        chatRoomMemberRepository.save(</span>
+<span class="nc" id="L126">                ChatRoomMember.builder()</span>
+<span class="nc" id="L127">                        .member(member)</span>
+<span class="nc" id="L128">                        .chatRoom(chatRoom)</span>
+<span class="nc" id="L129">                        .build()</span>
+        );
+<span class="nc" id="L131">        chatRoomMemberRepository.save(</span>
+<span class="nc" id="L132">                ChatRoomMember.builder()</span>
+<span class="nc" id="L133">                        .member(targetMember)</span>
+<span class="nc" id="L134">                        .chatRoom(chatRoom)</span>
+<span class="nc" id="L135">                        .build()</span>
+        );
+<span class="nc" id="L137">        redisMessageListener.enterChattingRoom(chatRoom.getId());</span>
+<span class="nc" id="L138">        return chatRoom.getId();</span>
+    }
+
+    @Transactional
+    public ChattingReadCountResponseDto readCountDecrease(String chatId){
+<span class="nc" id="L143">        ChatMessage chat = chatRepository.findAllChatMessageListByChatId(chatId);</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">        if(chat.getReadCount()&gt;0){</span>
+<span class="nc" id="L145">            chat.decreaseReadCount();</span>
+<span class="nc" id="L146">            ChatMessage chatMessage = chatRepository.saveChatMessageForReadCount(chat);</span>
+<span class="nc" id="L147">            return ChattingReadCountResponseDto.builder()</span>
+<span class="nc" id="L148">                    .readCount(chatMessage.getReadCount())</span>
+<span class="nc" id="L149">                    .build();</span>
+        }
+<span class="nc" id="L151">        return ChattingReadCountResponseDto.builder()</span>
+<span class="nc" id="L152">                .readCount(chat.getReadCount())</span>
+<span class="nc" id="L153">                .build();</span>
+    }
+
+    // 채팅 방이 존재하지는 여부
+    public ChattingRoomCheckResponseDto chatRoomCheck(String nickname, String targetNickname) {
+
+
+<span class="nc" id="L160">        Member member = memberService.findMemberByNicknameOrElseThrowApplicationException(nickname);</span>
+<span class="nc" id="L161">        Member targetMember = memberService.findMemberByNicknameOrElseThrowApplicationException(targetNickname);</span>
+
+<span class="nc bnc" id="L163" title="All 2 branches missed.">        if (member == targetMember) throw new ApplicationException(ApplicationErrorType.BAD_REQUEST);</span>
+        // 이미 존재하는 채팅방인지 확인
+<span class="nc" id="L165">        boolean chatRoomExists = member.getChatRoomMemberList().stream()</span>
+<span class="nc" id="L166">                .anyMatch(chatRoomMember -&gt; {</span>
+<span class="nc" id="L167">                    ChatRoom chatRoom = chatRoomMember.getChatRoom();</span>
+<span class="nc" id="L168">                    List&lt;ChatRoomMember&gt; chatRoomMemberList = chatRoom.getChatRoomMemberList();</span>
+<span class="nc bnc" id="L169" title="All 2 branches missed.">                    return chatRoomMemberList.size() == 2</span>
+<span class="nc bnc" id="L170" title="All 2 branches missed.">                            &amp;&amp; chatRoomMemberList.stream().allMatch(</span>
+<span class="nc bnc" id="L171" title="All 4 branches missed.">                            crm -&gt; crm.getMember().equals(member) || crm.getMember().equals(targetMember)</span>
+                    );
+                });
+
+        // false 시 이미 존재하는 채팅 방
+<span class="nc bnc" id="L176" title="All 2 branches missed.">        return ChattingRoomCheckResponseDto.builder()</span>
+<span class="nc" id="L177">                .roomCheck(!chatRoomExists)</span>
+<span class="nc" id="L178">                .build();</span>
+    }
+
+    private ChatMessage findLatestMessage(List&lt;ChatMessage&gt; messages) {
+<span class="nc" id="L182">        return messages.stream()</span>
+<span class="nc" id="L183">                .max(Comparator.comparing(ChatMessage::getCreatedAt))</span>
+<span class="nc" id="L184">                .orElse(null);</span>
+    }
+
+    private List&lt;Map&lt;String, String&gt;&gt; extractMemberInfoList(List&lt;ChatRoomMember&gt; chatRoomMemberList, Long roomId) {
+<span class="nc" id="L188">        return chatRoomMemberList.stream()</span>
+<span class="nc" id="L189">                .flatMap(crm -&gt; crm.getChatRoom().getChatRoomMemberList().stream())</span>
+<span class="nc" id="L190">                .filter(c -&gt; c.getChatRoom().getId().equals(roomId))</span>
+<span class="nc" id="L191">                .map(c -&gt; {</span>
+<span class="nc" id="L192">                    Map&lt;String, String&gt; memberInfo = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L193">                    memberInfo.put(&quot;nickname&quot;, c.getMember().getNickname());</span>
+<span class="nc" id="L194">                    memberInfo.put(&quot;profileImage&quot;, c.getMember().getBasicProfile().getProfileImage());</span>
+<span class="nc" id="L195">                    return memberInfo;</span>
+                })
+<span class="nc" id="L197">                .collect(Collectors.toList());</span>
+    }
+
+    private ChatRoomResponseDto.ChatRoomListDto createChatRoomListDto(Long roomId, List&lt;Map&lt;String, String&gt;&gt; memberInfoList, ChatMessage latestMessage) {
+<span class="nc" id="L201">        return ChatRoomResponseDto.ChatRoomListDto.builder()</span>
+<span class="nc" id="L202">                .roomId(roomId)</span>
+<span class="nc" id="L203">                .memberList(memberInfoList)</span>
+<span class="nc" id="L204">                .lastMessageTime(toCreatedTime(latestMessage.getCreatedAt()))</span>
+<span class="nc" id="L205">                .lastMessageText(latestMessage.getMessage())</span>
+<span class="nc" id="L206">                .readCount(latestMessage.getReadCount())</span>
+<span class="nc" id="L207">                .build();</span>
+    }
+
+    private ChatRoom getChattingRoomById(Long chattingRoomId) {
+<span class="nc" id="L211">        log.info(&quot;해당하는 챗 id 가져오는 곳&quot;);</span>
+<span class="nc" id="L212">        return chatRoomRepository.findById(chattingRoomId)</span>
+<span class="nc" id="L213">                .orElseThrow(() -&gt; new ApplicationException(ApplicationErrorType.UNAUTHORIZED));</span>
+    }
+    private List&lt;ChattingResponse&gt; getChattingResponses(Long chattingRoomId) {
+<span class="nc" id="L216">        log.info(&quot;redis 토픽안에 담긴 메세지를 가져오는 곳&quot;);</span>
+<span class="nc" id="L217">        return chatRepository.readRoomWithChatMessageList(chattingRoomId)</span>
+<span class="nc" id="L218">                .stream()</span>
+<span class="nc" id="L219">                .sorted(Comparator.comparing(ChatMessage::getCreatedAt))</span>
+<span class="nc" id="L220">                .map(message -&gt; ChattingResponse.builder()</span>
+<span class="nc" id="L221">                        .senderId(message.getSenderId())</span>
+<span class="nc" id="L222">                        .content(message.getMessage())</span>
+<span class="nc" id="L223">                        .createdDate(toCreatedDate(message.getCreatedAt()))</span>
+<span class="nc" id="L224">                        .createdTime(toCreatedTime(message.getCreatedAt()))</span>
+<span class="nc" id="L225">                        .chatId(message.getId())</span>
+<span class="nc" id="L226">                        .readCount(message.getReadCount())</span>
+<span class="nc" id="L227">                        .build())</span>
+<span class="nc" id="L228">                .collect(Collectors.toList());</span>
+    }
+
+    private List&lt;MemberResponse&gt; getMemberResponses(ChatRoom chattingRoom) {
+<span class="nc" id="L232">        log.info(&quot;멤버 프로필 반환&quot;);</span>
+
+<span class="nc" id="L234">        return chattingRoom.getChatRoomMemberList()</span>
+<span class="nc" id="L235">                .stream()</span>
+<span class="nc" id="L236">                .map(chatRoomMember-&gt;MemberResponse.from(chatRoomMember.getMember()))</span>
+<span class="nc" id="L237">                .collect(Collectors.toList());</span>
+    }
+
+    private String toCreatedTime(LocalDateTime createdAt) {
+<span class="nc" id="L241">        return createdAt.getYear() + dot + createdAt.getMonthValue() + dot + createdAt.getDayOfMonth() + dot;</span>
+    }
+
+    private String toCreatedDate(LocalDateTime createdAt) {
+<span class="nc" id="L245">        return createdAt.getHour() + TIME_DELIMITER + createdAt.getMinute();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

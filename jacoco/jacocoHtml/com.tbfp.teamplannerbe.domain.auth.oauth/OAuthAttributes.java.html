@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OAuthAttributes.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TeamPlanner-BE</a> &gt; <a href="index.source.html" class="el_package">com.tbfp.teamplannerbe.domain.auth.oauth</a> &gt; <span class="el_source">OAuthAttributes.java</span></div><h1>OAuthAttributes.java</h1><pre class="source lang-java linenums">package com.tbfp.teamplannerbe.domain.auth.oauth;
+
+import com.tbfp.teamplannerbe.domain.auth.MemberRole;
+import com.tbfp.teamplannerbe.domain.auth.ProviderType;
+import com.tbfp.teamplannerbe.domain.member.entity.Member;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.Map;
+import java.util.UUID;
+
+@Getter
+<span class="nc" id="L14">@Slf4j</span>
+public class OAuthAttributes {
+<span class="nc" id="L16">    private String nameAttributeKey; // OAuth2 로그인 진행 시 키가 되는 필드 값, PK와 같은 의미</span>
+<span class="nc" id="L17">    private OAuth2MemberInfo oauth2MemberInfo; // 소셜 타입별 로그인 유저 정보(닉네임, 이메일, 프로필 사진 등등)</span>
+
+<span class="nc" id="L19">    @Builder</span>
+<span class="nc" id="L20">    public OAuthAttributes(String nameAttributeKey, OAuth2MemberInfo oauth2MemberInfo) {</span>
+<span class="nc" id="L21">        this.nameAttributeKey = nameAttributeKey;</span>
+<span class="nc" id="L22">        this.oauth2MemberInfo = oauth2MemberInfo;</span>
+<span class="nc" id="L23">    }</span>
+
+    /**
+     * SocialType에 맞는 메소드 호출하여 OAuthAttributes 객체 반환
+     * 파라미터 : userNameAttributeName -&gt; OAuth2 로그인 시 키(PK)가 되는 값 / attributes : OAuth 서비스의 유저 정보들
+     * 소셜별 of 메소드(ofGoogle, ofKaKao, ofNaver)들은 각각 소셜 로그인 API에서 제공하는
+     * 회원의 식별값(id), attributes, nameAttributeKey를 저장 후 build
+     */
+    public static OAuthAttributes of(ProviderType providerType,
+                                     String userNameAttributeName, Map&lt;String, Object&gt; attributes) {
+
+<span class="nc bnc" id="L34" title="All 2 branches missed.">        if (providerType == ProviderType.KAKAO) {</span>
+<span class="nc" id="L35">            return ofKakao(userNameAttributeName, attributes);</span>
+        }
+<span class="nc bnc" id="L37" title="All 2 branches missed.">        if(providerType==ProviderType.NAVER){</span>
+<span class="nc" id="L38">            return ofNaver(userNameAttributeName,attributes);</span>
+        }
+<span class="nc" id="L40">        return ofGoogle(userNameAttributeName, attributes);</span>
+    }
+
+    private static OAuthAttributes ofKakao(String userNameAttributeName, Map&lt;String, Object&gt; attributes) {
+<span class="nc" id="L44">        return OAuthAttributes.builder()</span>
+<span class="nc" id="L45">                .nameAttributeKey(userNameAttributeName)</span>
+<span class="nc" id="L46">                .oauth2MemberInfo(new KakaoOAuth2MemberInfo(attributes))</span>
+<span class="nc" id="L47">                .build();</span>
+    }
+    private static OAuthAttributes ofNaver(String userNameAttributeName, Map&lt;String, Object&gt; attributes) {
+<span class="nc" id="L50">        return OAuthAttributes.builder()</span>
+<span class="nc" id="L51">                .nameAttributeKey(userNameAttributeName)</span>
+<span class="nc" id="L52">                .oauth2MemberInfo(new NaverOAuth2MemberInfo(attributes))</span>
+<span class="nc" id="L53">                .build();</span>
+    }
+
+    public static OAuthAttributes ofGoogle(String userNameAttributeName, Map&lt;String, Object&gt; attributes) {
+<span class="nc" id="L57">        return OAuthAttributes.builder()</span>
+<span class="nc" id="L58">                .nameAttributeKey(userNameAttributeName)</span>
+<span class="nc" id="L59">                .oauth2MemberInfo(new GoogleOAuth2MemberInfo(attributes))</span>
+<span class="nc" id="L60">                .build();</span>
+    }
+
+    /**
+     * of메소드로 OAuthAttributes 객체가 생성되어, 유저 정보들이 담긴 OAuth2UserInfo가 소셜 타입별로 주입된 상태
+     * OAuth2UserInfo에서 socialId(식별값), nickname, imageUrl을 가져와서 build
+     * email에는 UUID로 중복 없는 랜덤 값 생성
+     * role은 GUEST로 설정
+     */
+    public Member toEntity(ProviderType providerType, OAuth2MemberInfo oauth2MemberInfo) {
+<span class="nc" id="L70">        log.info(&quot;providerType.name() + \&quot;-\&quot; + UUID.randomUUID() = &quot; + providerType.name() + &quot;-&quot; + UUID.randomUUID());</span>
+<span class="nc" id="L71">        return Member.builder()</span>
+<span class="nc" id="L72">                .providerType(providerType)</span>
+<span class="nc" id="L73">                .providerId(oauth2MemberInfo.getId())</span>
+<span class="nc" id="L74">                .email(oauth2MemberInfo.getEmail()) //</span>
+<span class="nc" id="L75">                .username(providerType.name() + &quot;-&quot; + UUID.randomUUID())</span>
+<span class="nc" id="L76">                .state(true)</span>
+<span class="nc" id="L77">                .password(&quot;&quot; + UUID.randomUUID())</span>
+<span class="nc" id="L78">                .nickname(providerType.name() + &quot;-&quot; + UUID.randomUUID())</span>
+//                .nickname(oauth2MemberInfo.getNickname())
+//                .imageUrl(oauth2MemberInfo.getImageUrl())
+<span class="nc" id="L81">                .memberRole(MemberRole.MEMBER)</span>
+<span class="nc" id="L82">                .build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

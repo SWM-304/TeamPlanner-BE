@@ -116,3 +116,9 @@ permitUrls:
   put:
   patch:
 
+
+web:
+  chromedriver: ${SPRING_CHROMEDRIVER_PATH}
+
+
+

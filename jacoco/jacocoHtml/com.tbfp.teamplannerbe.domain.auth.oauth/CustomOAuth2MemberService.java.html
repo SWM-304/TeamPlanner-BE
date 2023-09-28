@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CustomOAuth2MemberService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TeamPlanner-BE</a> &gt; <a href="index.source.html" class="el_package">com.tbfp.teamplannerbe.domain.auth.oauth</a> &gt; <span class="el_source">CustomOAuth2MemberService.java</span></div><h1>CustomOAuth2MemberService.java</h1><pre class="source lang-java linenums">package com.tbfp.teamplannerbe.domain.auth.oauth;
+
+import com.tbfp.teamplannerbe.domain.auth.ProviderType;
+import com.tbfp.teamplannerbe.domain.member.entity.Member;
+import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
+import com.tbfp.teamplannerbe.domain.profile.entity.BasicProfile;
+import com.tbfp.teamplannerbe.domain.profile.repository.BasicProfileRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
+import java.util.Map;
+
+import static com.tbfp.teamplannerbe.domain.auth.ProviderType.NAVER;
+
+
+<span class="nc" id="L25">@Slf4j</span>
+@Service
+<span class="nc" id="L27">@RequiredArgsConstructor</span>
+public class CustomOAuth2MemberService implements OAuth2UserService&lt;OAuth2UserRequest, OAuth2User&gt; {
+    private final MemberRepository memberRepository;
+    private final BasicProfileRepository basicProfileRepository;
+
+    private static final String KAKAO = &quot;kakao&quot;;
+
+    @Override
+    @Transactional
+    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+<span class="nc" id="L37">        log.info(&quot;CustomOAuth2MemberService.loadUser&quot;);</span>
+        /**
+         * DefaultOAuth2UserService 객체를 생성하여, loadUser(userRequest)를 통해 DefaultOAuth2User 객체를 생성 후 반환
+         * DefaultOAuth2UserService의 loadUser()는 소셜 로그인 API의 사용자 정보 제공 URI로 요청을 보내서
+         * 사용자 정보를 얻은 후, 이를 통해 DefaultOAuth2User 객체를 생성 후 반환한다.
+         * 결과적으로, OAuth2User는 OAuth 서비스에서 가져온 유저 정보를 담고 있는 유저
+         */
+<span class="nc" id="L44">        OAuth2UserService&lt;OAuth2UserRequest, OAuth2User&gt; delegate = new DefaultOAuth2UserService();</span>
+<span class="nc" id="L45">        OAuth2User oAuth2User = delegate.loadUser(userRequest);</span>
+
+        /**
+         * userRequest에서 registrationId 추출 후 registrationId으로 ProviderType 저장
+         * http://localhost:8080/oauth2/authorization/kakao에서 kakao가 registrationId
+         * userNameAttributeName은 이후에 nameAttributeKey로 설정된다.
+         */
+<span class="nc" id="L52">        String registrationId = userRequest.getClientRegistration().getRegistrationId();</span>
+<span class="nc" id="L53">        ProviderType providerType = getProviderType(registrationId);</span>
+<span class="nc" id="L54">        String userNameAttributeName = userRequest.getClientRegistration()</span>
+<span class="nc" id="L55">                .getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName(); // OAuth2 로그인 시 키(PK)가 되는 값</span>
+<span class="nc" id="L56">        Map&lt;String, Object&gt; attributes = oAuth2User.getAttributes(); // 소셜 로그인에서 API가 제공하는 userInfo의 Json 값(유저 정보들)</span>
+        // socialType에 따라 유저 정보를 통해 OAuthAttributes 객체 생성
+<span class="nc" id="L58">        OAuthAttributes extractAttributes = OAuthAttributes.of(providerType, userNameAttributeName, attributes);</span>
+<span class="nc" id="L59">        Member createdUser = getUser(extractAttributes, providerType); // getUser() 메소드로 Member 객체 생성 후 반환</span>
+
+        // DefaultOAuth2User를 구현한 CustomOAuth2User 객체를 생성해서 반환
+<span class="nc" id="L62">        return new CustomOAuth2Member(</span>
+<span class="nc" id="L63">                Collections.singleton(new SimpleGrantedAuthority(createdUser.getMemberRole().getKey())),</span>
+                attributes,
+<span class="nc" id="L65">                extractAttributes.getNameAttributeKey(),</span>
+<span class="nc" id="L66">                createdUser.getUsername(),</span>
+<span class="nc" id="L67">                createdUser.getMemberRole()</span>
+        );
+    }
+    private ProviderType getProviderType(String registrationId) {
+<span class="nc bnc" id="L71" title="All 2 branches missed.">        if(KAKAO.equals(registrationId)) {</span>
+<span class="nc" id="L72">            return ProviderType.KAKAO;</span>
+        }
+<span class="nc bnc" id="L74" title="All 2 branches missed.">        if(&quot;naver&quot;.equalsIgnoreCase(registrationId)){</span>
+<span class="nc" id="L75">            return ProviderType.NAVER;</span>
+        }
+<span class="nc" id="L77">        return ProviderType.GOOGLE;</span>
+    }
+
+    /**
+     * ProviderType과 attributes에 들어있는 소셜 로그인의 식별값 id를 통해 회원을 찾아 반환하는 메소드
+     * 만약 찾은 회원이 있다면, 그대로 반환하고 없다면 saveUser()를 호출하여 회원을 저장한다.
+     */
+
+    private Member getUser(OAuthAttributes attributes, ProviderType providerType) {
+<span class="nc" id="L86">        log.info(&quot;CustomOAuth2MemberService.getUser&quot;);</span>
+<span class="nc" id="L87">        Member findUser = memberRepository.findByProviderTypeAndProviderId(providerType,</span>
+<span class="nc" id="L88">                attributes.getOauth2MemberInfo().getId()).orElse(null);</span>
+
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        if(findUser == null) {</span>
+<span class="nc" id="L91">            return saveUser(attributes, providerType);</span>
+        }
+<span class="nc" id="L93">        return findUser;</span>
+    }
+
+    /**
+     * OAuthAttributes의 toEntity() 메소드를 통해 빌더로 Member 객체 생성 후 반환
+     * 생성된 Member 객체를 DB에 저장 : providerType, socialId, email, role 값만 있는 상태
+     */
+    @Transactional
+    private Member saveUser(OAuthAttributes attributes, ProviderType providerType) {
+<span class="nc" id="L102">        log.info(&quot;CustomOAuth2MemberService.saveUser&quot;);</span>
+<span class="nc" id="L103">        Member createdMember = attributes.toEntity(providerType, attributes.getOauth2MemberInfo());</span>
+<span class="nc" id="L104">        log.info(&quot;createdMember = &quot; + createdMember);</span>
+<span class="nc" id="L105">        basicProfileRepository.save(</span>
+<span class="nc" id="L106">                BasicProfile.builder()</span>
+<span class="nc" id="L107">                        .member(createdMember)</span>
+<span class="nc" id="L108">                        .profileImage(attributes.getOauth2MemberInfo().getImageUrl())</span>
+<span class="nc" id="L109">                        .build()</span>
+        );
+<span class="nc" id="L111">        return memberRepository.save(createdMember);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -10,10 +10,10 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class CrawlingController {
 
-    private final CrawlingTest crawlingTest;
+    private final CrawlingService crawlingService;
 
     @GetMapping("/crawling")
     public void testCrawling() throws IOException {
-        crawlingTest.searchXml();
+        crawlingService.searchXml();
     }
 }

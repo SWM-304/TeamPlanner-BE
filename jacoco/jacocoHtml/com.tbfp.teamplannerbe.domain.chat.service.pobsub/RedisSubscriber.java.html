@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RedisSubscriber.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TeamPlanner-BE</a> &gt; <a href="index.source.html" class="el_package">com.tbfp.teamplannerbe.domain.chat.service.pobsub</a> &gt; <span class="el_source">RedisSubscriber.java</span></div><h1>RedisSubscriber.java</h1><pre class="source lang-java linenums">package com.tbfp.teamplannerbe.domain.chat.service.pobsub;
+
+import com.tbfp.teamplannerbe.config.helper.UserHelper;
+import com.tbfp.teamplannerbe.domain.chat.dto.request.ChatRoomRequestDto;
+import com.tbfp.teamplannerbe.domain.chat.entity.ChatMessage;
+import com.tbfp.teamplannerbe.domain.chat.repository.ChatRepository;
+import com.tbfp.teamplannerbe.domain.common.util.JsonParser;
+import com.tbfp.teamplannerbe.domain.member.entity.Member;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.connection.Message;
+import org.springframework.data.redis.connection.MessageListener;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+<span class="nc" id="L21">@Slf4j</span>
+<span class="nc" id="L22">@RequiredArgsConstructor</span>
+@Service
+public class RedisSubscriber implements MessageListener {
+
+    private final JsonParser jsonParser;
+    private final RedisTemplate redisTemplate;
+    private final SimpMessageSendingOperations messagingTemplate;
+    private static final String DOT = &quot;.&quot;;
+    private static final String TIME_DELIMITER = &quot;:&quot;;
+
+    @Override
+    public void onMessage(Message message, byte[] pattern) {
+
+        // subscribe 되는 시점에 채팅의 readcount를 감소시켜줘야함.
+
+<span class="nc" id="L37">        ChatRoomRequestDto.ChattingReqeust chattingRequest = jsonParser.toChattingRequest((String) redisTemplate.getStringSerializer().deserialize(message.getBody()));</span>
+<span class="nc" id="L38">        chattingRequest.setCreatedDate(toCreatedDate(LocalDateTime.now())); // Set the current timestamp</span>
+<span class="nc" id="L39">        chattingRequest.setCreatedTime(toCreatedTime(LocalDateTime.now())); // Set the current timestamp</span>
+
+
+<span class="nc" id="L42">        messagingTemplate.convertAndSend(&quot;/sub/chattings/rooms/&quot; + chattingRequest.getChattingRoomId(), chattingRequest);</span>
+<span class="nc" id="L43">        log.info(&quot;Message [{}] send by member: {} to chatting room: {}&quot;, chattingRequest.getContent(), chattingRequest.getSenderId(), chattingRequest.getChattingRoomId(),chattingRequest.getReadCount());</span>
+<span class="nc" id="L44">    }</span>
+
+
+    private String toCreatedTime(LocalDateTime createdAt) {
+<span class="nc" id="L48">        return createdAt.getYear() + DOT + createdAt.getMonthValue() + DOT + createdAt.getDayOfMonth() + DOT;</span>
+    }
+
+    private String toCreatedDate(LocalDateTime createdAt) {
+<span class="nc" id="L52">        return createdAt.getHour() + TIME_DELIMITER + createdAt.getMinute();</span>
+    }
+
+
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RedisPublisher.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TeamPlanner-BE</a> &gt; <a href="index.source.html" class="el_package">com.tbfp.teamplannerbe.domain.chat.service.pobsub</a> &gt; <span class="el_source">RedisPublisher.java</span></div><h1>RedisPublisher.java</h1><pre class="source lang-java linenums">package com.tbfp.teamplannerbe.domain.chat.service.pobsub;
+
+import com.tbfp.teamplannerbe.domain.chat.dto.request.ChatRoomRequestDto.ChattingReqeust;
+import com.tbfp.teamplannerbe.domain.common.util.JsonParser;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.stereotype.Service;
+
+<span class="nc" id="L11">@RequiredArgsConstructor</span>
+@Service
+<span class="nc" id="L13">@Slf4j</span>
+public class RedisPublisher {
+
+    private final RedisTemplate&lt;String, String&gt; redisTemplate;
+    private final JsonParser jsonParser;
+
+    public void publish(ChannelTopic topic, ChattingReqeust chattingRequest) {
+<span class="nc" id="L20">        log.info(&quot;퍼블리시 하는 곳&quot;);</span>
+<span class="nc" id="L21">        System.out.println(&quot;토픽:&quot;+ topic);</span>
+<span class="nc" id="L22">        redisTemplate.convertAndSend(topic.getTopic(), jsonParser.toJson(chattingRequest));</span>
+<span class="nc" id="L23">    }</span>
+//    public void readCountPublish(ChannelTopic topic) {
+//        log.info(&quot;readCountPublish&quot;);
+//        System.out.println(&quot;readCountPublish 토픽:&quot;+ topic);
+//        redisTemplate.convertAndSend(topic.getTopic(), jsonParser.toJson(chattingRequest));
+//    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

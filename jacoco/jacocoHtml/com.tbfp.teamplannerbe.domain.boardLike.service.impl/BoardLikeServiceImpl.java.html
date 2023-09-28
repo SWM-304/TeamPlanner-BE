@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ko"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BoardLikeServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">TeamPlanner-BE</a> &gt; <a href="index.source.html" class="el_package">com.tbfp.teamplannerbe.domain.boardLike.service.impl</a> &gt; <span class="el_source">BoardLikeServiceImpl.java</span></div><h1>BoardLikeServiceImpl.java</h1><pre class="source lang-java linenums">package com.tbfp.teamplannerbe.domain.boardLike.service.impl;
+
+
+import com.tbfp.teamplannerbe.domain.board.entity.Board;
+import com.tbfp.teamplannerbe.domain.board.repository.BoardRepository;
+import com.tbfp.teamplannerbe.domain.boardLike.dto.BoardLikeResponseDto;
+import com.tbfp.teamplannerbe.domain.boardLike.entity.BoardLike;
+import com.tbfp.teamplannerbe.domain.boardLike.repository.BoardLikeRepository;
+import com.tbfp.teamplannerbe.domain.boardLike.service.BoardLikeService;
+import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
+import com.tbfp.teamplannerbe.domain.member.entity.Member;
+import com.tbfp.teamplannerbe.domain.member.repository.MemberRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
+
+import static com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType.*;
+
+@Service
+<span class="nc" id="L22">@RequiredArgsConstructor</span>
+@Transactional(readOnly = true)
+public class BoardLikeServiceImpl implements BoardLikeService {
+
+    private final MemberRepository memberRepository;
+    private final BoardRepository boardRepository;
+    private final BoardLikeRepository boardLikeRepository;
+
+    /**
+     *  공고 좋아요테이블에 좋아요내역 추가 및 공고테이블 좋아요카운트 동기화
+     *  주의 동시성 발생할 가능성 있음
+     *
+     * @param boardId
+     * @param username
+     *
+     * @return void
+     */
+    @Override
+    @Transactional
+    public void createLikesOnBoard(Long boardId, String username) {
+
+<span class="nc" id="L43">        Member member = memberRepository.findByUsername(username)</span>
+<span class="nc" id="L44">                .orElseThrow(() -&gt; new ApplicationException(USER_NOT_FOUND));</span>
+
+<span class="nc" id="L46">        Board board = boardRepository.findById(boardId)</span>
+<span class="nc" id="L47">                .orElseThrow(() -&gt; new ApplicationException(BOARD_NOT_FOUND));</span>
+
+<span class="nc" id="L49">        Optional&lt;BoardLike&gt; boardLike = boardLikeRepository.findByBoardIdAndMemberId(boardId, member.getId());</span>
+
+<span class="nc bnc" id="L51" title="All 2 branches missed.">        if(boardLike.isPresent()){</span>
+<span class="nc" id="L52">            throw new ApplicationException(ALREADY_LIKED);</span>
+        }
+
+        // boardTable의 board 동기화
+<span class="nc" id="L56">        board.plusLikeCount(board.getLikeCount()+1);</span>
+
+        //boardLike 테이블에 좋아요 정보최신화
+<span class="nc" id="L59">        BoardLike boardlike=BoardLike.builder()</span>
+<span class="nc" id="L60">                .member(member)</span>
+<span class="nc" id="L61">                .board(board)</span>
+<span class="nc" id="L62">                .build();</span>
+<span class="nc" id="L63">        boardLikeRepository.save(boardlike);</span>
+
+<span class="nc" id="L65">    }</span>
+
+    /**
+     * 좋아요 내역을 삭제
+     * @param boardLikeId
+     * @param username
+     */
+    @Override
+    @Transactional
+    public void deleteLikesOnBoard(Long boardLikeId, String username) {
+<span class="nc" id="L75">        memberRepository.findByUsername(username)</span>
+<span class="nc" id="L76">                .orElseThrow(() -&gt; new ApplicationException(USER_NOT_FOUND));</span>
+<span class="nc" id="L77">        BoardLike boardLike = boardLikeRepository.findById(boardLikeId).orElseThrow(</span>
+<span class="nc" id="L78">                () -&gt; new ApplicationException(NOT_FOUND));</span>
+
+
+        //좋아요 삭제 시 해당 boardLikeCount -=1
+<span class="nc" id="L82">        boardLike.getBoard().minusLikeCount(boardLike.getBoard().getLikeCount()-1);</span>
+
+<span class="nc" id="L84">        boardLikeRepository.deleteById(boardLikeId);</span>
+        
+<span class="nc" id="L86">    }</span>
+
+    /**
+     * 좋아요 상태조회
+     * @param boardId
+     * @param username
+     */
+    @Override
+    public BoardLikeResponseDto.boardStateResponseDto getLikeState(Long boardId,String username) {
+<span class="nc" id="L95">        Member member = memberRepository.findByUsername(username).orElseThrow(() -&gt; new ApplicationException(USER_NOT_FOUND));</span>
+<span class="nc" id="L96">        Optional&lt;BoardLike&gt; board = boardLikeRepository.findByBoardIdAndMemberId(boardId, member.getId());</span>
+
+<span class="nc" id="L98">        BoardLikeResponseDto.boardStateResponseDto responseDto = board</span>
+<span class="nc" id="L99">                .map(b -&gt; BoardLikeResponseDto.boardStateResponseDto.builder()</span>
+<span class="nc" id="L100">                        .stateMessage(true)</span>
+<span class="nc" id="L101">                        .boardLikeId(b.getId())</span>
+<span class="nc" id="L102">                        .build())</span>
+<span class="nc" id="L103">                .orElse(BoardLikeResponseDto.boardStateResponseDto.builder()</span>
+<span class="nc" id="L104">                        .stateMessage(false)</span>
+<span class="nc" id="L105">                        .build());</span>
+
+<span class="nc" id="L107">        return responseDto;</span>
+
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -126,7 +126,7 @@ pipeline {
             echo 'deploy push application And S3 script upload'
             sh'''
                 cd /var/jenkins_home/workspace
-                zip teamplanner-backend.zip teamplanner-backend
+                zip teamplanner-backend.zip teamPlannerBackEnd_jenkinsFile
                 cd /var/jenkins_home/workspace/teamPlannerBackEnd_jenkinsFile
                 aws deploy push --application-name teamplanner-webapp --s3-location s3://teamplanner-codeploy-bucket/teamplanner-backend.zip --ignore-hidden-files
 

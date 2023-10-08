@@ -4,6 +4,8 @@ import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.service.MemberService;
+import com.tbfp.teamplannerbe.domain.notification.dto.request.CreateMessageEvent;
+import com.tbfp.teamplannerbe.domain.notification.service.NotificationService;
 import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
 import com.tbfp.teamplannerbe.domain.recruitment.service.RecruitmentService;
 import com.tbfp.teamplannerbe.domain.recruitmentApply.dto.RecruitmentApplyRequestDto.*;
@@ -17,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -30,6 +33,8 @@ public class RecruitmentApplyServiceImpl implements RecruitmentApplyService {
     private final RecruitmentApplyRepository recruitmentApplyRepository;
     private final RecruitmentService recruitmentService;
     private final MemberService memberService;
+
+    private final NotificationService notificationService;
     @Transactional
     public CreateApplyResponse apply(String username, Long recruitmentId, CreateApplyRequest createApplyRequest) {
 
@@ -59,6 +64,7 @@ public class RecruitmentApplyServiceImpl implements RecruitmentApplyService {
         if(recruitment.getAuthor().getUsername().equals(username)){
             throw new ApplicationException(ApplicationErrorType.AUTHOR_CANNOT_PARTICIPATE);
         }
+        sendNotification(createApplyRequest, recruitment);
 
         return CreateApplyResponse.builder()
                 .recruitmentApplyId(
@@ -74,6 +80,17 @@ public class RecruitmentApplyServiceImpl implements RecruitmentApplyService {
                 )
                 .build();
     }
+
+    private void sendNotification(CreateApplyRequest createApplyRequest, Recruitment recruitment) {
+        CreateMessageEvent createMessageEvent = CreateMessageEvent.builder()
+                .createdDate(LocalDateTime.now())
+                .memberId(recruitment.getAuthor().getId())
+                .content(createApplyRequest.getContent())
+                .recruitmentProfileImage(recruitment.getBoard().getActivityImg())
+                .build();
+        notificationService.send(createMessageEvent);
+    }
+
     @Transactional
     public void cancelApply(String username, Long recruitmentId) {
         RecruitmentApply recruitmentApply = recruitmentApplyRepository.findRecruitmentApplyByRecruitment_IdAndApplicant_Username(recruitmentId, username)

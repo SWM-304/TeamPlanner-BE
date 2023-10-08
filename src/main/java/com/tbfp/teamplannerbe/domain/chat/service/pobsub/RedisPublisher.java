@@ -18,13 +18,6 @@ public class RedisPublisher {
 
     public void publish(ChannelTopic topic, ChattingReqeust chattingRequest) {
         log.info("퍼블리시 하는 곳");
-        System.out.println("토픽:"+ topic);
         redisTemplate.convertAndSend(topic.getTopic(), jsonParser.toJson(chattingRequest));
     }
-//    public void readCountPublish(ChannelTopic topic) {
-//        log.info("readCountPublish");
-//        System.out.println("readCountPublish 토픽:"+ topic);
-//        redisTemplate.convertAndSend(topic.getTopic(), jsonParser.toJson(chattingRequest));
-//    }
-
 }

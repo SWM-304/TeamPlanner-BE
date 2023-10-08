@@ -95,7 +95,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Transactional
     public Long createRoom(String nickname, String targetNickname) {
-        log.info("ChatRoomService.createRoom");
+        log.info("채팅방 생성해주는 곳");
         Member member = memberService.findMemberByNicknameOrElseThrowApplicationException(nickname);
         Member targetMember = memberService.findMemberByNicknameOrElseThrowApplicationException(targetNickname);
 

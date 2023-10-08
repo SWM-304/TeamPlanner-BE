@@ -9,6 +9,5 @@ import java.util.Optional;
 public interface RedisChatRoomRepository extends CrudRepository<RedisChatRoom, String> {
 
     List<RedisChatRoom> findByChatroomNo(Integer chatRoomNo);
-
     Optional<RedisChatRoom> findByChatroomNoAndUsername(Integer chatRoomNo, String username);
 }

@@ -1,6 +1,5 @@
 package com.tbfp.teamplannerbe.domain.chat.service.pobsub;
 
-import com.tbfp.teamplannerbe.config.helper.UserHelper;
 import com.tbfp.teamplannerbe.domain.chat.dto.request.ChatRoomRequestDto;
 import com.tbfp.teamplannerbe.domain.chat.entity.ChatMessage;
 import com.tbfp.teamplannerbe.domain.chat.repository.ChatRepository;
@@ -33,12 +32,9 @@ public class RedisSubscriber implements MessageListener {
     public void onMessage(Message message, byte[] pattern) {
 
         // subscribe 되는 시점에 채팅의 readcount를 감소시켜줘야함.
-
         ChatRoomRequestDto.ChattingReqeust chattingRequest = jsonParser.toChattingRequest((String) redisTemplate.getStringSerializer().deserialize(message.getBody()));
         chattingRequest.setCreatedDate(toCreatedDate(LocalDateTime.now())); // Set the current timestamp
         chattingRequest.setCreatedTime(toCreatedTime(LocalDateTime.now())); // Set the current timestamp
-
-
         messagingTemplate.convertAndSend("/sub/chattings/rooms/" + chattingRequest.getChattingRoomId(), chattingRequest);
         log.info("Message [{}] send by member: {} to chatting room: {}", chattingRequest.getContent(), chattingRequest.getSenderId(), chattingRequest.getChattingRoomId(),chattingRequest.getReadCount());
     }

@@ -1,6 +1,8 @@
 package com.tbfp.teamplannerbe.config.redis;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tbfp.teamplannerbe.domain.chat.service.pobsub.RedisSubscriber;
+import com.tbfp.teamplannerbe.domain.notification.dto.response.NotificationResponseDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,11 +10,13 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
@@ -66,5 +70,26 @@ public class RedisConfig {
     @Bean
     public ChannelTopic channelTopic() {
         return new ChannelTopic(TOPIC_NAME);
+    }
+
+    /**
+     * RedisOperations은 RedisTemplate의 인터페이스이다. 인터페이스로 정의한 이유는
+     * 테스트 코드에서 테스트하기 편하게 하기 위해서이다.
+     * redisOperations를 통해 RedisConnection에서 넘겨준 byte 값을 객체 직렬화한다.
+     * Redis와 통신할때 사용
+     */
+    @Bean
+    public RedisOperations<String, NotificationResponseDto> eventRedisOperations(
+            RedisConnectionFactory redisConnectionFactory, ObjectMapper objectMapper) {
+        final Jackson2JsonRedisSerializer<NotificationResponseDto> jsonRedisSerializer = new Jackson2JsonRedisSerializer<>(
+                NotificationResponseDto.class);
+        jsonRedisSerializer.setObjectMapper(objectMapper);
+        final RedisTemplate<String, NotificationResponseDto> eventRedisTemplate = new RedisTemplate<>();
+        eventRedisTemplate.setConnectionFactory(redisConnectionFactory);
+        eventRedisTemplate.setKeySerializer(RedisSerializer.string());
+        eventRedisTemplate.setValueSerializer(jsonRedisSerializer);
+        eventRedisTemplate.setHashKeySerializer(RedisSerializer.string());
+        eventRedisTemplate.setHashValueSerializer(jsonRedisSerializer);
+        return eventRedisTemplate;
     }
 }

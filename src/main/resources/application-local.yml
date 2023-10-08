@@ -1,3 +1,7 @@
+logging:
+  level:
+    com.zaxxer.hikari.HikariConfig: DEBUG
+    com.zaxxer.hikari: TRACE
 spring:
   session:
     store-type: redis
@@ -9,6 +13,8 @@ spring:
     url: jdbc:mysql://localhost:3306/testdb?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: root
     password:
+    hikari:
+      leak-detection-threshold: 2000
   jpa:
     hibernate:
       ddl-auto: validate
@@ -18,6 +24,7 @@ spring:
         format_sql: true
         use_sql_comments: true
         default_batch_fetch_size: 100
+    open-in-view: false
   mail:
     host: smtp.gmail.com
     port: 587
@@ -107,7 +114,7 @@ amazon:
     bucket: ENC(DY8KvVk0IQLZUQvhbosqcCuw9yOzwVd5ouVEybAZtFk=)
 
 permitUrls:
-  get: /api/v1/board/**, /api/v1/recruitment/**, /api/v1/member/signup/**/, /api/v1/image/new-pre-signed-url, /api/v1/profile/techStacks
+  get: /api/v1/board/**, /api/v1/recruitment/**, /api/v1/member/signup/**/, /api/v1/image/new-pre-signed-url, /api/v1/profile/techStacks,/api/v1/notifications/**
   post: /api/v1/member/signup/**, /api/v1/member/forgot-username, /api/v1/member/forgot-password,/api/v1/member/email-verify,/api/v1/member/idEmail-verify
   all: /, /api/v1/member/login, /api/v1/member/renew-access-token, /swagger-ui.html, /swagger-ui/**, /v3/api-docs/**, /api/v1/board,/ws/chat/**
   delete:

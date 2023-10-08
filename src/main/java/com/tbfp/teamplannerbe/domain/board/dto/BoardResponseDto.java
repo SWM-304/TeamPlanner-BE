@@ -46,6 +46,7 @@ public class BoardResponseDto {
         private String activityPeriod; //활동기간
         private Long viewCount;
         private Long likeCount;
+        private Long recruitmentWriterCount; // 모집 글 갯수
         private List<BoardWithCommentListResponseDto> comments=new ArrayList<>();
 
 
@@ -60,7 +61,6 @@ public class BoardResponseDto {
             this.target = board.getTarget();
             this.activityArea = board.getActivityArea();
             this.recruitmentPeriod = board.getRecruitmentPeriod();
-            this.recruitmentCount = board.getRecruitmentCount();
             this.meetingTime = board.getMeetingTime();
             this.homepage = board.getHomepage();
             this.activityBenefits = board.getActivityBenefits();
@@ -72,6 +72,7 @@ public class BoardResponseDto {
             this.activityPeriod = board.getActivityPeriod();
             this.viewCount=board.getView();
             this.likeCount=board.getLikeCount();
+            this.recruitmentWriterCount=board.getRecruitment().stream().count();
             // 현재 null인 값만 가져오고 있음
             if (board.getComments() != null) {
                 this.comments = board.getComments().stream()

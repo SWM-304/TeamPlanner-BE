@@ -82,7 +82,7 @@ public class BoardController {
                                        @PageableDefault(size=10, sort="view",direction = Sort.Direction.DESC) Pageable pageable){
 
             return ResponseEntity.status(HttpStatus.OK).body(
-                    boardService.searchPageSimple(boardSearchCondition,pageable).map(BoardSimpleListResponseDto::toDTO)
+                    boardService.searchPageSimple(boardSearchCondition,pageable)
             );
     }
 

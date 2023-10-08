@@ -80,17 +80,8 @@ public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements 
                 .leftJoin(recruitment.author, member).fetchJoin()
                 .leftJoin(recruitment.recruitmentApplyList, recruitmentApply).fetchJoin()
                 .where(recruitment.author.username.eq(username))
+                .distinct() // 중복 데이터 제거
                 .fetch();
-//        JPAQuery<Long> countQuery =
-//                select(recruitment.count()).
-//                        from(recruitment).
-//                        leftJoin(recruitment.board, board).fetchJoin()
-//                        .leftJoin(recruitment.author, member).fetchJoin()
-//                        .leftJoin(recruitment.recruitmentApplyList, recruitmentApply).fetchJoin()
-//                        .where(recruitment.author.username.eq(username));
-//
-//        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
         return content;
-
     }
 }

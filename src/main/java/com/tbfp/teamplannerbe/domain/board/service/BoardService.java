@@ -22,7 +22,7 @@ public interface BoardService {
 
     List<BoardResponseDto.BoardDetailResponseDto> getBoardDetail(Long boardId);
 
-    Page<Board> searchPageSimple(BoardSearchCondition condition, Pageable pageable);
+    Page<BoardResponseDto.BoardSimpleListResponseDto> searchPageSimple(BoardSearchCondition condition, Pageable pageable);
 
 
     savedBoardIdResponseDto createBoard(createBoardResquestDto createBoardResquestDto, String userId);

@@ -125,7 +125,7 @@ public class BoardController {
                                              BoardSearchCondition boardSearchCondition){
 
         return ResponseEntity.status(HttpStatus.OK).body(
-                boardService.searcBoardList(searchWord,pageable,boardSearchCondition).map(boardSearchListResponseDto::toDTO)
+                boardService.searcBoardList(searchWord,pageable,boardSearchCondition)
         );
     }
 

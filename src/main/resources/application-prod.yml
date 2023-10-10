@@ -1,4 +1,6 @@
-
+spring:
+  session:
+    store-type: redis
   config:
     activate:
       on-profile: prod

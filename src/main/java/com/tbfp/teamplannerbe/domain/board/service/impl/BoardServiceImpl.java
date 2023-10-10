@@ -5,6 +5,7 @@ import com.tbfp.teamplannerbe.domain.board.dto.BoardRequestDto.updateBoardReqeus
 import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto.BoardDetailResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto.BoardSimpleListResponseDto;
+import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto.boardSearchListResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto.savedBoardIdResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardSearchCondition;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
@@ -142,11 +143,15 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public Page<Board> searcBoardList(String searchWord, Pageable pageable,BoardSearchCondition boardSearchCondition) {
+    public Page<boardSearchListResponseDto> searcBoardList(String searchWord, Pageable pageable,BoardSearchCondition boardSearchCondition) {
 
         Page<Board> searchBoard = boardRepository.searchBoardList(searchWord, pageable,boardSearchCondition);
 
-        return searchBoard;
+
+        Page<boardSearchListResponseDto> result = searchBoard.map(boardSearchListResponseDto::toDTO);
+
+
+        return result;
     }
 
 

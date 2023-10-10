@@ -31,5 +31,5 @@ public interface BoardService {
 
     Boolean updateBoard(Long boardId,updateBoardReqeustDto updateBoardReqeustDto, String userId);
 
-    Page<Board> searcBoardList(String searchWord, Pageable pageable,BoardSearchCondition boardSearchCondition);
+    Page<BoardResponseDto.boardSearchListResponseDto> searcBoardList(String searchWord, Pageable pageable, BoardSearchCondition boardSearchCondition);
 }

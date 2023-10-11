@@ -118,3 +118,6 @@ permitUrls:
   delete:
   put:
   patch:
+
+refer:
+  host: http://localhost:3000/

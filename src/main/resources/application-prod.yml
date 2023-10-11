@@ -117,3 +117,6 @@ permitUrls:
   put:
   patch:
 
+
+refer:
+  host: https://teamplanner.co.kr/

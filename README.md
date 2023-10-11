@@ -20,6 +20,6 @@
 <img width="620" alt="image" src="https://github.com/SWM-304/TeamPlanner-BE/assets/79193811/5511a01a-0f14-47b6-9991-cc6a75fe5822">
 
 
-## TeamPlanner-Ci/CD V2
+## TeamPlanner-CI/CD V2
 
 <img width="684" alt="image" src="https://github.com/SWM-304/TeamPlanner-BE/assets/79193811/4cd64a7b-071c-4405-a974-f746354af484">

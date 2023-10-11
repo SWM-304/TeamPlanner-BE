@@ -1,9 +1,9 @@
 # TeamPlanner-BE
-team planner project backend repository
+
 
 ## AWS Architecture V1
 
-![image](https://github.com/SWM-304/TeamPlanner-BE/assets/79193811/2def1b7b-6acd-4571-9181-fea5933f2c87)
+<img width="895" alt="image" src="https://github.com/SWM-304/TeamPlanner-BE/assets/79193811/86bc1775-1383-45ea-a4e0-951cffb4eeec">
 
 
 ## AWS Architecture V2
@@ -12,7 +12,8 @@ team planner project backend repository
 
 ## AWS Architecture V3
 
-<img width="867" alt="image" src="https://github.com/SWM-304/TeamPlanner-BE/assets/79193811/4bb63e59-dffb-43b4-bb6e-877bd679a3d8">
+<img width="872" alt="image" src="https://github.com/SWM-304/TeamPlanner-BE/assets/79193811/06637ce3-cd49-4fb7-a579-07a28b576285">
+
 
 ## TeamPlanner-CI/CD V1
 

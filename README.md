@@ -1,5 +1,8 @@
 # TeamPlanner-BE
 
+<img width="932" alt="image" src="https://github.com/SWM-304/TeamPlanner-BE/assets/79193811/94735cc6-aa3a-4c64-a768-ae216daf4dab">
+
+
 
 ## AWS Architecture V1
 

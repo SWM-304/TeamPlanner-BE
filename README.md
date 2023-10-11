@@ -17,7 +17,7 @@
 
 ## TeamPlanner-CI/CD V1
 
-<img width="895" alt="image" src="https://github.com/SWM-304/TeamPlanner-BE/assets/79193811/25edd158-2a1b-424c-b081-95c25e742a70">
+<img width="620" alt="image" src="https://github.com/SWM-304/TeamPlanner-BE/assets/79193811/5511a01a-0f14-47b6-9991-cc6a75fe5822">
 
 
 ## TeamPlanner-Ci/CD V2

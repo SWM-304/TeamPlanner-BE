@@ -18,6 +18,7 @@ public class NotificationResponseDto {
     private String content;
     private LocalDateTime createdAt;
     private String recruitmentProfileImage;
+    private Integer readCount;
 
     public static NotificationResponseDto from(Notification notification) {
 
@@ -26,6 +27,7 @@ public class NotificationResponseDto {
                 .id(notification.getId())
                 .createdAt(notification.getCreatedAt())
                 .recruitmentProfileImage(notification.getRecruitmentProfileImage())
+                .readCount(notification.getReadCount())
                 .build();
     }
 }

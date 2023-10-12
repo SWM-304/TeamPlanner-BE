@@ -24,6 +24,7 @@ public class Notification{
     private String recruitmentProfileImage;
 
     @DynamoDBAttribute
+
     private String content;
     @DynamoDBAttribute
     private Long memberId;
@@ -31,4 +32,13 @@ public class Notification{
     @DynamoDBAttribute
     @DynamoDBTypeConverted(converter = DynamoDBConfig.LocalDateTimeConverter.class)
     private LocalDateTime createdAt;
+
+    @DynamoDBAttribute
+    private Integer readCount;
+
+    public void updateNotificationReadCount(Integer readCount) {
+        if(readCount>0){
+            this.readCount=readCount-1;
+        }
+    }
 }

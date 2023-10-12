@@ -7,5 +7,7 @@ import java.util.List;
 
 public interface NotificationRepository {
     void save(Notification notification);
+    void saveAll(List<Notification> notificationList);
+
     List<Notification> findAllByMemberId(Long memberId);
 }

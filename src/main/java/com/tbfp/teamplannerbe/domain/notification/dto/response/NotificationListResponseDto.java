@@ -14,6 +14,7 @@ public class NotificationListResponseDto {
     private Long memberId;
     private String recruitmentProfileImage;
     private LocalDateTime createdDate;
+    private Integer readCount;
 
     public static NotificationListResponseDto from(Notification notification) {
         return NotificationListResponseDto.builder()
@@ -21,6 +22,7 @@ public class NotificationListResponseDto {
                 .recruitmentProfileImage(notification.getRecruitmentProfileImage())
                 .createdDate(notification.getCreatedAt())
                 .memberId(notification.getMemberId())
+                .readCount(notification.getReadCount())
                 .build();
 
     }

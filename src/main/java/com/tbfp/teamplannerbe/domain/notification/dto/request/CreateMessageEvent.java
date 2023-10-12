@@ -16,6 +16,7 @@ public class CreateMessageEvent {
     private Long memberId;
     private String recruitmentProfileImage;
     private LocalDateTime createdDate;
+    private Integer readCount;
 
 
     public static Notification toEntity(CreateMessageEvent createMessageEvent) {
@@ -24,6 +25,7 @@ public class CreateMessageEvent {
                 .content(createMessageEvent.getContent())
                 .createdAt(LocalDateTime.now())
                 .recruitmentProfileImage(createMessageEvent.recruitmentProfileImage)
+                .readCount(1)
                 .build();
     }
 }

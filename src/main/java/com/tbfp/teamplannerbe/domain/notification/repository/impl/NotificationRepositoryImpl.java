@@ -24,6 +24,11 @@ public class NotificationRepositoryImpl implements NotificationRepository {
     }
 
     @Override
+    public void saveAll(List<Notification> notificationList) {
+        dynamoNotificationRepository.saveAll(notificationList);
+    }
+
+    @Override
     public List<Notification> findAllByMemberId(Long memberId) {
 
         List<Notification> notificationList = dynamoNotificationRepository.findAllByMemberId(memberId);

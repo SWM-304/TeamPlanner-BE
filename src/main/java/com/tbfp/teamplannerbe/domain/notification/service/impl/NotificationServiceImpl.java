@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @RequiredArgsConstructor
@@ -61,14 +62,15 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public List<NotificationListResponseDto> getNotificationList(String username) {
 
         Member member = memberRepository.findByUsername(username).orElseThrow(() -> new ApplicationException(ApplicationErrorType.UNAUTHORIZED));
 
         List<Notification> notificationListEntity = notificationRepository.findAllByMemberId(member.getId());
 
-
+        updateReadCount(notificationListEntity);
+        notificationRepository.saveAll(notificationListEntity);
         List<NotificationListResponseDto> notificationListDto = notificationListEntity.stream().
                 map(NotificationListResponseDto::from)
                 .collect(Collectors.toList());
@@ -99,6 +101,16 @@ public class NotificationServiceImpl implements NotificationService {
         checkEmitterStatus(emitter, messageListener);
         return emitter;
     }
+
+    /**
+     * 알림 읽음처리를 해주는 로직
+     */
+
+    private static void updateReadCount(List<Notification> notificationListEntity) {
+
+        notificationListEntity.forEach(notification -> notification.updateNotificationReadCount(notification.getReadCount()));
+    }
+
 
 
 

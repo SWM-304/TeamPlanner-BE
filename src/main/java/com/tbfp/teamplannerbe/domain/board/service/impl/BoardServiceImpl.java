@@ -92,8 +92,8 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public Page<BoardSimpleListResponseDto> searchPageSimple(BoardSearchCondition condition, Pageable pageable) {
-        Page<Board> getBoardList = boardRepository.getBoardList(condition, pageable);
-        Page<BoardSimpleListResponseDto> result = getBoardList.map(BoardSimpleListResponseDto::toDTO);
+        Page<BoardResponseDto.BoardSimpleListResponseDto> result = boardRepository.getBoardList(condition, pageable);
+
         return result;
     }
 

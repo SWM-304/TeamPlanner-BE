@@ -50,7 +50,11 @@ public class BoardQuerydslRepositoryImpl extends Querydsl4RepositorySupport impl
                         board.view,
                         board.likeCount,
                         board.recruitmentPeriod,
-                        Expressions.numberTemplate(Integer.class, "DATEDIFF(CURRENT_DATE, STR_TO_DATE({0}, '%y.%m.%d'))", board.recruitmentPeriod).as("deadlineInDays"), // Change to Integer.class
+                        Expressions.numberTemplate(
+                                Integer.class,
+                                "DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX({0}, ' ~ ', -1), '%y.%m.%d'), CURRENT_DATE)",
+                                board.recruitmentPeriod
+                        ),
                         board.comments.size()
                 ))
                 .from(board)

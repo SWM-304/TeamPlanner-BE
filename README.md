@@ -33,6 +33,11 @@
 
 <img width="824" alt="image" src="https://github.com/SWM-304/TeamPlanner-FE/assets/79193811/b412cb4a-bd9e-4376-8d82-1b7c3891a51d">
 
+## TeamPlanner Notification Architecture
+SSE를 사용할 때 단일서버일 경우에는 문제가 없지만 서버를 Scale-out 할 때 문제가 발생한다.
+사용자 정보를 SseEmitter가 서버 메모리에 저장되어 있기 때문이다. 그래서 사용자의 정보를 redis topic에 담아 Scale-out할 때도 모든 서버에서 subscribe할 수 있도록 처리.
+
+<img width="825" alt="image" src="https://github.com/SWM-304/TeamPlanner-BE/assets/79193811/bbf484c0-2865-49ca-8add-2ec23a404222">
 
 
 ### 발생했던 이슈 및 내용정리 블로그

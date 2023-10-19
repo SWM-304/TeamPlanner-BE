@@ -29,6 +29,11 @@
 
 <img width="684" alt="image" src="https://github.com/SWM-304/TeamPlanner-BE/assets/79193811/4cd64a7b-071c-4405-a974-f746354af484">
 
+## TeamPlanner ChatService Architecture
+
+<img width="824" alt="image" src="https://github.com/SWM-304/TeamPlanner-FE/assets/79193811/b412cb4a-bd9e-4376-8d82-1b7c3891a51d">
+
+
 
 ### 발생했던 이슈 및 내용정리 블로그
 https://minwoo-it-factory.tistory.com/entry/ngrinder-entity-%EC%A1%B0%ED%9A%8C%EB%B0%A9%EC%8B%9D-vs-dto-%EC%A1%B0%ED%9A%8C%EB%B0%A9%EC%8B%9D-%EC%84%B1%EB%8A%A5%ED%85%8C%EC%8A%A4%ED%8A%B8-%EA%B2%B0%EA%B3%BC

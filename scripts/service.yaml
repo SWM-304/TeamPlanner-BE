@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minwoo-deploy1
+  namespace: minwoo
+spec:
+  replicas: 2
+  minReadySeconds: 5
+  selector:
+    matchLabels:
+      app: minwoodeploy1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  template:
+    metadata:
+      labels:
+        app: minwoodeploy1
+    spec:
+      containers:
+        - name: minwoo-deploy-container
+          image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: test
+            - name: SPRING_DATASOURCE_USERNAME
+              value: test
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: test
+            - name: SPRING_PROFILES_ACTIVE
+              value: test
+            - name: JASYPT_KEY
+              value: test
+            - name: jasypt.encryptor.password
+              value: test
+            - name: SPRING_REDIS_HOST
+              value: test
+            - name: SPRING_REDIS_PORT
+              value: test
+            - name: SPRING_REDIS_PASSWORD
+              value: test
+      restartPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: minwoo
+  name: minwoo-svc1
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  selector:
+    app: minwoodeploy1

@@ -129,17 +129,20 @@ pipeline {
                 credentialsId: 'repo-and-hook-access-token-credentials',
                 url: 'https://github.com/SWM-304/TeamPlanner-BE.git'
 
-                sh "git config --global --unset user.name"
-                sh "git config --global --unset user.email"
-                sh "git config --global user.email ${gitEmail}"
-                sh "git config --global user.name ${gitName}"
-                sh "sed -i 's/latest/${BUILD_NUMBER}/g' scripts/service.yaml"
-                sh "git add ."
-                sh "git commit -m 'fix:${IMAGE_NAME} ${BUILD_NUMBER} image versioning'"
-                sh "git branch -M develop"
-                sh "git remote remove origin"
-                sh "git remote add origin https://github.com/SWM-304/TeamPlanner-BE.git"
-                sh "git push origin HEAD:develop"
+                sh """
+                cd /var/jenkins_home/workspace/teamPlannerBackEnd_jenkinsFile
+                git config --global --unset user.name
+                git config --global --unset user.email
+                git config --global user.email ${gitEmail}
+                git config --global user.name ${gitName}
+                sed -i 's/latest/${BUILD_NUMBER}/g' scripts/service.yaml
+                git add .
+                git commit -m 'fix:${IMAGE_NAME} ${BUILD_NUMBER} image versioning'
+                git branch -M develop
+                git remote remove origin
+                git remote add origin https://github.com/SWM-304/TeamPlanner-BE.git
+                git push origin HEAD:develop
+                 """
             }
             post {
                     failure {

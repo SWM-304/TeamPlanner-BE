@@ -144,7 +144,7 @@ pipeline {
                     }
             }
         }
-}
+
 
 
     stage('Clean Up Docker Images on Jenkins Server') {

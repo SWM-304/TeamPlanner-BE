@@ -127,9 +127,9 @@ pipeline {
                 credentialsId: 'repo-and-hook-access-token-credentials',
                 url: 'https://github.com/SWM-304/TeamPlanner-BE.git'
 
-                sh "sed -i 's/latest/${currentBuild.number}/g' scripts/service.yaml"
+                sh "sed -i 's/latest/${BUILD_NUMBER}/g' scripts/service.yaml"
                 sh "git add ."
-                sh "git commit -m 'fix:${awsecrRegistry} ${currentBuild.number} image versioning'"
+                sh "git commit -m 'fix:${IMAGE_NAME} ${BUILD_NUMBER} image versioning'"
                 sh "git branch -M develop"
                 sh "git remote remove origin"
                 sh "git remote add origin https://github.com/SWM-304/TeamPlanner-BE.git"

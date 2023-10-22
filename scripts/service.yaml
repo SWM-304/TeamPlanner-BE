@@ -1,19 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: minwoo-deploy1
+  name: minwoo-deployment
   namespace: minwoo
 spec:
-  replicas: 2
   minReadySeconds: 5
   selector:
     matchLabels:
       app: minwoodeploy1
   strategy:
-    type: RollingUpdate
     rollingUpdate:
       maxSurge: 25%
-      maxUnavailable: 25%
   template:
     metadata:
       labels:
@@ -25,29 +22,10 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
-          env:
-            - name: SPRING_DATASOURCE_URL
-              value: test
-            - name: SPRING_DATASOURCE_USERNAME
-              value: test
-            - name: SPRING_DATASOURCE_PASSWORD
-              value: test
-            - name: SPRING_PROFILES_ACTIVE
-              value: test
-            - name: JASYPT_KEY
-              value: test
-            - name: jasypt.encryptor.password
-              value: test
-            - name: SPRING_REDIS_HOST
-              value: test
-            - name: SPRING_REDIS_PORT
-              value: test
-            - name: SPRING_REDIS_PASSWORD
-              value: test
-      restartPolicy: Always
-
+          envFrom:
+            - secretRef:
+                name: minwoo-secrets
 ---
-
 apiVersion: v1
 kind: Service
 metadata:

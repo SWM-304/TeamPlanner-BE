@@ -11,6 +11,8 @@ pipeline {
         //github
         TARGET_BRANCH = 'develop'
         REPOSITORY_URL= 'https://github.com/SWM-304/TeamPlanner-BE.git'
+        gitEmail = 'kbsserver@naver.com'
+        gitName = 'minwoo1999'
 
         //docker-hub
         registryCredential = 'docker-hub'
@@ -127,6 +129,10 @@ pipeline {
                 credentialsId: 'repo-and-hook-access-token-credentials',
                 url: 'https://github.com/SWM-304/TeamPlanner-BE.git'
 
+                sh "git config --global --unset user.name"
+                sh "git config --global --unset user.email"
+                sh "git config --global user.email ${gitEmail}"
+                sh "git config --global user.name ${gitName}"
                 sh "sed -i 's/latest/${BUILD_NUMBER}/g' scripts/service.yaml"
                 sh "git add ."
                 sh "git commit -m 'fix:${IMAGE_NAME} ${BUILD_NUMBER} image versioning'"

@@ -130,18 +130,15 @@ pipeline {
                 url: 'https://github.com/SWM-304/TeamPlanner-BE.git'
 
 
-                cd /var/jenkins_home/workspace/teamPlannerBackEnd_jenkinsFile
-                sh "git config --global --unset user.name"
-                sh "git config --global --unset user.email"
-                sh "git config --global user.email ${gitEmail}"
-                sh "git config --global user.name ${gitName}"
-                sh "sed -i 's/latest/${BUILD_NUMBER}/g' scripts/service.yaml"
-                sh "git add ."
-                sh "git commit -m 'fix:${IMAGE_NAME} ${BUILD_NUMBER} image versioning'"
-                sh "git branch -M develop"
-                sh "git remote remove origin"
-                sh "git remote add origin https://github.com/SWM-304/TeamPlanner-BE.git"
-                sh "git push origin HEAD:develop"
+                // Change directory to the workspace
+                dir("/var/jenkins_home/workspace/teamPlannerBackEnd_jenkinsFile") {
+                    sh "git config --global user.email '${gitEmail}'"
+                    sh "git config --global user.name '${gitName}'"
+                    sh "sed -i 's/latest/${BUILD_NUMBER}/g' scripts/service.yaml"
+                    sh "git add ."
+                    sh "git commit -m 'fix:${IMAGE_NAME} ${BUILD_NUMBER} image versioning'"
+                    sh "git push origin HEAD:develop"
+                }
             }
             post {
                     failure {

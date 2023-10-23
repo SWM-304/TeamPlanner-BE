@@ -125,13 +125,14 @@ pipeline {
 
     stage('K8S Manifest Update') {
             steps {
-                git branch: 'develop',
-                credentialsId: 'repo-and-hook-access-token-credentials',
-                url: 'https://github.com/SWM-304/TeamPlanner-BE.git'
-
-
                 // Change directory to the workspace
                 dir("/var/jenkins_home/workspace/teamPlannerBackEnd_jenkinsFile") {
+
+                    git branch: 'develop',
+                    credentialsId: 'repo-and-hook-access-token-credentials',
+                    url: 'https://github.com/SWM-304/TeamPlanner-BE.git'
+
+
                     sh "git config --global user.email '${gitEmail}'"
                     sh "git config --global user.name '${gitName}'"
                     sh "sed -i 's/latest/${BUILD_NUMBER}/g' scripts/service.yaml"

@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: teamplanner-api-container
-          image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:latest
+          image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:316
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

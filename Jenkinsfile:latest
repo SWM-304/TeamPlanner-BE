@@ -135,7 +135,7 @@ pipeline {
                     // argocd manifest
                     sh "git config --global user.email '${gitEmail}'"
                     sh "git config --global user.name '${gitName}'"
-                    sh "sed -i 's/latest/${BUILD_NUMBER}/g' scripts/service.yaml"
+                    sh "sed -i 's/${BUILD_NUMBER}-1/${BUILD_NUMBER}/g' scripts/service.yaml"
                     sh "git add scripts"
                     sh "git commit -m 'fix:${IMAGE_NAME} ${BUILD_NUMBER} image versioning'"
                     sh "git branch -M main"

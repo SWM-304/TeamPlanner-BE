@@ -141,7 +141,7 @@ pipeline {
                     sh """
 
                                 // sed -i 's/image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:\$current_tag@image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:\$BUILD_NUMBER@g' scripts/service.yaml
-                                sh "sed -i 's/latest/${BUILD_NUMBER}/g' scripts/service.yaml"
+                                // sh "sed -i 's/latest/${BUILD_NUMBER}/g' scripts/service.yaml"
                                 rm -rf build
                                 git add scripts/service.yaml # 변경된 파일을 스테이징 영역에 추가
                                 git commit -a -m 'fix:${IMAGE_NAME} ${BUILD_NUMBER} image versioning' # 커밋을 만듭니다.

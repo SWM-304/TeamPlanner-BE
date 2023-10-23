@@ -130,7 +130,7 @@ pipeline {
 
                     git branch: 'main',
                     credentialsId: 'repo-and-hook-access-token-credentials',
-                    url: 'https://github.com/SWM-304/TeamPlanner-BE.git'
+                    url: 'https://github.com/SWM-304/Teamplanner-gitopsRepository'
 
                     // argocd manifest
                     sh "git config --global user.email '${gitEmail}'"

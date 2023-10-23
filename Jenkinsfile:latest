@@ -140,11 +140,10 @@ pipeline {
                         current_tag=\$(grep -oP 'image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:\\K\\d+' scripts/service.yaml)
                        if [ "\$current_tag" -lt "\$BUILD_NUMBER" ]; then
                                sed -i 's@image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:\$current_tag@image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:\$BUILD_NUMBER@g' scripts/service.yaml
+
+                               git add scripts # 변경된 파일을 스테이징 영역에 추가
                        fi
                     """
-
-
-                    sh "git add scripts"
                     sh "git commit -m 'fix:${IMAGE_NAME} ${BUILD_NUMBER} image versioning'"
                     sh "git branch -M main"
                     sh "git remote remove origin"

@@ -133,15 +133,15 @@ pipeline {
                     url: 'https://github.com/SWM-304/TeamPlanner-BE.git'
 
 
-                    sh "git config --global user.email '${gitEmail}'"
-                    sh "git config --global user.name '${gitName}'"
+                    // sh "git config --global user.email '${gitEmail}'"
+                    // sh "git config --global user.name '${gitName}'"
                     sh "sed -i 's/latest/${BUILD_NUMBER}/g' scripts/service.yaml"
                     sh "git add ."
                     sh "git commit -m 'fix:${IMAGE_NAME} ${BUILD_NUMBER} image versioning'"
-                    sh "git branch -M develop"
-                    sh "git remote remove origin"
-                    sh "git remote add origin https://github.com/SWM-304/TeamPlanner-BE"
-                    sh "git push origin HEAD:develop"
+                    // sh "git branch -M develop"
+                    // sh "git remote remove origin"
+                    sh "git remote set-url origin https://github.com/SWM-304/TeamPlanner-BE.git"
+                    sh "git push origin develop"
                 }
             }
             post {

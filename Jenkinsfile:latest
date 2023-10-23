@@ -24,6 +24,8 @@ pipeline {
         ECR_PATH = '129715120090.dkr.ecr.ap-northeast-2.amazonaws.com'
         IMAGE_NAME = '129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver'
         REGION = 'ap-northeast-2'
+
+        previousTAG= sh(script: 'echo `expr ${BUILDNUMBER} - 1`', returnStdout: true).trim()
     }
 
 
@@ -138,16 +140,17 @@ pipeline {
                     // 이미지 태그를 변경
                     sh """
                         current_tag=\$(grep -oP 'image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:\\K\\d+' scripts/service.yaml)
-                            if [ "\$current_tag" -lt "\$BUILD_NUMBER" ]; then
-                                sed -i 's@image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:\$current_tag@image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:\$BUILD_NUMBER@g' scripts/service.yaml
+
+                                // sed -i 's/image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:\$current_tag@image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:\$BUILD_NUMBER@g' scripts/service.yaml
+                                sed -i 's/129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:${previousTAG}/129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:${BUILD_NUMBER}/g' scripts/service.yaml
                                 rm -rf build
-                                git add . # 변경된 파일을 스테이징 영역에 추가
+                                git add scripts/service.yaml # 변경된 파일을 스테이징 영역에 추가
                                 git commit -a -m 'fix:${IMAGE_NAME} ${BUILD_NUMBER} image versioning' # 커밋을 만듭니다.
                                 git branch -M main
                                 git remote remove origin
                                 git remote add origin https://github.com/SWM-304/Teamplanner-gitopsRepository
                                 git push origin main
-                       fi
+
                     """
 
                 }

@@ -128,7 +128,7 @@ pipeline {
                 // Change directory to the workspace
                 dir("/var/jenkins_home/workspace/teamPlannerBackEnd_jenkinsFile") {
 
-                    git branch: 'develop',
+                    git branch: 'main',
                     credentialsId: 'repo-and-hook-access-token-credentials',
                     url: 'https://github.com/SWM-304/TeamPlanner-BE.git'
 
@@ -140,7 +140,7 @@ pipeline {
                     sh "git commit -m 'fix:${IMAGE_NAME} ${BUILD_NUMBER} image versioning'"
                     sh "git branch -M main"
                     sh "git remote remove origin"
-                    sh "git remote set-url origin https://github.com/SWM-304/Teamplanner-gitopsRepository"
+                    sh "git remote add origin https://github.com/SWM-304/Teamplanner-gitopsRepository"
                     sh "git push origin main"
                 }
             }

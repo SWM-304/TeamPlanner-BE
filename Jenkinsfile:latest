@@ -132,7 +132,7 @@ pipeline {
 
                     git branch: 'main',
                     credentialsId: 'repo-and-hook-access-token-credentials',
-                    url: 'https://github.com/SWM-304/Teamplanner-gitopsRepository'
+                    url: 'https://github.com/SWM-304/Teamplanner-gitopsRepository.git'
 
                     // argocd manifest
                     sh "git config --global user.email '${gitEmail}'"
@@ -140,14 +140,15 @@ pipeline {
                     // 이미지 태그를 변경
                     sh """
 
-
-                       rm -rf build
-                       git add scripts/service.yaml # 변경된 파일을 스테이징 영역에 추가
-                       git commit -a -m 'fix:${IMAGE_NAME} ${BUILD_NUMBER} image versioning' # 커밋을 만듭니다.
-                       git branch -M main
-                       git remote remove origin
-                       git remote add origin https://github.com/SWM-304/Teamplanner-gitopsRepository
-                       git push origin main
+                                // sed -i 's/image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:\$current_tag@image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:\$BUILD_NUMBER@g' scripts/service.yaml
+                                 sh "sed -i 's/latest/${BUILD_NUMBER}/g' scripts/service.yaml"
+                                rm -rf build
+                                git add scripts/service.yaml # 변경된 파일을 스테이징 영역에 추가
+                                git commit -a -m 'fix:${IMAGE_NAME} ${BUILD_NUMBER} image versioning' # 커밋을 만듭니다.
+                                git branch -M main
+                                git remote remove origin
+                                git remote add origin https://github.com/SWM-304/Teamplanner-gitopsRepository
+                                git push origin main
 
                     """
 

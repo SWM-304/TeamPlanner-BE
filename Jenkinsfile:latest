@@ -142,7 +142,7 @@ pipeline {
                                sed -i 's@image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:\$current_tag@image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:\$BUILD_NUMBER@g' scripts/service.yaml
 
                                git add scripts # 변경된 파일을 스테이징 영역에 추가
-                                git commit -m 'fix:${IMAGE_NAME} ${BUILD_NUMBER} image versioning'
+                                git commit -a -m 'fix:${IMAGE_NAME} ${BUILD_NUMBER} image versioning' # 커밋을 만듭니다.
                                 git branch -M main
                                 git remote remove origin
                                 git remote add origin https://github.com/SWM-304/Teamplanner-gitopsRepository

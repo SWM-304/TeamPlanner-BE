@@ -139,7 +139,7 @@ pipeline {
                     sh """
                         current_tag=\$(grep -oP 'image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:\\K\\d+' scripts/service.yaml)
                         if [ "\$current_tag" -lt "\$BUILD_NUMBER" ]; then
-                            sed -i 's/image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:\$current_tag/image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:\$BUILD_NUMBER/g' scripts/service.yaml
+                            sed -i 's:image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:\$current_tag:image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:\$BUILD_NUMBER:g' scripts/service.yaml
                         fi
                     """
 

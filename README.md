@@ -34,6 +34,10 @@
 
 <img width="684" alt="image" src="https://github.com/SWM-304/TeamPlanner-BE/assets/79193811/4cd64a7b-071c-4405-a974-f746354af484">
 
+### V3
+
+![image](https://github.com/SWM-304/TeamPlanner-BE/assets/79193811/e57d0d54-2dde-4c81-ae1e-cae449b2bb81)
+
 ## 2-3. ChatService Acritecture
 
 ### V1

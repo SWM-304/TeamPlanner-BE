@@ -62,9 +62,20 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    @Transactional
     public List<NotificationListResponseDto> getNotificationList(String username) {
 
+        Member member = memberRepository.findByUsername(username).orElseThrow(() -> new ApplicationException(ApplicationErrorType.UNAUTHORIZED));
+
+        List<Notification> notificationListEntity = notificationRepository.findAllByMemberId(member.getId());
+        List<NotificationListResponseDto> notificationListDto = notificationListEntity.stream().
+                map(NotificationListResponseDto::from)
+                .collect(Collectors.toList());
+        return notificationListDto;
+    }
+
+    @Override
+    @Transactional
+    public List<NotificationListResponseDto> readNotificationList(String username) {
         Member member = memberRepository.findByUsername(username).orElseThrow(() -> new ApplicationException(ApplicationErrorType.UNAUTHORIZED));
 
         List<Notification> notificationListEntity = notificationRepository.findAllByMemberId(member.getId());

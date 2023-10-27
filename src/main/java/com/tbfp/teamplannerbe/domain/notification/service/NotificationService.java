@@ -15,4 +15,8 @@ public interface NotificationService {
 
     List<NotificationListResponseDto> getNotificationList(String username);
 
+    List<NotificationListResponseDto> readNotificationList(String username);
+
+
+
 }

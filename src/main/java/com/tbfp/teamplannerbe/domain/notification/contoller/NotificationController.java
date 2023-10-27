@@ -45,4 +45,14 @@ public class NotificationController {
                 notificationService.getNotificationList(principal.getName())
         );
     }
+    @PutMapping("/")
+    public ResponseEntity<?> readNotificationList(Principal principal) {
+        log.info("readNotificationList 호출");
+        if(principal==null){
+            throw new ApplicationException(ApplicationErrorType.UNAUTHORIZED);
+        }
+        return ResponseEntity.ok().body(
+                notificationService.readNotificationList(principal.getName())
+        );
+    }
 }

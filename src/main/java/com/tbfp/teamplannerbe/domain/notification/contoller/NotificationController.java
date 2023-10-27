@@ -45,7 +45,7 @@ public class NotificationController {
                 notificationService.getNotificationList(principal.getName())
         );
     }
-    @PutMapping("/")
+    @PutMapping("")
     public ResponseEntity<?> readNotificationList(Principal principal) {
         log.info("readNotificationList 호출");
         if(principal==null){

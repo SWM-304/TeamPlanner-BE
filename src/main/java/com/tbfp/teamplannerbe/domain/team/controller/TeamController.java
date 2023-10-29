@@ -37,6 +37,19 @@ public class TeamController {
         return ResponseEntity.ok().body(teamService.createTeam(principal.getName(),creatTeamRequestDto));
     }
 
+    @PutMapping("/{teamId}")
+    @Operation(summary = "팀 조기 마감", description = "활동이 끝난 팀은 조기에 마감할 수 있다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청"),
+            @ApiResponse(responseCode = "500", description = "내부 서버 에러"),
+    })
+    public ResponseEntity<?> TeamClosed(@PathVariable Long teamId, Principal principal){
+        teamService.closedTeam(teamId,principal.getName());
+        return new ResponseEntity<>(
+                new CommonResponseDto<>(1,"팀 마감에 성공하였습니다",null), HttpStatus.OK);
+    }
+
     @DeleteMapping("/{teamId}/member/{memberId}")
     public ResponseEntity<?> deleteTeamMember(Principal principal,@PathVariable Long teamId,@PathVariable Long memberId){
         teamService.deleteTeamMember(principal.getName(),teamId,memberId);

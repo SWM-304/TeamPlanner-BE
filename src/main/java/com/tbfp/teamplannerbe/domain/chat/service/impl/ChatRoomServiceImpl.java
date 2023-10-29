@@ -1,5 +1,6 @@
 package com.tbfp.teamplannerbe.domain.chat.service.impl;
 
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.tbfp.teamplannerbe.config.redis.util.ChattingRedisUtil;
 import com.tbfp.teamplannerbe.domain.chat.dto.redis.RedisChatRoom;
 import com.tbfp.teamplannerbe.domain.chat.dto.response.*;
@@ -75,6 +76,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
         return new ArrayList<>(roomMap.values());
     }
+
 
     /**
      * 해당하는 채팅방에 대한 메세지까지 다 보여줌

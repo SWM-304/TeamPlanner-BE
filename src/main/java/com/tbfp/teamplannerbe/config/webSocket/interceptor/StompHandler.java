@@ -50,8 +50,6 @@ public class StompHandler implements ChannelInterceptor {
                 connectToChatRoom(accessor, username);
                 break;
             case SUBSCRIBE:
-            case SEND:
-                jwtProvider.verifyToken(accessor.getFirstNativeHeader("Authorization").replace("Bearer ",""));
                 break;
         }
     }

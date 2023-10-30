@@ -64,7 +64,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public List<NotificationListResponseDto> getNotificationList(String username) {
 
-        Member member = memberRepository.findByUsername(username).orElseThrow(() -> new ApplicationException(ApplicationErrorType.UNAUTHORIZED));
+        Member member = memberRepository.findByUsername(username).orElseThrow(() -> new ApplicationException(ApplicationErrorType.BAD_REQUEST));
 
         List<Notification> notificationListEntity = notificationRepository.findAllByMemberId(member.getId());
         List<NotificationListResponseDto> notificationListDto = notificationListEntity.stream().
@@ -76,7 +76,7 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     @Transactional
     public List<NotificationListResponseDto> readNotificationList(String username) {
-        Member member = memberRepository.findByUsername(username).orElseThrow(() -> new ApplicationException(ApplicationErrorType.UNAUTHORIZED));
+        Member member = memberRepository.findByUsername(username).orElseThrow(() -> new ApplicationException(ApplicationErrorType.BAD_REQUEST));
 
         List<Notification> notificationListEntity = notificationRepository.findAllByMemberId(member.getId());
 
@@ -149,20 +149,15 @@ public class NotificationServiceImpl implements NotificationService {
 
     private void checkEmitterStatus(final SseEmitter emitter, final MessageListener messageListener) {
         emitter.onCompletion(() -> {
-            log.info("끊어버린다1");
             emitters.remove(emitter);
             this.redisMessageListenerContainer.removeMessageListener(messageListener);
         });
         emitter.onTimeout(() -> {
-            log.info("끊어버린다2");
             emitters.remove(emitter);
             this.redisMessageListenerContainer.removeMessageListener(messageListener);
         });
     }
 
-    private void removeEmitter(SseEmitter emitter) {
-        emitters.remove(emitter);
-    }
     private String getChannelName(final String memberId) {
         return "topics:" + memberId;
     }

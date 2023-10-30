@@ -1,7 +1,9 @@
 package com.tbfp.teamplannerbe.domain.member.repository;
 
 import com.tbfp.teamplannerbe.domain.auth.ProviderType;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
+import com.tbfp.teamplannerbe.domain.profile.dto.ProfileResponseDto;
 import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
 
 import java.util.List;
@@ -27,4 +29,7 @@ public interface MemberQuerydslRepository {
 
     List<Recruitment> getApplicantList(String username);
 
+    List<MemberDto.ProfileInfoForScoringDto> findAllProfileInfosForScoring();
+
+    ProfileResponseDto.RecommendedUserResponseDto getRecommendedUserResponseDto(Long id, List<String> similarities);
 }

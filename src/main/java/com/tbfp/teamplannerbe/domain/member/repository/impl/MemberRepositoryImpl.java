@@ -1,16 +1,26 @@
 package com.tbfp.teamplannerbe.domain.member.repository.impl;
 
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.tbfp.teamplannerbe.domain.auth.ProviderType;
 import com.tbfp.teamplannerbe.domain.common.querydsl.support.Querydsl4RepositorySupport;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberDto;
+import com.tbfp.teamplannerbe.domain.member.dto.QMemberDto_ProfileInfoForScoringDto_TechStackItemDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberQuerydslRepository;
+import com.tbfp.teamplannerbe.domain.profile.dto.ProfileResponseDto;
 import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.tbfp.teamplannerbe.domain.board.entity.QBoard.board;
 import static com.tbfp.teamplannerbe.domain.member.entity.QMember.member;
+import static com.tbfp.teamplannerbe.domain.profile.entity.QActivity.activity;
+import static com.tbfp.teamplannerbe.domain.profile.entity.QCertification.certification;
+import static com.tbfp.teamplannerbe.domain.profile.entity.QTechStack.techStack;
+import static com.tbfp.teamplannerbe.domain.profile.entity.QTechStackItem.techStackItem;
 import static com.tbfp.teamplannerbe.domain.recruitment.entity.QRecruitment.recruitment;
 import static com.tbfp.teamplannerbe.domain.recruitmentApply.entity.QRecruitmentApply.recruitmentApply;
 
@@ -93,4 +103,118 @@ public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements 
         return content;
 
     }
+    @Override
+    public List<MemberDto.ProfileInfoForScoringDto> findAllProfileInfosForScoring(){
+//        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(getEntityManager());
+//
+//        JPAQuery<MemberDto.ProfileInfoForScoringDto.TechStackItemDto> techStackItemDtoJPAQuery = jpaQueryFactory
+//                .select(new QMemberDto_ProfileInfoForScoringDto_TechStackItemDto(
+//                        techStack.techStackItem.id,
+//                        techStack.techStackItem.name,
+//                        techStack.skillLevel
+//                ))
+//                .from(techStack)
+//                .where(techStack.member.eq(member))
+//                .leftJoin(techStack.techStackItem,techStackItem)
+//                .leftJoin(techStack.member,member);
+//
+//        JPAQuery<String> activitySubjectsJPAQuery= jpaQueryFactory.select(activity.subject)
+//                .from(activity)
+//                .where(activity.member.eq(member))
+//                .leftJoin(activity.member,member);
+//
+//        JPAQuery<String> certificationNamesJPAQuery = jpaQueryFactory
+//                .select(certification.name)
+//                .from(certification)
+//                .where(certification.member.eq(member))
+//                .leftJoin(certification.member,member);
+
+//        return jpaQueryFactory
+//                .select(new QMemberDto_ProfileInfoForScoringDto(
+//                        member.id,
+//                        member.basicProfile.job,
+//                        member.basicProfile.education,
+//                        member.basicProfile.admissionDate,
+//                        member.basicProfile.birth,
+//                        member.basicProfile.address,
+//                        ExpressionUtils.as(JPAExpressions
+//                                .select(new QMemberDto_ProfileInfoForScoringDto_TechStackItemDto(
+//                                        techStack.techStackItem.id,
+//                                        techStack.techStackItem.name,
+//                                        techStack.skillLevel
+//                                ))
+//                                .from(techStack)
+//                                .where(techStack.member.eq(member))
+//                                .leftJoin(techStack.techStackItem,techStackItem)
+//                                .leftJoin(techStack.member,member),"techStackItems"),
+//                        ExpressionUtils.as(JPAExpressions.select(activity.subject)
+//                                .from(activity)
+//                                .where(activity.member.eq(member))
+//                                .leftJoin(activity.member,member),"activitySubjects"),
+//                        ExpressionUtils.as(JPAExpressions.select(certification.name)
+//                                .from(certification)
+//                                .where(certification.member.eq(member))
+//                                .leftJoin(certification.member,member),"certificationNames"),
+//                        Expressions.constant(0.0)))
+//                .from(member)
+//                .where(member.state.eq(true))
+//                .fetch();
+        return select(
+                Projections.constructor(
+                        MemberDto.ProfileInfoForScoringDto.class,
+                        member.id,
+                        member.basicProfile.job,
+                        member.basicProfile.education,
+                        member.basicProfile.admissionDate,
+                        member.basicProfile.birth,
+                        member.basicProfile.address,
+                        //List<String> activitySubjects : activity는 member와 many to one mapping, member의 activty.subject 가져오기
+                        Expressions.constant(
+                                select(
+                                        Projections.constructor(
+                                                MemberDto.ProfileInfoForScoringDto.TechStackItemDto.class,
+                                                techStack.techStackItem.id,
+                                                techStack.techStackItem.name,
+                                                techStack.skillLevel
+                                        ))
+                                        .from(techStack)
+                                        .where(techStack.member.eq(member))
+                                        .leftJoin(techStack.techStackItem,techStackItem)
+                                        .leftJoin(techStack.member,member)
+                                        .fetch()
+                        ),
+                        Projections.list(
+                                select(activity.subject)
+                                        .from(activity)
+                                        .where(activity.member.eq(member))
+                        ),
+                        Expressions.constant(select(certification.name)
+                                .from(certification)
+                                .where(certification.member.eq(member))
+                                .leftJoin(certification.member,member)
+                                .fetch()
+                        ),
+                        Expressions.constant(0.0
+                        )))
+                .from(member)
+                .where(member.state.eq(true))
+                .fetch();
+    }
+
+    @Override
+    public ProfileResponseDto.RecommendedUserResponseDto getRecommendedUserResponseDto(Long id, List<String> similarities){
+        return select(
+                Projections.constructor(
+                        ProfileResponseDto.RecommendedUserResponseDto.class,
+                        member.id,
+                        member.nickname,
+                        member.basicProfile.profileIntro,
+                        member.basicProfile.profileImage,
+                        Expressions.constant(similarities)
+                ))
+                .from(member)
+                .where(member.id.eq(id).and(member.state.eq(true)))
+                .fetchOne();
+    }
+    //Long id, String nickname, String profileIntro, String profileImage, List<String> similarities
 }

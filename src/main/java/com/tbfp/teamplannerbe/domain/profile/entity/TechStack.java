@@ -24,11 +24,11 @@ public class TechStack extends BaseTimeEntity{
 
     private Integer skillLevel;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TECH_STACK_ITEM_ID")
     private TechStackItem techStackItem;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "MEMBER_ID")
     private Member member;
 

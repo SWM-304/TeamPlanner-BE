@@ -7,8 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface TechStackRepository extends JpaRepository<TechStack,Long> {
-    Optional<List<TechStack>> findAllByMemberId(Long memberId);
+public interface TechStackRepository extends JpaRepository<TechStack,Long>, TechStackQuerydslRepository {
 
     void deleteAllByIdInAndMember(List<Long> techStackIds, Member member);
 

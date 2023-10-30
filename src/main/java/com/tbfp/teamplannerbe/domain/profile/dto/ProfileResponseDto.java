@@ -4,14 +4,11 @@ import com.tbfp.teamplannerbe.domain.member.Education;
 import com.tbfp.teamplannerbe.domain.member.Gender;
 import com.tbfp.teamplannerbe.domain.member.Job;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
-import com.tbfp.teamplannerbe.domain.profile.CRUDType;
-import com.tbfp.teamplannerbe.domain.profile.SkillLevel;
 import com.tbfp.teamplannerbe.domain.profile.entity.*;
 import lombok.*;
 
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.util.List;
 
 public class ProfileResponseDto {
@@ -133,7 +130,17 @@ public class ProfileResponseDto {
         private Integer stat4;
         private Integer stat5;
     }
-
+    @Getter
+    @Builder
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
+    public static class RecommendedUserResponseDto {
+        private Long id;
+        private String nickname;
+        private String profileIntro;
+        private String profileImage;
+        private List<String> similarities;
+    }
 
     @Getter
     @Builder
@@ -145,6 +152,7 @@ public class ProfileResponseDto {
         private List<ActivityResponseDto> activities;
         private List<CertificationResponseDto> certifications;
         private List<EvaluationResponseDto> evaluations;
+        private List<RecommendedUserResponseDto> recommendedUsers;
     }
 
     @Getter

@@ -1,7 +1,9 @@
 package com.tbfp.teamplannerbe.domain.profile.service.impl;
 
+import com.mysema.commons.lang.Pair;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationErrorType;
 import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
+import com.tbfp.teamplannerbe.domain.member.dto.MemberDto;
 import com.tbfp.teamplannerbe.domain.profile.CRUDType;
 import com.tbfp.teamplannerbe.domain.profile.dto.ProfileRequestDto;
 import com.tbfp.teamplannerbe.domain.profile.dto.ProfileResponseDto;
@@ -10,17 +12,17 @@ import com.tbfp.teamplannerbe.domain.member.repository.*;
 import com.tbfp.teamplannerbe.domain.profile.entity.*;
 import com.tbfp.teamplannerbe.domain.profile.repository.*;
 import com.tbfp.teamplannerbe.domain.profile.service.ProfileService;
-import com.tbfp.teamplannerbe.domain.team.dto.TeamRequestDto;
-import com.tbfp.teamplannerbe.domain.team.dto.TeamResponseDto;
 import com.tbfp.teamplannerbe.domain.team.entity.MemberTeam;
 import com.tbfp.teamplannerbe.domain.team.entity.Team;
 import com.tbfp.teamplannerbe.domain.team.repository.MemberTeamRepository;
 import com.tbfp.teamplannerbe.domain.team.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Period;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,6 +44,18 @@ public class ProfileServiceImpl implements ProfileService {
     private final TeamRepository teamRepository;
     private final MemberTeamRepository memberTeamRepository;
 
+    private static final Map<String,Double> weightMap = new HashMap<>(){{
+        put("job",3.0);
+        put("education",3.0);
+        put("admissionDate",6.0);
+        put("birth",6.0);
+        put("address",6.0);
+        put("techStackItemIds",50.0);
+        put("activitySubjects",10.0);
+        put("certificationNames",8.0);
+        put("averageStats",8.0);
+    }};
+
     @Override
     @Transactional
     public ProfileResponseDto.ShowProfileResponseDto showProfile(String nickname){
@@ -56,6 +70,7 @@ public class ProfileServiceImpl implements ProfileService {
         List<ProfileResponseDto.ActivityResponseDto> activityResponseDtos = activityRepository.findAllByMemberId(memberId).orElse(null).stream().map(Activity::toDto).collect(Collectors.toList());
         List<ProfileResponseDto.CertificationResponseDto> certificationResponseDtos = certificationRepository.findAllByMemberId(memberId).orElse(null).stream().map(Certification::toDto).collect(Collectors.toList());
         List<ProfileResponseDto.EvaluationResponseDto> evaluationResponseDtos = evaluationRepository.findAllBySubjectMemberId(memberId).orElse(null).stream().map(Evaluation::toDto).collect(Collectors.toList());
+        List<ProfileResponseDto.RecommendedUserResponseDto> recommendedUserResponseDtos = compareWithAllMembers(member.get());
 
         return ProfileResponseDto.ShowProfileResponseDto.builder()
                 .basicProfile(basicProfileResponseDto)
@@ -63,8 +78,161 @@ public class ProfileServiceImpl implements ProfileService {
                 .activities(activityResponseDtos)
                 .certifications(certificationResponseDtos)
                 .evaluations(evaluationResponseDtos)
+                .recommendedUsers(recommendedUserResponseDtos)
                 .build();
     }
+
+    public List<ProfileResponseDto.RecommendedUserResponseDto> compareWithAllMembers(Member member){
+        //dto로 추출
+        Long memberId = member.getId();
+
+        //모든 사용자의 정보
+        List<MemberDto.ProfileInfoForScoringDto> profileInfoForScoringDtos = memberRepository.findAllProfileInfosForScoring();
+
+//        for(MemberDto.ProfileInfoForScoringDto profileInfoForScoringDto : profileInfoForScoringDtos){
+//            System.out.println("시작 : "+ profileInfoForScoringDto.getId());
+//            System.out.println("직업 : "+profileInfoForScoringDto.getJob());
+//            System.out.println("교육 : "+profileInfoForScoringDto.getEducation());
+//            System.out.println("입학 : "+profileInfoForScoringDto.getAdmissionDate());
+//            System.out.println("생일 : "+profileInfoForScoringDto.getBirth());
+//            System.out.println("주소 : "+profileInfoForScoringDto.getAddress());
+//            System.out.println("기술스택");
+//            for(MemberDto.ProfileInfoForScoringDto.TechStackItemDto techStackItemDto: profileInfoForScoringDto.getTechStackItems()){
+//                System.out.println(techStackItemDto.getName());
+//            }
+//            System.out.println("자격증 이름");
+//            for(String certificationName : profileInfoForScoringDto.getCertificationNames()){
+//                System.out.println(certificationName);
+//            }
+//        }
+        //현재 사용자의 정보
+        MemberDto.ProfileInfoForScoringDto myInfoForScoringDto = profileInfoForScoringDtos.stream()
+                .filter(dto -> dto.getId().equals(memberId))
+                .findFirst()
+                .orElse(null);
+
+        //모든 사용자 - 현재 사용자
+        profileInfoForScoringDtos.removeIf(dto -> dto.getId().equals(memberId));
+
+        //1대1로 비교해서 score, similarities 매기기
+        List<MemberDto.ScoreAndSimilaritiesDto> scoreAndSimilaritiesList = new ArrayList<>();
+
+        for(MemberDto.ProfileInfoForScoringDto otherInfoForScoringDto : profileInfoForScoringDtos){
+            MemberDto.ScoreAndSimilaritiesDto scoreAndSimilarities = getMatchingScore(myInfoForScoringDto,otherInfoForScoringDto);
+            scoreAndSimilaritiesList.add(scoreAndSimilarities);
+        }
+        //scoreAndSimilaritiesList 정렬해서 상위 5개에 대해 dto build하고 list로 리턴
+        //정렬
+        return scoreAndSimilaritiesList.stream()
+                .sorted(Comparator.comparing(MemberDto.ScoreAndSimilaritiesDto::getScore).reversed())
+                .limit(5)
+                .map(entry -> memberRepository.getRecommendedUserResponseDto(entry.getId(),entry.getSimilarities()))
+                .collect(Collectors.toList());
+    }
+    public MemberDto.ScoreAndSimilaritiesDto getMatchingScore(MemberDto.ProfileInfoForScoringDto memberInfo1, MemberDto.ProfileInfoForScoringDto memberInfo2){
+        Double score = 0.0;
+        Double tempScore = 0.0;
+        List<Pair<String, Double>> weightedSimilarities = new ArrayList<>();
+        //똑같은거 있으면 socre+1
+        // job
+        if (memberInfo1.getJob() == memberInfo2.getJob()){
+            tempScore = weightMap.get("job");
+            weightedSimilarities.add(new Pair<>(memberInfo1.getJob().getLabel(), tempScore));
+        }
+        // education
+        if (memberInfo1.getEducation() == memberInfo2.getEducation()) {
+            tempScore = weightMap.get("education");
+            weightedSimilarities.add(new Pair<>(memberInfo1.getEducation().getLabel(), tempScore));
+        }
+        // admissionDate : 차이가 3년 이하면 가중치 따라 score 부여
+        Integer admissionDateDiff = Period.between(memberInfo1.getAdmissionDate(),memberInfo2.getAdmissionDate()).getYears();
+        if (Math.abs(admissionDateDiff) < 3){
+            tempScore = (weightMap.get("admissionDate")/3) * (3-admissionDateDiff);
+            weightedSimilarities.add(new Pair<>("입학년도", tempScore));
+        }
+        //birth
+        Integer birthDiff = Math.abs(memberInfo1.getBirth().getYear()-memberInfo2.getBirth().getYear());
+        if (birthDiff < 3){
+            tempScore = (weightMap.get("birth") / 3) * (3-birthDiff);
+            weightedSimilarities.add(new Pair<>("나이", tempScore));
+        }
+        // address
+        tempScore = weightMap.get("address") * getMatchWordCount(memberInfo1.getAddress(),memberInfo2.getAddress());
+        weightedSimilarities.add(new Pair<>("거주지", tempScore));
+
+        //techStackItemIds
+        // 0. techStackItems 추출
+        List<MemberDto.ProfileInfoForScoringDto.TechStackItemDto> techStackItems1 = memberInfo1.getTechStackItems();
+        List<MemberDto.ProfileInfoForScoringDto.TechStackItemDto> techStackItems2 = memberInfo2.getTechStackItems();
+
+        // 1. id 같으면 skillLevel 비교해서 techStackSimilarities에 넣기
+        List<Pair<String, Double>> techStackSimilarities = new ArrayList<>();
+        for (MemberDto.ProfileInfoForScoringDto.TechStackItemDto item1 : techStackItems1) {
+            for (MemberDto.ProfileInfoForScoringDto.TechStackItemDto item2 : techStackItems2) {
+//                System.out.println("item1 : " + item1.getId()+" "+ item1.getName() + " " + item1.getSkillLevel());
+                if (item1.getId().equals(item2.getId())) {
+                    // id가 같은 경우 skillLevel 비교
+                    double skillLevelSimilarity = 9.0;
+                    skillLevelSimilarity += ( (1.0 / 2) * (2 - Math.abs(item1.getSkillLevel() - item2.getSkillLevel())) );
+                    //기술스택 이름, 점수 넣기
+                    techStackSimilarities.add(new Pair<>(item1.getName(), skillLevelSimilarity));
+                }
+            }
+        }
+
+//        System.out.println("techStackSimilarities : ");
+//        for(Pair<String,Double> p: techStackSimilarities){
+//            System.out.println(p.getFirst() + " " + p.getSecond());
+//        }
+        // 2. sort해서 상위 5개 weightedSimilarities에 넣기
+        techStackSimilarities.sort((pair1, pair2) -> Double.compare(pair2.getSecond(), pair1.getSecond()));
+        for (int i = 0; i < Math.min(5, techStackSimilarities.size()); i++) {
+            weightedSimilarities.add(techStackSimilarities.get(i));
+        }
+
+        // activitySubjects
+        tempScore = (weightMap.get("activitySubjects") / 3) * Math.min(3,Math.abs(memberInfo1.getActivitySubjects().size() - memberInfo2.getActivitySubjects().size()));
+        weightedSimilarities.add(new Pair<>("완료활동", tempScore));
+        // certificationNames
+//        System.out.println("certificationNames : " + memberInfo2.getCertificationNames().get(0));
+        tempScore = (weightMap.get("certificationNames") / 3) * Math.min(3,Math.abs(memberInfo1.getCertificationNames().size() - memberInfo2.getCertificationNames().size()));
+        weightedSimilarities.add(new Pair<>("자격증/수상이력", tempScore));
+        //averageStats
+        if (memberInfo1.getAverageStat()!=0.0 && memberInfo2.getAverageStat()!=0.0){
+            tempScore = (weightMap.get("averageStats") / 5) * Math.min(5,5 - Math.abs(memberInfo1.getAverageStat() - memberInfo2.getAverageStat()));
+            weightedSimilarities.add(new Pair<>("팀원평가", tempScore));
+        }
+
+        List<String> similarities = new ArrayList<>();
+        weightedSimilarities.sort((pair1, pair2) -> Double.compare(pair2.getSecond(), pair1.getSecond()));
+        //weightedSimilarities 순회하여 score += getSecond, 상위 3개 similarities에 추가
+        for (Pair<String,Double> pair : weightedSimilarities){
+            score += pair.getSecond();
+            if(similarities.size() < 3){
+                similarities.add(pair.getFirst());
+            }
+        }
+
+//        System.out.println(memberInfo2.getId()+"점수"+score);
+//        for(Pair<String,Double> p: weightedSimilarities){
+//            System.out.println(p.getFirst() + " " + p.getSecond());
+//        }
+//        System.out.println(similarities);
+
+        return MemberDto.ScoreAndSimilaritiesDto.builder()
+                .id(memberInfo2.getId())
+                .score(score)
+                .similarities(similarities)
+                .build();
+    }
+
+    public double getMatchWordCount(String addressStr1, String addressStr2){
+        Integer levenshteinDistance = StringUtils.getLevenshteinDistance(addressStr1,addressStr2);
+        double maxLength = Double.max(addressStr1.length(), addressStr2.length());
+        double percentage = (maxLength - levenshteinDistance) / maxLength;
+        return percentage;
+    }
+
 
     @Override
     @Transactional

@@ -249,9 +249,9 @@ public class ProfileServiceImpl implements ProfileService {
 
     public boolean containsNull(Object item1, Object item2){
         if (item1==null || item2==null){
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     public double getMatchWordCount(String addressStr1, String addressStr2){

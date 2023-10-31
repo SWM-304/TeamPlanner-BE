@@ -183,7 +183,7 @@ public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements 
                                         .leftJoin(techStack.member,member)
                                         .fetch()
                         ),
-                        Projections.list(
+                        Expressions.constant(
                                 select(activity.subject)
                                         .from(activity)
                                         .where(activity.member.eq(member))

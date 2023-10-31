@@ -188,7 +188,7 @@ public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements 
                                         .from(activity)
                                         .where(activity.member.eq(member))
                                         .leftJoin(activity.member,member)
-                                            .fetch()
+                                        .fetch()
                         ),
                         Expressions.constant(
                                 select(certification.name)
@@ -197,8 +197,8 @@ public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements 
                                         .leftJoin(certification.member,member)
                                         .fetch()
                         ),
-                        Expressions.constant(0.0
-                        )))
+                        Expressions.constant(0.0)
+                ))
                 .from(member)
                 .where(member.state.eq(true))
                 .fetch();

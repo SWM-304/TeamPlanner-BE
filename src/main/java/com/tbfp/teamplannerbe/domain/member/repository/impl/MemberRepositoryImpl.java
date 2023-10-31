@@ -187,12 +187,15 @@ public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements 
                                 select(activity.subject)
                                         .from(activity)
                                         .where(activity.member.eq(member))
+                                        .leftJoin(activity.member,member)
+                                            .fetch()
                         ),
-                        Expressions.constant(select(certification.name)
-                                .from(certification)
-                                .where(certification.member.eq(member))
-                                .leftJoin(certification.member,member)
-                                .fetch()
+                        Expressions.constant(
+                                select(certification.name)
+                                        .from(certification)
+                                        .where(certification.member.eq(member))
+                                        .leftJoin(certification.member,member)
+                                        .fetch()
                         ),
                         Expressions.constant(0.0
                         )))

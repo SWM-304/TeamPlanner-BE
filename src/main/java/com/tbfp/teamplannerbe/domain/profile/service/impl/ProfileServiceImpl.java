@@ -133,74 +133,95 @@ public class ProfileServiceImpl implements ProfileService {
         Double score = 0.0;
         Double tempScore = 0.0;
         List<Pair<String, Double>> weightedSimilarities = new ArrayList<>();
+
         //똑같은거 있으면 socre+1
         // job
-        if (memberInfo1.getJob() == memberInfo2.getJob()){
+        if (!containsNull(memberInfo1.getJob(), memberInfo2.getJob()) && memberInfo1.getJob() == memberInfo2.getJob()){
             tempScore = weightMap.get("job");
             weightedSimilarities.add(new Pair<>(memberInfo1.getJob().getLabel(), tempScore));
         }
+
         // education
-        if (memberInfo1.getEducation() == memberInfo2.getEducation()) {
+        if (!containsNull(memberInfo1.getEducation(), memberInfo2.getEducation()) && memberInfo1.getEducation() == memberInfo2.getEducation()) {
             tempScore = weightMap.get("education");
             weightedSimilarities.add(new Pair<>(memberInfo1.getEducation().getLabel(), tempScore));
         }
+
         // admissionDate : 차이가 3년 이하면 가중치 따라 score 부여
-        Integer admissionDateDiff = Period.between(memberInfo1.getAdmissionDate(),memberInfo2.getAdmissionDate()).getYears();
-        if (Math.abs(admissionDateDiff) < 3){
-            tempScore = (weightMap.get("admissionDate")/3) * (3-admissionDateDiff);
-            weightedSimilarities.add(new Pair<>("입학년도", tempScore));
-        }
-        //birth
-        Integer birthDiff = Math.abs(memberInfo1.getBirth().getYear()-memberInfo2.getBirth().getYear());
-        if (birthDiff < 3){
-            tempScore = (weightMap.get("birth") / 3) * (3-birthDiff);
-            weightedSimilarities.add(new Pair<>("나이", tempScore));
-        }
-        // address
-        tempScore = weightMap.get("address") * getMatchWordCount(memberInfo1.getAddress(),memberInfo2.getAddress());
-        weightedSimilarities.add(new Pair<>("거주지", tempScore));
-
-        //techStackItemIds
-        // 0. techStackItems 추출
-        List<MemberDto.ProfileInfoForScoringDto.TechStackItemDto> techStackItems1 = memberInfo1.getTechStackItems();
-        List<MemberDto.ProfileInfoForScoringDto.TechStackItemDto> techStackItems2 = memberInfo2.getTechStackItems();
-
-        // 1. id 같으면 skillLevel 비교해서 techStackSimilarities에 넣기
-        List<Pair<String, Double>> techStackSimilarities = new ArrayList<>();
-        for (MemberDto.ProfileInfoForScoringDto.TechStackItemDto item1 : techStackItems1) {
-            for (MemberDto.ProfileInfoForScoringDto.TechStackItemDto item2 : techStackItems2) {
-//                System.out.println("item1 : " + item1.getId()+" "+ item1.getName() + " " + item1.getSkillLevel());
-                if (item1.getId().equals(item2.getId())) {
-                    // id가 같은 경우 skillLevel 비교
-                    double skillLevelSimilarity = 9.0;
-                    skillLevelSimilarity += ( (1.0 / 2) * (2 - Math.abs(item1.getSkillLevel() - item2.getSkillLevel())) );
-                    //기술스택 이름, 점수 넣기
-                    techStackSimilarities.add(new Pair<>(item1.getName(), skillLevelSimilarity));
-                }
+        if(!containsNull(memberInfo1.getAdmissionDate(), memberInfo2.getAdmissionDate())){
+            Integer admissionDateDiff = Period.between(memberInfo1.getAdmissionDate(),memberInfo2.getAdmissionDate()).getYears();
+            if (Math.abs(admissionDateDiff) < 3){
+                tempScore = (weightMap.get("admissionDate")/3) * (3-admissionDateDiff);
+                weightedSimilarities.add(new Pair<>("입학년도", tempScore));
             }
         }
+
+        //birth
+        if(!containsNull(memberInfo1.getBirth(), memberInfo2.getBirth())){
+            Integer birthDiff = Math.abs(memberInfo1.getBirth().getYear()-memberInfo2.getBirth().getYear());
+            if (birthDiff < 3){
+                tempScore = (weightMap.get("birth") / 3) * (3-birthDiff);
+                weightedSimilarities.add(new Pair<>("나이", tempScore));
+            }
+        }
+
+        // address
+        if(!containsNull(memberInfo1.getAddress(), memberInfo2.getAddress())) {
+            tempScore = weightMap.get("address") * getMatchWordCount(memberInfo1.getAddress(), memberInfo2.getAddress());
+            weightedSimilarities.add(new Pair<>("거주지", tempScore));
+        }
+
+        //techStackItemIds
+        if(!containsNull(memberInfo1.getTechStackItems(), memberInfo2.getTechStackItems())) {
+            // 0. techStackItems 추출
+            List<MemberDto.ProfileInfoForScoringDto.TechStackItemDto> techStackItems1 = memberInfo1.getTechStackItems();
+            List<MemberDto.ProfileInfoForScoringDto.TechStackItemDto> techStackItems2 = memberInfo2.getTechStackItems();
+
+            // 1. id 같으면 skillLevel 비교해서 techStackSimilarities에 넣기
+            List<Pair<String, Double>> techStackSimilarities = new ArrayList<>();
+            for (MemberDto.ProfileInfoForScoringDto.TechStackItemDto item1 : techStackItems1) {
+                for (MemberDto.ProfileInfoForScoringDto.TechStackItemDto item2 : techStackItems2) {
+//                System.out.println("item1 : " + item1.getId()+" "+ item1.getName() + " " + item1.getSkillLevel());
+                    if (item1.getId().equals(item2.getId())) {
+                        // id가 같은 경우 skillLevel 비교
+                        double skillLevelSimilarity = 9.0;
+                        skillLevelSimilarity += ((1.0 / 2) * (2 - Math.abs(item1.getSkillLevel() - item2.getSkillLevel())));
+                        //기술스택 이름, 점수 넣기
+                        techStackSimilarities.add(new Pair<>(item1.getName(), skillLevelSimilarity));
+                    }
+                }
+            }
 
 //        System.out.println("techStackSimilarities : ");
 //        for(Pair<String,Double> p: techStackSimilarities){
 //            System.out.println(p.getFirst() + " " + p.getSecond());
 //        }
-        // 2. sort해서 상위 5개 weightedSimilarities에 넣기
-        techStackSimilarities.sort((pair1, pair2) -> Double.compare(pair2.getSecond(), pair1.getSecond()));
-        for (int i = 0; i < Math.min(5, techStackSimilarities.size()); i++) {
-            weightedSimilarities.add(techStackSimilarities.get(i));
+            // 2. sort해서 상위 5개 weightedSimilarities에 넣기
+            techStackSimilarities.sort((pair1, pair2) -> Double.compare(pair2.getSecond(), pair1.getSecond()));
+            for (int i = 0; i < Math.min(5, techStackSimilarities.size()); i++) {
+                weightedSimilarities.add(techStackSimilarities.get(i));
+            }
         }
 
-        // activitySubjects
-        tempScore = (weightMap.get("activitySubjects") / 3) * Math.min(3,Math.abs(memberInfo1.getActivitySubjects().size() - memberInfo2.getActivitySubjects().size()));
-        weightedSimilarities.add(new Pair<>("완료활동", tempScore));
+        if(!containsNull(memberInfo1.getActivitySubjects(), memberInfo2.getActivitySubjects())) {
+            // activitySubjects
+            tempScore = (weightMap.get("activitySubjects") / 3) * Math.min(3, Math.abs(memberInfo1.getActivitySubjects().size() - memberInfo2.getActivitySubjects().size()));
+            weightedSimilarities.add(new Pair<>("완료활동", tempScore));
+        }
+
         // certificationNames
-//        System.out.println("certificationNames : " + memberInfo2.getCertificationNames().get(0));
-        tempScore = (weightMap.get("certificationNames") / 3) * Math.min(3,Math.abs(memberInfo1.getCertificationNames().size() - memberInfo2.getCertificationNames().size()));
-        weightedSimilarities.add(new Pair<>("자격증/수상이력", tempScore));
-        //averageStats
-        if (memberInfo1.getAverageStat()!=0.0 && memberInfo2.getAverageStat()!=0.0){
-            tempScore = (weightMap.get("averageStats") / 5) * Math.min(5,5 - Math.abs(memberInfo1.getAverageStat() - memberInfo2.getAverageStat()));
-            weightedSimilarities.add(new Pair<>("팀원평가", tempScore));
+        if(!containsNull(memberInfo1.getCertificationNames(), memberInfo2.getCertificationNames())) {
+            //        System.out.println("certificationNames : " + memberInfo2.getCertificationNames().get(0));
+            tempScore = (weightMap.get("certificationNames") / 3) * Math.min(3, Math.abs(memberInfo1.getCertificationNames().size() - memberInfo2.getCertificationNames().size()));
+            weightedSimilarities.add(new Pair<>("자격증/수상이력", tempScore));
+        }
+
+        if(!containsNull(memberInfo1.getAverageStat(), memberInfo2.getAverageStat())){
+            //averageStats
+            if (memberInfo1.getAverageStat()!=0.0 && memberInfo2.getAverageStat()!=0.0){
+                tempScore = (weightMap.get("averageStats") / 5) * Math.min(5,5 - Math.abs(memberInfo1.getAverageStat() - memberInfo2.getAverageStat()));
+                weightedSimilarities.add(new Pair<>("팀원평가", tempScore));
+            }
         }
 
         List<String> similarities = new ArrayList<>();
@@ -224,6 +245,13 @@ public class ProfileServiceImpl implements ProfileService {
                 .score(score)
                 .similarities(similarities)
                 .build();
+    }
+
+    public boolean containsNull(Object item1, Object item2){
+        if (item1==null || item2==null){
+            return false;
+        }
+        return true;
     }
 
     public double getMatchWordCount(String addressStr1, String addressStr2){

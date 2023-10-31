@@ -90,6 +90,7 @@ public class RecruitmentResponseDto {
         private Integer currentMemberSize;
         private Integer viewCount;
         private Integer likeCount;
+        private String type;
 
         public static RecruitmentReadResponseDto toDto(Recruitment recruitment) {
             return builder()
@@ -100,6 +101,7 @@ public class RecruitmentResponseDto {
                     .currentMemberSize(recruitment.getCurrentMemberSize())
                     .viewCount(recruitment.getViewCount())
                     .likeCount(recruitment.getLikeCount())
+                    .type(recruitment.getBoard().getCategory())
                     .build();
         }
     }

@@ -28,6 +28,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -69,6 +70,7 @@ public class NotificationServiceImpl implements NotificationService {
         List<Notification> notificationListEntity = notificationRepository.findAllByMemberId(member.getId());
         List<NotificationListResponseDto> notificationListDto = notificationListEntity.stream().
                 map(NotificationListResponseDto::from)
+                .sorted(Comparator.comparing(NotificationListResponseDto::getCreatedDate).reversed())
                 .collect(Collectors.toList());
         return notificationListDto;
     }

@@ -91,7 +91,6 @@ public class RecruitmentResponseDto {
         private Integer viewCount;
         private Integer likeCount;
         private String type;
-
         public static RecruitmentReadResponseDto toDto(Recruitment recruitment) {
             return builder()
                     .id(recruitment.getId())

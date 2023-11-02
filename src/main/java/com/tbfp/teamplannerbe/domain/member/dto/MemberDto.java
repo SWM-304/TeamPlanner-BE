@@ -14,6 +14,7 @@ public class MemberDto {
     @Getter
     @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor
     public static class ProfileInfoForScoringDto {
         //memberid
         private Long id;
@@ -46,7 +47,7 @@ public class MemberDto {
         private Double averageStat;
 
         @QueryProjection
-        public ProfileInfoForScoringDto(Long id, Job job, Education education, LocalDate admissionDate, LocalDate birth, String address, List<TechStackItemDto> techStackItems, List<String> activitySubjects, List<String> certificationNames, Double averageStat){
+        public ProfileInfoForScoringDto(Long id, Job job, Education education, LocalDate admissionDate, LocalDate birth, String address, List<TechStackItemDto> techStackItems, List<String> activitySubjects, List<String> certificationNames){
             this.id = id;
             this.job = job;
             this.education = education;
@@ -56,7 +57,7 @@ public class MemberDto {
             this.techStackItems = techStackItems;
             this.activitySubjects = activitySubjects;
             this.certificationNames = certificationNames;
-            this.averageStat = averageStat;
+            this.averageStat=0.0;
         }
         @Getter
         @Builder

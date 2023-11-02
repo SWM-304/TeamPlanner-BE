@@ -1,12 +1,18 @@
 package com.tbfp.teamplannerbe.domain.member.repository.impl;
 
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.SimpleExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.tbfp.teamplannerbe.domain.auth.ProviderType;
+import com.tbfp.teamplannerbe.domain.board.dto.QBoardResponseDto_BoardSimpleListResponseDto;
 import com.tbfp.teamplannerbe.domain.common.querydsl.support.Querydsl4RepositorySupport;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberDto;
+import com.tbfp.teamplannerbe.domain.member.dto.QMemberDto_ProfileInfoForScoringDto;
 import com.tbfp.teamplannerbe.domain.member.dto.QMemberDto_ProfileInfoForScoringDto_TechStackItemDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberQuerydslRepository;
@@ -193,6 +199,10 @@ public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements 
                 .from(member)
                 .where(member.state.eq(true))
                 .fetch();
+
+
+
+
     }
 
     @Override

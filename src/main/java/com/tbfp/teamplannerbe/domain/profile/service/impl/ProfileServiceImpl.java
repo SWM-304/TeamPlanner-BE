@@ -94,13 +94,13 @@ public class ProfileServiceImpl implements ProfileService {
                 .collect(Collectors.toList());
 
 
-        for (MemberDto.ProfileInfoForScoringDto profileInfoForScoringDto : profileInfoForScoringDtos) {
-            System.out.println(profileInfoForScoringDto.getCertificationNames());
-            System.out.println(profileInfoForScoringDto.getTechStackItems());
-            System.out.println(profileInfoForScoringDto.getActivitySubjects());
-            System.out.println(profileInfoForScoringDto.getAverageStat());
-            System.out.println(profileInfoForScoringDto.getEducation());
-        }
+//        for (MemberDto.ProfileInfoForScoringDto profileInfoForScoringDto : profileInfoForScoringDtos) {
+//            System.out.println(profileInfoForScoringDto.getCertificationNames());
+//            System.out.println(profileInfoForScoringDto.getTechStackItems());
+//            System.out.println(profileInfoForScoringDto.getActivitySubjects());
+//            System.out.println(profileInfoForScoringDto.getAverageStat());
+//            System.out.println(profileInfoForScoringDto.getEducation());
+//        }
 
 //        for(MemberDto.ProfileInfoForScoringDto profileInfoForScoringDto : profileInfoForScoringDtos){
 //            System.out.println("시작 : "+ profileInfoForScoringDto.getId());

@@ -87,7 +87,11 @@ public class ProfileServiceImpl implements ProfileService {
         Long memberId = member.getId();
 
         //모든 사용자의 정보
-        List<MemberDto.ProfileInfoForScoringDto> profileInfoForScoringDtos = memberRepository.findAllProfileInfosForScoring();
+        List<Member> members = memberRepository.findAll();
+
+        List<MemberDto.ProfileInfoForScoringDto> profileInfoForScoringDtos = members.stream()
+                .map(memberNow -> memberRepository.findProfileInfoForScoring(memberNow.getId()))
+                .collect(Collectors.toList());
 
 
         for (MemberDto.ProfileInfoForScoringDto profileInfoForScoringDto : profileInfoForScoringDtos) {
@@ -108,6 +112,10 @@ public class ProfileServiceImpl implements ProfileService {
 //            System.out.println("기술스택");
 //            for(MemberDto.ProfileInfoForScoringDto.TechStackItemDto techStackItemDto: profileInfoForScoringDto.getTechStackItems()){
 //                System.out.println(techStackItemDto.getName());
+//            }
+//            System.out.println("활동");
+//            for(String activitySubject : profileInfoForScoringDto.getActivitySubjects()){
+//                System.out.println(activitySubject);
 //            }
 //            System.out.println("자격증 이름");
 //            for(String certificationName : profileInfoForScoringDto.getCertificationNames()){

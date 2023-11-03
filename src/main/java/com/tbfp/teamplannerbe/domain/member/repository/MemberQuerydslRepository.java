@@ -29,7 +29,7 @@ public interface MemberQuerydslRepository {
 
     List<Recruitment> getApplicantList(String username);
 
-    List<MemberDto.ProfileInfoForScoringDto> findAllProfileInfosForScoring();
+    MemberDto.ProfileInfoForScoringDto findProfileInfoForScoring(Long memberId);
 
     ProfileResponseDto.RecommendedUserResponseDto getRecommendedUserResponseDto(Long id, List<String> similarities);
 }

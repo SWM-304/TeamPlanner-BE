@@ -2,6 +2,7 @@ package com.tbfp.teamplannerbe.domain.chat.repository;
 
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.tbfp.teamplannerbe.domain.chat.dto.response.ChatRoomResponseDto;
+import com.tbfp.teamplannerbe.domain.chat.dto.response.ChattingResponse;
 import com.tbfp.teamplannerbe.domain.chat.entity.ChatMessage;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public interface ChatRepository {
 
     ChatMessage saveChatMessageForReadCount(ChatMessage chatMessage);
 
-    List<ChatMessage> findAllChatListByRoomId(Integer roomId);
+    List<ChattingResponse> findAllChatListByRoomId(Long roomId, Map<String, AttributeValue> exclusiveStartKey);
 
 
 }

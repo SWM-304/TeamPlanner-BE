@@ -12,7 +12,7 @@ import java.util.Map;
 public interface ChatRoomService {
     List<ChatRoomResponseDto.ChatRoomListDto> getRoomList(String nickname);
 //    ChattingRoomDetailResponse getMyRoom(String nickname, Long chattingRoomId);
-    ChattingRoomDetailResponse getMyRoom(String nickname, Long chattingRoomId);
+    ChattingRoomDetailResponse getMyRoom(String nickname, Long chattingRoomId,Map<String, AttributeValue> exclusiveStartKey);
 
     Long createRoom(String nickname, String targetNickname);
 

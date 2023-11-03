@@ -1,6 +1,8 @@
 package com.tbfp.teamplannerbe.domain.chat.controller;
 
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.tbfp.teamplannerbe.domain.auth.MemberDetails;
+import com.tbfp.teamplannerbe.domain.chat.entity.ChatMessage;
 import com.tbfp.teamplannerbe.domain.chat.service.RedisChatRoomService;
 import com.tbfp.teamplannerbe.domain.chat.service.impl.ChatRoomServiceImpl;
 import com.tbfp.teamplannerbe.domain.chat.dto.request.ChatRoomRequestDto;
@@ -11,6 +13,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,10 +28,19 @@ public class ChatRoomController {
      * 선택 한 채팅방에대한 채팅을 뿌려주는 곳!
      */
 
-    @GetMapping("/room/{chattingRoomId}")
-    public ResponseEntity getMyRoom(@PathVariable Long chattingRoomId,@AuthenticationPrincipal MemberDetails memberDetails) {
+    @GetMapping("/room/{chattingRoomId}/{id}/{createdAt}")
+    public ResponseEntity getMyRoom(@PathVariable Long chattingRoomId,
+                                    @PathVariable(required = false) String id,
+                                    @PathVariable(required = false) String createdAt,
+                                    @AuthenticationPrincipal MemberDetails memberDetails) {
+        log.info("getMyRoom Controller 호출");
+        Map<String, AttributeValue> exclusiveStartKey = new HashMap<>();
+        if(chattingRoomId!=null && createdAt!=null && id!=null){
+            ChatMessage chatMessage=new ChatMessage();
+            exclusiveStartKey = chatMessage.entityToDynomodb(chattingRoomId, id, createdAt);
+        }
         return ResponseEntity.ok(
-                chatRoomService.getMyRoom(memberDetails.getNickname(),chattingRoomId)
+                chatRoomService.getMyRoom(memberDetails.getNickname(),chattingRoomId,exclusiveStartKey)
 
         );
     }

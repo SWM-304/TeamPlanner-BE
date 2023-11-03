@@ -95,7 +95,7 @@ public class RedisChatRoomServiceImpl implements RedisChatRoomService {
         Member findMember = memberRepository.findByUsername(username)
                 .orElseThrow(()->new ApplicationException(USER_NOT_FOUND));
 
-        List<ChatMessage> chatList = chatRepository.findAllChatListByRoomId(chatNo);
+        List<ChatMessage> chatList = chatRepository.readRoomWithChatMessageList(Long.valueOf(chatNo));
         List<ChatMessage> filteredChatList = chatList.stream()
                 .filter(chatMessage -> !chatMessage.getSenderId().equals(findMember.getId()))
                 .collect(Collectors.toList());

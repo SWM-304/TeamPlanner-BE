@@ -46,7 +46,6 @@ public class MemberDto {
         //evaluation
         private Double averageStat;
 
-        @QueryProjection
         public ProfileInfoForScoringDto(Long id, Job job, Education education, LocalDate admissionDate, LocalDate birth, String address, List<TechStackItemDto> techStackItems, List<String> activitySubjects, List<String> certificationNames){
             this.id = id;
             this.job = job;
@@ -67,7 +66,6 @@ public class MemberDto {
             private String name;
             private Integer skillLevel;
 
-            @QueryProjection
             public TechStackItemDto(Long id, String name, Integer skillLevel){
                 this.id = id;
                 this.name = name;

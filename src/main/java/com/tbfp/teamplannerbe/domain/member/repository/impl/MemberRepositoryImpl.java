@@ -12,8 +12,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.tbfp.teamplannerbe.domain.auth.ProviderType;
 import com.tbfp.teamplannerbe.domain.common.querydsl.support.Querydsl4RepositorySupport;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberDto;
-import com.tbfp.teamplannerbe.domain.member.dto.QMemberDto_ProfileInfoForScoringDto;
-import com.tbfp.teamplannerbe.domain.member.dto.QMemberDto_ProfileInfoForScoringDto_TechStackItemDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.member.entity.QMember;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberQuerydslRepository;

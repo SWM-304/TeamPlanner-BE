@@ -2,13 +2,16 @@ package com.tbfp.teamplannerbe.domain.chat.entity;
 
 import com.amazonaws.services.config.model.MessageType;
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.tbfp.teamplannerbe.config.dynamodb.DynamoDBConfig;
 import lombok.*;
 
 import javax.persistence.Id;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Getter
@@ -41,6 +44,26 @@ public class ChatMessage {
 
     @DynamoDBAttribute
     private Integer readCount;
+
+    // 생성자: Map<String, AttributeValue>에서 엔티티로 변환
+    public ChatMessage(Map<String, AttributeValue> item) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        this.id = item.get("id").getS();
+        this.roomId = Long.parseLong(item.get("roomId").getN());
+        this.senderId = Long.parseLong(item.get("senderId").getN());
+        this.message = item.get("message").getS();
+        this.createdAt = LocalDateTime.parse(item.get("createdAt").getS(), formatter);
+        this.readCount = Integer.parseInt(item.get("readCount").getN());
+    }
+    // 엔티티를 Map<String, AttributeValue>로 변환
+    public Map<String, AttributeValue> entityToDynomodb(Long roomId, String id, String createdAt) {
+        Map<String, AttributeValue> item = new HashMap<>();
+        item.put("id", new AttributeValue().withS(id));
+        item.put("roomId", new AttributeValue().withN(Long.toString(roomId)));
+        item.put("createdAt", new AttributeValue().withS(String.valueOf(createdAt)));
+        return item;
+    }
+
 
     public void decreaseReadCount(){
         this.readCount-=1;

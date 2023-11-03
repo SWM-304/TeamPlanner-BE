@@ -125,7 +125,7 @@ public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements 
                                                 techStack.skillLevel
                                         ))
                                         .from(techStack)
-                                        .where(techStack.member.id.eq(memberId))
+                                        .where(member.state.eq(true).and(techStack.member.id.eq(memberId)))
                                         .leftJoin(techStack.techStackItem,techStackItem)
                                         .leftJoin(techStack.member,member)
                                         .fetch()
@@ -133,14 +133,14 @@ public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements 
                         Expressions.constant(
                                 select(activity.subject)
                                         .from(activity)
-                                        .where(activity.member.id.eq(memberId))
+                                        .where(member.state.eq(true).and(activity.member.id.eq(memberId)))
                                         .leftJoin(activity.member,member)
                                         .fetch()
                         ),
                         Expressions.constant(
                                 select(certification.name)
                                         .from(certification)
-                                        .where(certification.member.id.eq(memberId))
+                                        .where(member.state.eq(true).and(certification.member.id.eq(memberId)))
                                         .leftJoin(certification.member,member)
                                         .fetch()
                         ),

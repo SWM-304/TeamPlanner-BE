@@ -87,7 +87,7 @@ public class ProfileServiceImpl implements ProfileService {
         Long memberId = member.getId();
 
         //모든 사용자의 정보
-        List<Member> members = memberRepository.findAll();
+        List<Member> members = memberRepository.findAllByStateIsTrue();
 
         List<MemberDto.ProfileInfoForScoringDto> profileInfoForScoringDtos = members.stream()
                 .map(memberNow -> memberRepository.findProfileInfoForScoring(memberNow.getId()))

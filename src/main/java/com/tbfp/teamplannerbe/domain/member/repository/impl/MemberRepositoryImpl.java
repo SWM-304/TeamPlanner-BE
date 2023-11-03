@@ -10,7 +10,6 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.tbfp.teamplannerbe.domain.auth.ProviderType;
-import com.tbfp.teamplannerbe.domain.board.dto.QBoardResponseDto_BoardSimpleListResponseDto;
 import com.tbfp.teamplannerbe.domain.common.querydsl.support.Querydsl4RepositorySupport;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberDto;
 import com.tbfp.teamplannerbe.domain.member.dto.QMemberDto_ProfileInfoForScoringDto;

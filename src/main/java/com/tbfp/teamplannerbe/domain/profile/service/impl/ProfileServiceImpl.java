@@ -45,13 +45,13 @@ public class ProfileServiceImpl implements ProfileService {
     private final MemberTeamRepository memberTeamRepository;
 
     private static final Map<String,Double> weightMap = new HashMap<>(){{
-        put("job",3.0);
-        put("education",3.0);
+        put("job",3.5);
+        put("education",4.0);
         put("admissionDate",6.0);
         put("birth",6.0);
-        put("address",6.0);
+        put("address",7.0);
         put("techStackItemIds",50.0);
-        put("activitySubjects",10.0);
+        put("activitySubjects",8.5);
         put("certificationNames",8.0);
         put("averageStats",8.0);
     }};

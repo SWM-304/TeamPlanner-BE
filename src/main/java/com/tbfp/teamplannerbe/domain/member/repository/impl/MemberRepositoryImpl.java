@@ -1,7 +1,11 @@
 package com.tbfp.teamplannerbe.domain.member.repository.impl;
 
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.ListExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.tbfp.teamplannerbe.domain.auth.ProviderType;
@@ -9,6 +13,7 @@ import com.tbfp.teamplannerbe.domain.common.querydsl.support.Querydsl4Repository
 import com.tbfp.teamplannerbe.domain.member.dto.MemberDto;
 import com.tbfp.teamplannerbe.domain.member.dto.QMemberDto_ProfileInfoForScoringDto_TechStackItemDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
+import com.tbfp.teamplannerbe.domain.member.entity.QMember;
 import com.tbfp.teamplannerbe.domain.member.repository.MemberQuerydslRepository;
 import com.tbfp.teamplannerbe.domain.profile.dto.ProfileResponseDto;
 import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
@@ -19,10 +24,12 @@ import static com.tbfp.teamplannerbe.domain.board.entity.QBoard.board;
 import static com.tbfp.teamplannerbe.domain.member.entity.QMember.member;
 import static com.tbfp.teamplannerbe.domain.profile.entity.QActivity.activity;
 import static com.tbfp.teamplannerbe.domain.profile.entity.QCertification.certification;
+import static com.tbfp.teamplannerbe.domain.profile.entity.QEvaluation.evaluation;
 import static com.tbfp.teamplannerbe.domain.profile.entity.QTechStack.techStack;
 import static com.tbfp.teamplannerbe.domain.profile.entity.QTechStackItem.techStackItem;
 import static com.tbfp.teamplannerbe.domain.recruitment.entity.QRecruitment.recruitment;
 import static com.tbfp.teamplannerbe.domain.recruitmentApply.entity.QRecruitmentApply.recruitmentApply;
+import static org.hibernate.internal.util.NullnessHelper.coalesce;
 
 public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements MemberQuerydslRepository {
     public MemberRepositoryImpl() {
@@ -104,61 +111,7 @@ public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements 
 
     }
     @Override
-    public List<MemberDto.ProfileInfoForScoringDto> findAllProfileInfosForScoring(){
-//        JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(getEntityManager());
-//
-//        JPAQuery<MemberDto.ProfileInfoForScoringDto.TechStackItemDto> techStackItemDtoJPAQuery = jpaQueryFactory
-//                .select(new QMemberDto_ProfileInfoForScoringDto_TechStackItemDto(
-//                        techStack.techStackItem.id,
-//                        techStack.techStackItem.name,
-//                        techStack.skillLevel
-//                ))
-//                .from(techStack)
-//                .where(techStack.member.eq(member))
-//                .leftJoin(techStack.techStackItem,techStackItem)
-//                .leftJoin(techStack.member,member);
-//
-//        JPAQuery<String> activitySubjectsJPAQuery= jpaQueryFactory.select(activity.subject)
-//                .from(activity)
-//                .where(activity.member.eq(member))
-//                .leftJoin(activity.member,member);
-//
-//        JPAQuery<String> certificationNamesJPAQuery = jpaQueryFactory
-//                .select(certification.name)
-//                .from(certification)
-//                .where(certification.member.eq(member))
-//                .leftJoin(certification.member,member);
-
-//        return jpaQueryFactory
-//                .select(new QMemberDto_ProfileInfoForScoringDto(
-//                        member.id,
-//                        member.basicProfile.job,
-//                        member.basicProfile.education,
-//                        member.basicProfile.admissionDate,
-//                        member.basicProfile.birth,
-//                        member.basicProfile.address,
-//                        ExpressionUtils.as(JPAExpressions
-//                                .select(new QMemberDto_ProfileInfoForScoringDto_TechStackItemDto(
-//                                        techStack.techStackItem.id,
-//                                        techStack.techStackItem.name,
-//                                        techStack.skillLevel
-//                                ))
-//                                .from(techStack)
-//                                .where(techStack.member.eq(member))
-//                                .leftJoin(techStack.techStackItem,techStackItem)
-//                                .leftJoin(techStack.member,member),"techStackItems"),
-//                        ExpressionUtils.as(JPAExpressions.select(activity.subject)
-//                                .from(activity)
-//                                .where(activity.member.eq(member))
-//                                .leftJoin(activity.member,member),"activitySubjects"),
-//                        ExpressionUtils.as(JPAExpressions.select(certification.name)
-//                                .from(certification)
-//                                .where(certification.member.eq(member))
-//                                .leftJoin(certification.member,member),"certificationNames"),
-//                        Expressions.constant(0.0)))
-//                .from(member)
-//                .where(member.state.eq(true))
-//                .fetch();
+    public MemberDto.ProfileInfoForScoringDto findProfileInfoForScoring(Long memberId){
         return select(
                 Projections.constructor(
                         MemberDto.ProfileInfoForScoringDto.class,
@@ -178,7 +131,7 @@ public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements 
                                                 techStack.skillLevel
                                         ))
                                         .from(techStack)
-                                        .where(techStack.member.eq(member))
+                                        .where(techStack.member.id.eq(memberId))
                                         .leftJoin(techStack.techStackItem,techStackItem)
                                         .leftJoin(techStack.member,member)
                                         .fetch()
@@ -186,22 +139,22 @@ public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements 
                         Expressions.constant(
                                 select(activity.subject)
                                         .from(activity)
-                                        .where(activity.member.eq(member))
+                                        .where(activity.member.id.eq(memberId))
                                         .leftJoin(activity.member,member)
                                         .fetch()
                         ),
                         Expressions.constant(
                                 select(certification.name)
                                         .from(certification)
-                                        .where(certification.member.eq(member))
+                                        .where(certification.member.id.eq(memberId))
                                         .leftJoin(certification.member,member)
                                         .fetch()
                         ),
                         Expressions.constant(0.0)
                 ))
                 .from(member)
-                .where(member.state.eq(true))
-                .fetch();
+                .where(member.state.eq(true).and(member.id.eq(memberId)))
+                .fetchOne();
     }
 
     @Override

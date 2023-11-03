@@ -1,5 +1,6 @@
 package com.tbfp.teamplannerbe.domain.board.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.board.entity.BoardStateEnum;
 import com.tbfp.teamplannerbe.domain.comment.dto.CommentResponseDto;
@@ -46,6 +47,7 @@ public class BoardResponseDto {
         private String activityPeriod; //활동기간
         private Long viewCount;
         private Long likeCount;
+        private Long recruitmentWriterCount; // 모집 글 갯수
         private List<BoardWithCommentListResponseDto> comments=new ArrayList<>();
 
 
@@ -60,7 +62,6 @@ public class BoardResponseDto {
             this.target = board.getTarget();
             this.activityArea = board.getActivityArea();
             this.recruitmentPeriod = board.getRecruitmentPeriod();
-            this.recruitmentCount = board.getRecruitmentCount();
             this.meetingTime = board.getMeetingTime();
             this.homepage = board.getHomepage();
             this.activityBenefits = board.getActivityBenefits();
@@ -72,6 +73,7 @@ public class BoardResponseDto {
             this.activityPeriod = board.getActivityPeriod();
             this.viewCount=board.getView();
             this.likeCount=board.getLikeCount();
+            this.recruitmentWriterCount=board.getRecruitment().stream().count();
             // 현재 null인 값만 가져오고 있음
             if (board.getComments() != null) {
                 this.comments = board.getComments().stream()
@@ -103,7 +105,6 @@ public class BoardResponseDto {
     @Getter
     @Builder
     @NoArgsConstructor(access = AccessLevel.PROTECTED)
-    @AllArgsConstructor
     public static class BoardSimpleListResponseDto {
 
         private Long boardId;
@@ -113,34 +114,46 @@ public class BoardResponseDto {
         private Long viewCount; //조회수
         private Long likeCount; //좋아요
         private String recruitmentPeriod;
-        private Long deadlineInDays;
-        private Long commentCount;
+        private Integer deadlineInDays;
+        private Integer commentCount;
 
-        public static BoardResponseDto.BoardSimpleListResponseDto toDTO(Board board) {
-
-            String[] day = board.getRecruitmentPeriod().split("~");
-
-            // "yyyy.MM.dd" 형식의 날짜 문자열을 LocalDateTime으로 변환
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.M.d");
-            LocalDateTime specificDate = LocalDate.parse(day[1].trim(), formatter).atStartOfDay();
-
-            // 현재 날짜와 마감일 사이의 날짜 차이 계산
-            Long deadlineInDays = ChronoUnit.DAYS.between(LocalDateTime.now(), specificDate);
-            if (deadlineInDays>=0){
-                return BoardSimpleListResponseDto.builder()
-                        .recruitmentPeriod(board.getRecruitmentPeriod())
-                        .boardId(board.getId())
-                        .deadlineInDays(deadlineInDays)
-                        .activitiyName(board.getActivityName())
-                        .activityImg(board.getActivityImg())
-                        .category(board.getCategory())
-                        .viewCount(board.getView())
-                        .likeCount(board.getLikeCount())
-                        .commentCount(board.getComments().stream().count())
-                        .build();
-            }
-            return null;
+        @QueryProjection
+        public BoardSimpleListResponseDto(Long boardId, String activitiyName, String activityImg, String category, Long viewCount, Long likeCount, String recruitmentPeriod, Integer deadlineInDays, Integer commentCount) {
+            this.boardId = boardId;
+            this.activitiyName = activitiyName;
+            this.activityImg = activityImg;
+            this.category = category;
+            this.viewCount = viewCount;
+            this.likeCount = likeCount;
+            this.recruitmentPeriod = recruitmentPeriod;
+            this.deadlineInDays = deadlineInDays;
+            this.commentCount = commentCount;
         }
+
+//        public static BoardResponseDto.BoardSimpleListResponseDto toDTO(Board board) {
+//
+//            String[] day = board.getRecruitmentPeriod().split("~");
+//
+//            // "yyyy.MM.dd" 형식의 날짜 문자열을 LocalDateTime으로 변환
+//            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yy.M.d");
+//            LocalDateTime specificDate = LocalDate.parse(day[1].trim(), formatter).atStartOfDay();
+//            // 현재 날짜와 마감일 사이의 날짜 차이 계산
+//            Long deadlineInDays = ChronoUnit.DAYS.between(LocalDateTime.now(), specificDate);
+//            if (deadlineInDays>=0){
+//                return BoardSimpleListResponseDto.builder()
+//                        .recruitmentPeriod(board.getRecruitmentPeriod())
+//                        .boardId(board.getId())
+//                        .deadlineInDays(deadlineInDays)
+//                        .activitiyName(board.getActivityName())
+//                        .activityImg(board.getActivityImg())
+//                        .category(board.getCategory())
+//                        .viewCount(board.getView())
+//                        .likeCount(board.getLikeCount())
+//                        .commentCount(board.getComments().stream().count())
+//                        .build();
+//            }
+//            return null;
+//        }
     }
 
     @Getter

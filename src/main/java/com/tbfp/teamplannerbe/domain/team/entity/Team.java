@@ -7,6 +7,7 @@ import com.tbfp.teamplannerbe.domain.common.exception.ApplicationException;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
 import com.tbfp.teamplannerbe.domain.team.dto.TeamRequestDto.CreatTeamRequestDto;
+import jdk.jfr.Name;
 import lombok.*;
 import net.minidev.json.annotate.JsonIgnore;
 
@@ -47,6 +48,10 @@ public class Team extends BaseTimeEntity {
 
     private LocalDateTime endDate;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name="team_state_enum",length = 255)
+    private TeamStateEnum teamStateEnum;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "RECRUITMENT_ID")
     private Recruitment recruitment;
@@ -57,18 +62,33 @@ public class Team extends BaseTimeEntity {
     private List<MemberTeam> memberTeams=new ArrayList<>();
 
 
+    public void teamStateClosed(){
+        this.teamStateEnum=TeamStateEnum.DEADLINE;
+    }
+
+
+
     public static Team initialCreateTeam (CreatTeamRequestDto creatTeamRequestDto,
                                   Recruitment recruitment,
                                   String username){
+
+        // Use a format pattern that matches the input string format
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        // Parse the date-time string
+        LocalDateTime startDate = LocalDateTime.parse(creatTeamRequestDto.getStartDate(), formatter);
+        LocalDateTime endDate = LocalDateTime.parse(creatTeamRequestDto.getEndDate(), formatter);
+
         // 초기 팀 생성
         Team team = Team.builder()
                 .teamName(creatTeamRequestDto.getTeamName())
                 .recruitment(recruitment)
                 .teamSize(1L)
                 .teamCapacity(creatTeamRequestDto.getMaxTeamSize())
-                .startDate(LocalDateTime.parse(creatTeamRequestDto.getStartDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-                .endDate(LocalDateTime.parse(creatTeamRequestDto.getEndDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+                .startDate(startDate)
+                .endDate(endDate)
                 .teamLeader(username)
+                .teamStateEnum(TeamStateEnum.ONGOING)
                 .build();
 
 

@@ -2,7 +2,10 @@ package com.tbfp.teamplannerbe.domain.board.service.impl;
 
 import com.tbfp.teamplannerbe.domain.board.dto.BoardRequestDto.createBoardResquestDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardRequestDto.updateBoardReqeustDto;
+import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto.BoardDetailResponseDto;
+import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto.BoardSimpleListResponseDto;
+import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto.boardSearchListResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto.savedBoardIdResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardSearchCondition;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
@@ -75,26 +78,11 @@ public class BoardServiceImpl implements BoardService {
         boardRepository.save(findBoard);
 
         List<Board> board = boardRepository.getBoardAndComment(boardId);
-
-
-
         List<BoardDetailResponseDto> result = board.stream().map(b -> new BoardDetailResponseDto(b))
                 .collect(Collectors.toList());
         return result;
     }
 
-
-//    @Transactional(readOnly = true)
-//    public List<BoardResponseDto.BoardSimpleListResponseDto> getBoardList(String category) {
-//        List<Board> getBoardList = boardRepository.getBoardListbyCategory(category);
-//
-//        List<BoardResponseDto.BoardSimpleListResponseDto> boardList = getBoardList.stream().
-//                map(i -> new BoardResponseDto.BoardSimpleListResponseDto(i)).
-//                collect(Collectors.toList());
-//
-//        return boardList;
-//
-//    }
 
     /**
      *
@@ -103,10 +91,10 @@ public class BoardServiceImpl implements BoardService {
      */
 
     @Override
-    public Page<Board> searchPageSimple(BoardSearchCondition condition, Pageable pageable) {
-        Page<Board> getBoardList = boardRepository.getBoardList(condition, pageable);
+    public Page<BoardSimpleListResponseDto> searchPageSimple(BoardSearchCondition condition, Pageable pageable) {
+        Page<BoardResponseDto.BoardSimpleListResponseDto> result = boardRepository.getBoardList(condition, pageable);
 
-        return getBoardList;
+        return result;
     }
 
     @Override
@@ -155,11 +143,15 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public Page<Board> searcBoardList(String searchWord, Pageable pageable,BoardSearchCondition boardSearchCondition) {
+    public Page<boardSearchListResponseDto> searcBoardList(String searchWord, Pageable pageable,BoardSearchCondition boardSearchCondition) {
 
         Page<Board> searchBoard = boardRepository.searchBoardList(searchWord, pageable,boardSearchCondition);
 
-        return searchBoard;
+
+        Page<boardSearchListResponseDto> result = searchBoard.map(boardSearchListResponseDto::toDTO);
+
+
+        return result;
     }
 
 

@@ -140,6 +140,7 @@ public class ProfileResponseDto {
         private String profileIntro;
         private String profileImage;
         private List<String> similarities;
+
     }
 
     @Getter

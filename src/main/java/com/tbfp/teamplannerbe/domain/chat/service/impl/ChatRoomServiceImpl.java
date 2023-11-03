@@ -1,5 +1,6 @@
 package com.tbfp.teamplannerbe.domain.chat.service.impl;
 
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.tbfp.teamplannerbe.config.redis.util.ChattingRedisUtil;
 import com.tbfp.teamplannerbe.domain.chat.dto.redis.RedisChatRoom;
 import com.tbfp.teamplannerbe.domain.chat.dto.response.*;
@@ -49,10 +50,15 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public List<ChatRoomResponseDto.ChatRoomListDto> getRoomList(String nickname) {
         log.info("모든 채팅방 리스트를 가져오는 곳");
 //        redisMessageListener.enterChattingRoom(chattingRoomId);
+        // 해당유저저를 꺼내서
         Member member = memberService.findMemberByNicknameOrElseThrowApplicationException(nickname);
+
+
         List<ChatRoomMember> chatRoomMemberList = member.getChatRoomMemberList();
         Map<Long, ChatRoomResponseDto.ChatRoomListDto> roomMap = new HashMap<>();
 
+
+//        채팅한 멤버가 누구인지, rootId 하고 마지막 채팅내용,마지막채팅시간 , ,readCount는 누군지
         chatRoomMemberList.forEach(chatRoomMember -> {
             Long roomId = chatRoomMember.getChatRoom().getId();
             List<ChatMessage> messages = chatRepository.readRoomWithChatMessageList(roomId);
@@ -71,6 +77,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         return new ArrayList<>(roomMap.values());
     }
 
+
     /**
      * 해당하는 채팅방에 대한 메세지까지 다 보여줌
      */
@@ -78,13 +85,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     public ChattingRoomDetailResponse getMyRoom(String nickname, Long chattingRoomId) {
         log.info("선택한 채팅방 정보를 보여주는 서비스 로직");
-
-
-        Member member = memberService.findMemberByNicknameOrElseThrowApplicationException(nickname);
-//         채팅방번호로 채팅방에 있는 MemberList 를 전부 가져옴
-        List<ChatMessage> chatMessages = chatRepository.readRoomWithChatMessageList(chattingRoomId);
-
-
         redisMessageListener.enterChattingRoom(chattingRoomId);
         ChatRoom chattingRoom = getChattingRoomById(chattingRoomId);
         return ChattingRoomDetailResponse.builder()
@@ -95,7 +95,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     @Transactional
     public Long createRoom(String nickname, String targetNickname) {
-        log.info("ChatRoomService.createRoom");
+        log.info("채팅방 생성해주는 곳");
         Member member = memberService.findMemberByNicknameOrElseThrowApplicationException(nickname);
         Member targetMember = memberService.findMemberByNicknameOrElseThrowApplicationException(targetNickname);
 

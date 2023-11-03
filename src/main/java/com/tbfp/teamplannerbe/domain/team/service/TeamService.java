@@ -18,4 +18,6 @@ public interface TeamService {
     void deleteTeam(String username,Long teamId);
 
     List<TeamResponseDto.GetMyTeamResponseDto> getMyTeam(String username);
+
+    void closedTeam(Long teamId,String username);
 }

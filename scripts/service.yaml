@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: teamplanner-api-deployment
+  namespace: minwoo
+spec:
+  replicas: 2
+  minReadySeconds: 5
+  selector:
+    matchLabels:
+      app: teamplanner-api
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+  template:
+    metadata:
+      labels:
+        app: teamplanner-api
+    spec:
+      containers:
+        - name: teamplanner-api-container
+          image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: minwoo-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: minwoo
+  name: teamplanner-svc
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  selector:
+    app: teamplanner-api

@@ -4,6 +4,7 @@ import com.tbfp.teamplannerbe.domain.member.dto.MemberResponseDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.team.entity.MemberTeam;
 import com.tbfp.teamplannerbe.domain.team.entity.Team;
+import com.tbfp.teamplannerbe.domain.team.entity.TeamStateEnum;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -23,6 +24,7 @@ public class TeamResponseDto {
         private String teamLeader;
         private Long currentSize;
         private Long capacity;
+        private TeamStateEnum teamStateEnum;
         private LocalDateTime startDate;
         private LocalDateTime endDate;
 
@@ -35,6 +37,7 @@ public class TeamResponseDto {
                     .startDate(team.getStartDate())
                     .endDate(team.getEndDate())
                     .teamId(team.getId())
+                    .teamStateEnum(team.getTeamStateEnum())
                     .build();
             return result;
         }
@@ -64,6 +67,7 @@ public class TeamResponseDto {
         private LocalDateTime endDate;
         private Long recruitmentId;
         private Long boardId;
+        private TeamStateEnum teamStateEnum;
         @Builder.Default
         private List<MemberResponseDto.MemberInfoDto> memberInfos = new ArrayList<>();
 
@@ -82,6 +86,7 @@ public class TeamResponseDto {
                     .activityName(team.getRecruitment().getBoard().getActivityName())
                     .boardId(team.getRecruitment().getBoard().getId())
                     .memberInfos(getMemberInfoFromMemberTeam(team))
+                    .teamStateEnum(team.getTeamStateEnum())
                     .build();
         }
 

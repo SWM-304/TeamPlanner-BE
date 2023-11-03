@@ -4,7 +4,10 @@ import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.tbfp.teamplannerbe.domain.board.dto.BoardResponseDto;
 import com.tbfp.teamplannerbe.domain.board.dto.BoardSearchCondition;
+import com.tbfp.teamplannerbe.domain.board.dto.QBoardResponseDto_BoardSimpleListResponseDto;
 import com.tbfp.teamplannerbe.domain.board.entity.Board;
 import com.tbfp.teamplannerbe.domain.board.entity.BoardStateEnum;
 import com.tbfp.teamplannerbe.domain.board.repository.BoardQuerydslRepository;
@@ -32,14 +35,30 @@ public class BoardQuerydslRepositoryImpl extends Querydsl4RepositorySupport impl
 
 
     @Override
-    public Page<Board> getBoardList(BoardSearchCondition condition, Pageable pageable) {
+    public Page<BoardResponseDto.BoardSimpleListResponseDto> getBoardList(BoardSearchCondition condition, Pageable pageable) {
 
         String[] word = (condition.getActivityField()!=null) ? condition.getActivityField().split("/") : null;
         BooleanExpression activityFieldExpression = (word != null) ? activityFieldContains(word) : null;
 
 
-        JPAQuery<Board> contentQuery = selectFrom(board)
-                .where(categoryEq(condition.getCategory()),recruitmentPeriodPredicate(),activityFieldExpression)
+        JPAQuery<BoardResponseDto.BoardSimpleListResponseDto> contentQuery = new JPAQueryFactory(getEntityManager())
+                .select(new QBoardResponseDto_BoardSimpleListResponseDto(
+                        board.id,
+                        board.activityName,
+                        board.activityImg,
+                        board.category,
+                        board.view,
+                        board.likeCount,
+                        board.recruitmentPeriod,
+                        Expressions.numberTemplate(
+                                Integer.class,
+                                "DATEDIFF(STR_TO_DATE(SUBSTRING_INDEX({0}, ' ~ ', -1), '%y.%m.%d'), CURRENT_DATE)",
+                                board.recruitmentPeriod
+                        ),
+                        board.comments.size()
+                ))
+                .from(board)
+                .where(categoryEq(condition.getCategory()), recruitmentPeriodPredicate(), activityFieldExpression)
                 .orderBy(getOrderSpecifier(pageable.getSort()).stream().toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());

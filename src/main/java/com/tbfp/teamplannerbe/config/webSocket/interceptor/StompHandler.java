@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
-@Order(Ordered.HIGHEST_PRECEDENCE + 99)
+//@Order(Ordered.HIGHEST_PRECEDENCE + 99)
 @Component
 @Slf4j
 @RequiredArgsConstructor
@@ -50,8 +50,6 @@ public class StompHandler implements ChannelInterceptor {
                 connectToChatRoom(accessor, username);
                 break;
             case SUBSCRIBE:
-            case SEND:
-                jwtProvider.verifyToken(accessor.getFirstNativeHeader("Authorization").replace("Bearer ",""));
                 break;
         }
     }

@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.TimeZone;
 
 @Configuration
-@EnableDynamoDBRepositories(basePackages = "com.tbfp.teamplannerbe.domain.chat.repository") // 패키지 경로를 수정
+@EnableDynamoDBRepositories(basePackages = {"com.tbfp.teamplannerbe.domain.chat.repository","com.tbfp.teamplannerbe.domain.notification.repository"}) // 패키지 경로를 수정
 public class DynamoDBConfig {
 
     @Value("${amazon.aws.endpoint}")

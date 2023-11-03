@@ -22,7 +22,7 @@ public interface BoardService {
 
     List<BoardResponseDto.BoardDetailResponseDto> getBoardDetail(Long boardId);
 
-    Page<Board> searchPageSimple(BoardSearchCondition condition, Pageable pageable);
+    Page<BoardResponseDto.BoardSimpleListResponseDto> searchPageSimple(BoardSearchCondition condition, Pageable pageable);
 
 
     savedBoardIdResponseDto createBoard(createBoardResquestDto createBoardResquestDto, String userId);
@@ -31,5 +31,5 @@ public interface BoardService {
 
     Boolean updateBoard(Long boardId,updateBoardReqeustDto updateBoardReqeustDto, String userId);
 
-    Page<Board> searcBoardList(String searchWord, Pageable pageable,BoardSearchCondition boardSearchCondition);
+    Page<BoardResponseDto.boardSearchListResponseDto> searcBoardList(String searchWord, Pageable pageable, BoardSearchCondition boardSearchCondition);
 }

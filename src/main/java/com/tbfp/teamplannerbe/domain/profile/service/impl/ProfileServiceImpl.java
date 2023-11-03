@@ -93,6 +93,15 @@ public class ProfileServiceImpl implements ProfileService {
                 .map(memberNow -> memberRepository.findProfileInfoForScoring(memberNow.getId()))
                 .collect(Collectors.toList());
 
+
+        for (MemberDto.ProfileInfoForScoringDto profileInfoForScoringDto : profileInfoForScoringDtos) {
+            System.out.println(profileInfoForScoringDto.getCertificationNames());
+            System.out.println(profileInfoForScoringDto.getTechStackItems());
+            System.out.println(profileInfoForScoringDto.getActivitySubjects());
+            System.out.println(profileInfoForScoringDto.getAverageStat());
+            System.out.println(profileInfoForScoringDto.getEducation());
+        }
+
 //        for(MemberDto.ProfileInfoForScoringDto profileInfoForScoringDto : profileInfoForScoringDtos){
 //            System.out.println("시작 : "+ profileInfoForScoringDto.getId());
 //            System.out.println("직업 : "+profileInfoForScoringDto.getJob());
@@ -129,6 +138,7 @@ public class ProfileServiceImpl implements ProfileService {
             MemberDto.ScoreAndSimilaritiesDto scoreAndSimilarities = getMatchingScore(myInfoForScoringDto,otherInfoForScoringDto);
             scoreAndSimilaritiesList.add(scoreAndSimilarities);
         }
+
         //scoreAndSimilaritiesList 정렬해서 상위 5개에 대해 dto build하고 list로 리턴
         //정렬
         return scoreAndSimilaritiesList.stream()
@@ -202,7 +212,7 @@ public class ProfileServiceImpl implements ProfileService {
 
 //        System.out.println("techStackSimilarities : ");
 //        for(Pair<String,Double> p: techStackSimilarities){
-//            System.out.println(p.getFirst() + " " + p.getSecond());
+//            System.out.println(p.getFirst() + "들어오라고" + p.getSecond());
 //        }
             // 2. sort해서 상위 5개 weightedSimilarities에 넣기
             techStackSimilarities.sort((pair1, pair2) -> Double.compare(pair2.getSecond(), pair1.getSecond()));
@@ -243,9 +253,7 @@ public class ProfileServiceImpl implements ProfileService {
         }
 
 //        System.out.println(memberInfo2.getId()+"점수"+score);
-//        for(Pair<String,Double> p: weightedSimilarities){
-//            System.out.println(p.getFirst() + " " + p.getSecond());
-//        }
+
 //        System.out.println(similarities);
 
         return MemberDto.ScoreAndSimilaritiesDto.builder()

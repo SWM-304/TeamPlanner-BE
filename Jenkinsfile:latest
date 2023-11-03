@@ -11,6 +11,8 @@ pipeline {
         //github
         TARGET_BRANCH = 'develop'
         REPOSITORY_URL= 'https://github.com/SWM-304/TeamPlanner-BE.git'
+        gitEmail = 'kbsserver@naver.com'
+        gitName = 'minwoo1999'
 
         //docker-hub
         registryCredential = 'docker-hub'
@@ -121,30 +123,45 @@ pipeline {
             }
         }
 
-    stage('S3 script upload') {
-        steps {
-            echo 'deploy push application And S3 script upload'
-            sh'''
-                cd /var/jenkins_home/workspace
-                zip teamplanner-backend.zip teamplanner-backend
-                cd /var/jenkins_home/workspace/teamPlannerBackEnd_jenkinsFile
-                aws deploy push --application-name teamplanner-webapp --s3-location s3://teamplanner-codeploy-bucket/teamplanner-backend.zip --ignore-hidden-files
+    stage('K8S Manifest Update') {
+            steps {
+                // Change directory to the workspace
+                dir("/var/jenkins_home/workspace/teamPlannerBackEnd_jenkinsFile") {
 
-            '''
+                    git branch: 'main',
+                    credentialsId: 'repo-and-hook-access-token-credentials',
+                    url: 'https://github.com/SWM-304/Teamplanner-gitopsRepository'
+
+                    // argocd manifest
+                    sh "git config --global user.email '${gitEmail}'"
+                    sh "git config --global user.name '${gitName}'"
+                    // 이미지 태그를 변경
+                    sh """
+                        current_tag=\$(grep -oP 'image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:\\K\\d+' scripts/service.yaml)
+                       if [ "\$current_tag" -lt "\$BUILD_NUMBER" ]; then
+                                rm -rf build
+                                sed -i "s@image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:\$current_tag@image: 129715120090.dkr.ecr.ap-northeast-2.amazonaws.com/teamplanner-backendserver:$BUILD_NUMBER@g" scripts/service.yaml
+                                git add . # 변경된 파일을 스테이징 영역에 추가
+                                git commit -a -m 'fix:${IMAGE_NAME} ${BUILD_NUMBER} image versioning' # 커밋을 만듭니다.
+                                git branch -M main
+                                git remote remove origin
+                                git remote add origin https://github.com/SWM-304/Teamplanner-gitopsRepository
+                                git push origin main
+                       fi
+                    """
+
+                }
+            }
+            post {
+                    failure {
+                      echo 'K8S Manifest Update failure !'
+                    }
+                    success {
+                      echo 'K8S Manifest Update success !'
+                    }
+            }
         }
-    }
 
-
-    stage('push deploy application') {
-    steps {
-        echo 'deploy push application And S3 script upload'
-        sh'''
-            cd /var/jenkins_home/workspace/teamPlannerBackEnd_jenkinsFile
-
-            aws deploy create-deployment --application-name teamplanner-webapp --s3-location "bucket=teamplanner-codeploy-bucket,key=teamplanner-backend.zip,bundleType=zip" --deployment-group-name teamplanner-backend-deploy --deployment-config-name CodeDeployDefault.OneAtATime --description "Deploy Init for teamplanner-backend-deploy-group"
-        '''
-    }
-}
 
 
     stage('Clean Up Docker Images on Jenkins Server') {

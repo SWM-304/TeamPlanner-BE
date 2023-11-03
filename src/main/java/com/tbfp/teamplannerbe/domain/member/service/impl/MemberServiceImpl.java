@@ -390,8 +390,6 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public List<RecruitmentApplicantResponseDto> findApplicantList(String username) {
         List<Recruitment> applicantList = memberRepository.getApplicantList(username);
-
-
         List<RecruitmentApplicantResponseDto> result = applicantList.stream().map(i -> new RecruitmentApplicantResponseDto(i)).collect(Collectors.toList());
         return result;
     }

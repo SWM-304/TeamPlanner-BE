@@ -49,3 +49,4 @@ public class ChattingServiceImpl implements ChattingService {
         log.info("chatting is saved");
     }
 }
+

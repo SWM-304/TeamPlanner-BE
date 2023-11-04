@@ -1,6 +1,9 @@
 package com.tbfp.teamplannerbe.domain.chat.dto.response;
 
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import lombok.*;
+
+import java.util.Map;
 
 @Getter
 @Builder
@@ -14,4 +17,5 @@ public class ChattingResponse {
     private String createdDate;
     private String createdTime;
     private Integer readCount;
+    private Map<String, AttributeValue> lastEvaluatedKey;
 }

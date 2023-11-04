@@ -225,8 +225,7 @@ public class TeamServiceImpl implements TeamService {
     @Transactional
     public void closedTeam(Long teamId, String username) {
         teamRepository.findById(teamId).orElseThrow(()->new ApplicationException(TEAM_NOT_FOUND));
-        Team team = teamRepository.findByTeamLeader(username).orElseThrow(() -> new ApplicationException(NOT_TEAM_LEADER));
-
+        Team team = teamRepository.findById(teamId).orElseThrow(() -> new ApplicationException(NOT_TEAM_LEADER));
         // 팀 closed하기
         team.teamStateClosed();
     }

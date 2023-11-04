@@ -5,6 +5,7 @@ import com.tbfp.teamplannerbe.domain.member.dto.MemberDto;
 import com.tbfp.teamplannerbe.domain.member.entity.Member;
 import com.tbfp.teamplannerbe.domain.profile.dto.ProfileResponseDto;
 import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +31,7 @@ public interface MemberQuerydslRepository {
     List<Recruitment> getApplicantList(String username);
 
     MemberDto.ProfileInfoForScoringDto findProfileInfoForScoring(Long memberId);
+
 
     ProfileResponseDto.RecommendedUserResponseDto getRecommendedUserResponseDto(Long id, List<String> similarities);
 }

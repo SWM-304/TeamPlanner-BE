@@ -74,7 +74,7 @@ public class DynamoDBConfig {
 
         private static final ZoneId KST_ZONE = ZoneId.of("Asia/Seoul");
         @Override
-        public Date convert(LocalDateTime source) {
+        public  Date convert(LocalDateTime source) {
             return Date.from(source.atZone(KST_ZONE).toInstant());
         }
 

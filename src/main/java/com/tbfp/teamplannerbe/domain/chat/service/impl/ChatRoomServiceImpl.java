@@ -83,13 +83,13 @@ public class ChatRoomServiceImpl implements ChatRoomService {
      */
 
 
-    public ChattingRoomDetailResponse getMyRoom(String nickname, Long chattingRoomId) {
+    public ChattingRoomDetailResponse getMyRoom(String nickname, Long chattingRoomId,Map<String, AttributeValue> exclusiveStartKey) {
         log.info("선택한 채팅방 정보를 보여주는 서비스 로직");
         redisMessageListener.enterChattingRoom(chattingRoomId);
         ChatRoom chattingRoom = getChattingRoomById(chattingRoomId);
         return ChattingRoomDetailResponse.builder()
                 .members(getMemberResponses(chattingRoom))
-                .chattings(getChattingResponses(chattingRoomId))
+                .chattings(getChattingResponses(chattingRoomId,exclusiveStartKey))
                 .build();
     }
 
@@ -212,20 +212,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         return chatRoomRepository.findById(chattingRoomId)
                 .orElseThrow(() -> new ApplicationException(ApplicationErrorType.UNAUTHORIZED));
     }
-    private List<ChattingResponse> getChattingResponses(Long chattingRoomId) {
+    // 이로직만 repository단에서 변환해서 내보냄
+    private List<ChattingResponse> getChattingResponses(Long chattingRoomId,Map<String, AttributeValue> exclusiveStartKey) {
         log.info("redis 토픽안에 담긴 메세지를 가져오는 곳");
-        return chatRepository.readRoomWithChatMessageList(chattingRoomId)
-                .stream()
-                .sorted(Comparator.comparing(ChatMessage::getCreatedAt))
-                .map(message -> ChattingResponse.builder()
-                        .senderId(message.getSenderId())
-                        .content(message.getMessage())
-                        .createdDate(toCreatedDate(message.getCreatedAt()))
-                        .createdTime(toCreatedTime(message.getCreatedAt()))
-                        .chatId(message.getId())
-                        .readCount(message.getReadCount())
-                        .build())
-                .collect(Collectors.toList());
+        return chatRepository.findAllChatListByRoomId(chattingRoomId,exclusiveStartKey);
     }
 
     private List<MemberResponse> getMemberResponses(ChatRoom chattingRoom) {

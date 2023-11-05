@@ -57,15 +57,9 @@ public class ChatRepositoryImpl implements ChatRepository {
                     .withKeyConditionExpression("roomId = :x")
                     .withExpressionAttributeValues(expressionAttributeValues)
                     .withScanIndexForward(false) // 내림차순 정렬
-                    .withLimit(2);
+                    .withLimit(10);
 
-
-//            Map<String, AttributeValue> lastEvaluatedKey=new HashMap<>();
-//            lastEvaluatedKey.put("createdAt",new AttributeValue().withS(exclusiveStartKey));
-//            if (exclusiveStartKey != null || exclusiveStartKey != "") {
-//                queryRequest.setExclusiveStartKey(lastEvaluatedKey);
-//            }
-
+            queryRequest.setExclusiveStartKey(exclusiveStartKey);
             QueryResult queryResult = amazonDynamoDB.query(queryRequest);
 
             // query dynomdb결과값을 entity값으로 변환
@@ -87,28 +81,6 @@ public class ChatRepositoryImpl implements ChatRepository {
                             .build())
                     .collect(Collectors.toList());
 
-//            Map<String, AttributeValue> lastEvaluatedKey1 = queryResult.getLastEvaluatedKey();
-//            for (String s : lastEvaluatedKey.keySet()) {
-//                System.out.println(s);
-//            }
-//            for (Map<String, AttributeValue> item : queryResult.getItems()) {
-//                System.out.println(lastEvaluatedKey);
-//
-//                System.out.println("테스트!"+item);
-//
-//            }
-//
-//            Map<String, AttributeValue> exclusiveStartKeyMap = new HashMap<>();
-//            exclusiveStartKeyMap.put("createdAt", new AttributeValue().withS(exclusiveStartKey));
-//            queryRequest.setExclusiveStartKey(queryResult.getLastEvaluatedKey());
-//
-//            queryResult = amazonDynamoDB.query(queryRequest);
-//
-//
-//            for (Map<String, AttributeValue> item : queryResult.getItems()) {
-//                System.out.println("테스트2!"+item);
-//
-//            }
 
         } catch (Exception e) {
             System.err.println("err: " + e);

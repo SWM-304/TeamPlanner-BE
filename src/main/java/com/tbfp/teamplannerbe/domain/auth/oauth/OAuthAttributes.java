@@ -66,7 +66,7 @@ public class OAuthAttributes {
      * email에는 UUID로 중복 없는 랜덤 값 생성
      * role은 GUEST로 설정
      */
-    public Member toEntity(ProviderType providerType, OAuth2MemberInfo oauth2MemberInfo) {
+    public Member toEntity(ProviderType providerType, OAuth2MemberInfo oauth2MemberInfo, String nickname) {
         log.info("providerType.name() + \"-\" + UUID.randomUUID() = " + providerType.name() + "-" + UUID.randomUUID());
         return Member.builder()
                 .providerType(providerType)
@@ -75,7 +75,7 @@ public class OAuthAttributes {
                 .username(providerType.name() + "-" + UUID.randomUUID())
                 .state(true)
                 .password("" + UUID.randomUUID())
-                .nickname(providerType.name() + "-" + UUID.randomUUID())
+                .nickname(nickname)
 //                .nickname(oauth2MemberInfo.getNickname())
 //                .imageUrl(oauth2MemberInfo.getImageUrl())
                 .memberRole(MemberRole.MEMBER)

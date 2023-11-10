@@ -228,4 +228,12 @@ public class MemberRequestDto {
         private String nickname;
     }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateNicknameRequestDto {
+        @NotEmpty(message = "닉네임 변경 요청은 빈 값이면 안됩니다.")
+        private String nickname;
+    }
 }

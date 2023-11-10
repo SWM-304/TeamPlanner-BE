@@ -436,6 +436,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional(readOnly = false)
     public MemberResponseDto.UpdateNicknameResponseDto updateNickname(String username, MemberRequestDto.UpdateNicknameRequestDto updateNicknameRequestDto){
         String nickname = updateNicknameRequestDto.getNickname();
         try{

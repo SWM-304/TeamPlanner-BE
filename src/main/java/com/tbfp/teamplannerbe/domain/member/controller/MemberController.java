@@ -117,4 +117,9 @@ public class MemberController {
     public ResponseEntity<?> idAndEmailVerify(@RequestBody MemberRequestDto.NickNameAndEmailVerifyRequestDto verifyRequestDto){
         return ResponseEntity.ok().body(memberService.verifyNicknameAndEmail(verifyRequestDto));
     }
+
+    @PutMapping("/nickname")
+    public ResponseEntity<?> updateNickname(Principal principal, @RequestBody MemberRequestDto.UpdateNicknameRequestDto updateNicknameRequestDto){
+        return ResponseEntity.ok().body(memberService.updateNickname(principal.getName(),updateNicknameRequestDto));
+    }
 }

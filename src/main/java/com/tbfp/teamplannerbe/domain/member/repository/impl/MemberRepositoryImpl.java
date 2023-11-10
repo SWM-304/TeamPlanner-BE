@@ -9,6 +9,7 @@ import com.querydsl.core.types.dsl.SimpleExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.querydsl.jpa.impl.JPAUpdateClause;
 import com.tbfp.teamplannerbe.domain.auth.ProviderType;
 import com.tbfp.teamplannerbe.domain.common.querydsl.support.Querydsl4RepositorySupport;
 import com.tbfp.teamplannerbe.domain.member.dto.MemberDto;
@@ -18,6 +19,8 @@ import com.tbfp.teamplannerbe.domain.member.repository.MemberQuerydslRepository;
 import com.tbfp.teamplannerbe.domain.profile.dto.ProfileResponseDto;
 import com.tbfp.teamplannerbe.domain.recruitment.entity.Recruitment;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.*;
 
 import static com.tbfp.teamplannerbe.domain.board.entity.QBoard.board;
@@ -35,6 +38,8 @@ public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements 
     public MemberRepositoryImpl() {
         super(Member.class);
     }
+    @PersistenceContext
+    private EntityManager entityManager;
 
     public List<Member> basicSelect() {
         return select(member)
@@ -164,4 +169,18 @@ public class MemberRepositoryImpl extends Querydsl4RepositorySupport implements 
                 .fetchOne();
     }
     //Long id, String nickname, String profileIntro, String profileImage, List<String> similarities
+
+    @Override
+    public void updateNickname(String username, String nickname){
+        JPAUpdateClause updateClause = new JPAUpdateClause(entityManager, member);
+
+        long updatedRows = updateClause
+                .set(member.nickname, nickname)
+                .where(member.username.eq(username))
+                .execute();
+
+        if (updatedRows == 0) {
+            throw new RuntimeException("닉네임 변경에 실패했습니다.");
+        }
+    }
 }

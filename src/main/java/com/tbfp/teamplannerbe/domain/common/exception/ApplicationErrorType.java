@@ -42,6 +42,7 @@ public enum ApplicationErrorType {
     INVALID_CONTACT_EMAIL(HttpStatus.BAD_REQUEST, -20003, "입력하신 아이디에 등록된 이메일이 아닙니다."),
     MAIL_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, -20004, "메일 전송 중 오류가 발생했습니다."),
     DUPLICATE_NICKNAME(HttpStatus.BAD_REQUEST,-20005,"이미 사용중인 닉네임입니다."),
+    NICKNAME_UPDATE_FAILED(HttpStatus.BAD_REQUEST, -20006,"닉네임 변경에 실패했습니다."),
 
 
     //회원가입

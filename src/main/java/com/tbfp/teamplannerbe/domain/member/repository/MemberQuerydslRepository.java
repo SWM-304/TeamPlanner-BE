@@ -34,4 +34,6 @@ public interface MemberQuerydslRepository {
 
 
     ProfileResponseDto.RecommendedUserResponseDto getRecommendedUserResponseDto(Long id, List<String> similarities);
+
+    void updateNickname(String username, String nickname);
 }

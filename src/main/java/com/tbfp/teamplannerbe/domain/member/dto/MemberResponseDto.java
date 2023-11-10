@@ -173,4 +173,12 @@ public class MemberResponseDto {
     public static class NickNameAndEmailVerifyResponseDto {
         private String message;
     }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateNicknameResponseDto {
+        private String message;
+    }
 }

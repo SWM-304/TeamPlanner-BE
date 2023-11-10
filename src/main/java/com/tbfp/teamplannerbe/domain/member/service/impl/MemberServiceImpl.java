@@ -434,4 +434,17 @@ public class MemberServiceImpl implements MemberService {
     public Member findMemberByNicknameOrElseThrowApplicationException(String nickname) {
         return memberRepository.findByNickname(nickname).orElseThrow(() -> new ApplicationException(USER_NOT_FOUND));
     }
+
+    @Override
+    public MemberResponseDto.UpdateNicknameResponseDto updateNickname(String username, MemberRequestDto.UpdateNicknameRequestDto updateNicknameRequestDto){
+        String nickname = updateNicknameRequestDto.getNickname();
+        try{
+            memberRepository.updateNickname(username,nickname);
+            return MemberResponseDto.UpdateNicknameResponseDto.builder()
+                    .message("성공적으로 닉네임을 변경했습니다.")
+                    .build();
+        } catch (RuntimeException e){
+            throw new ApplicationException(NICKNAME_UPDATE_FAILED);
+        }
+    }
 }
